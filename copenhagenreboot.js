@@ -331,6 +331,14 @@ function (dojo, declare) {
 
             dojo.style("shadow_box", "opacity","0"); // note - don't use the (#) pound symbol for this function
             
+            // set elements behind the shadow box
+            dojo.query("#harbors").addClass("behind_shadow_box");
+            dojo.query("#deck_cards").addClass("behind_shadow_box");
+            dojo.query("#harbor_cards").addClass("behind_shadow_box");
+            dojo.query("#polyominoes").addClass("behind_shadow_box");  
+            dojo.query("#opponent_playerboards").addClass("behind_shadow_box");  
+
+
             dojo.animateProperty({
                 node: "shadow_box",
                 duration: 500,

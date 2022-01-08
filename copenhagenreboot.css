@@ -97,6 +97,7 @@
 
 #deck_cards
 {
+    position: relative;
     width: 28px;
     display: inline-block;
 }
@@ -117,6 +118,7 @@
 
 #harbor_cards
 {
+    position:  relative;
     display: inline-block;
     font-size: 0px; /* used to ignore whitespace, keep HTML readable */
 }
