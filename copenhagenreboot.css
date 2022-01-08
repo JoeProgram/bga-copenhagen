@@ -1,0 +1,535 @@
+/**
+ *------
+ * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
+ * CopenhagenReboot implementation : © <Your name here> <Your email address here>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ *
+ * copenhagenreboot.css
+ *
+ * CopenhagenReboot stylesheet
+ *
+ */
+
+/*
+    This is the CSS stylesheet of your game User Interface.
+    
+    Styles defined on this file will be applied to the HTML elements you define in your
+    HTML template (copenhagenreboot_copenhagenreboot.tpl), and to HTML elements you create dynamically
+    (in copenhagenreboot.js).
+    
+    Usually, you are using CSS to:
+    
+    1°) define the overall layout of your game
+        (ex: place the board on the top left, place player's hand beside, place the deck on the right, ...).
+
+    2°) create your CSS-sprites:
+        All images of your games should be gathered into a small number of image files. Then, using
+        background-image and background-position CSS properties, you create HTML blocks that can 
+        display these images correctly (see example below).
+    
+    3°) ... anything else:
+        It is really easy to add and remove CSS classes dynamically from your Javascript with
+        dojo.addClass and dojo.removeClass. It is also easy to check if an element has a class
+        (dojo.hasClass) or to get all elements with a specific class (dojo.query). This is why,
+        very often, using CSS classes for the logic of your user interface allow you to do complex
+        thing easily.
+        
+        
+     Note: on the production platform, this file will be compressed and comments will be removed.
+           Consequently, don't hesitate to put as many comments as necessary.
+*/
+
+
+/* Note: you must not use any @import directive */
+
+
+/********* You can start writing your CSS below this line: **********/
+
+
+/*
+    Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
+
+    .white_token {
+        background-image: url('img/tokens.png');
+        background-position: 0px 0px;
+    }
+    .black_token {
+        background-image: url('img/tokens.png');
+        background-position: -20px 0px;
+    }
+    .token {
+        width: 20px;
+        height: 20px;
+        background-repeat: none;
+    }
+*/
+
+#playspace
+{
+    width: 730px;
+    height: 1000px;
+    border:  1px solid white;
+}
+
+#harbors
+{
+    position: relative;
+    display:  inline-block;
+    margin-left: 30px;
+    height: 7px;
+    width: 462px;
+    font-size: 0px; /* used to ignore whitespace, keep HTML readable */
+
+}
+
+.harbor
+{
+    display: inline-block;
+    width: 66px;
+    height: 7px;
+    background-image:  url('img/harbor.png');
+    background-repeat: no-repeat;
+
+}
+
+#deck_cards
+{
+    width: 28px;
+    display: inline-block;
+}
+
+#deck
+{
+    width: 28px;
+    height: 41px;  
+    background-color: brown; 
+}
+
+#mermaid_card
+{
+    width: 28px;
+    height: 41px;
+    background-color: red;
+}
+
+#harbor_cards
+{
+    display: inline-block;
+    font-size: 0px; /* used to ignore whitespace, keep HTML readable */
+}
+
+#harbor_cards .card
+{
+    width: 65px;
+    height: 94px;
+    background-image:  url('img/cards.png');
+    display: inline-block;
+    margin:  0px;
+    padding:  0px;
+}
+
+#polyominoes
+{
+    position: absolute;
+    width:  477px;
+    height:  370px;
+    display:  block;
+}
+
+#polyominoes .polyomino
+{
+    background-image: url('img/polyominoes.png');
+    position: absolute;
+
+
+}
+
+.polyomino:hover
+{
+    border:  1px solid white;
+}
+
+.polyomino.purple-2
+{
+    background-position: 0px -207px;
+    width: 64px;
+    height: 32px;
+
+    left: 0px;
+    top: 4px;
+}
+
+.polyomino.purple-3
+{
+    background-position: 0px -170px;
+    width: 95px;
+    height: 32px;
+
+    left: 76px;
+    top: 4px;
+}
+
+.polyomino.purple-4
+{
+    background-position: -292px 0px;
+    width: 127px;
+    height: 32px;
+
+    left: 181px;
+    top: 4px;
+}
+
+.polyomino.purple-5
+{
+    background-position: -195px -170px;
+    width: 158px;
+    height: 32px;
+
+    left: 319px;
+    top: 4px;
+}
+
+.polyomino.green-2
+{
+    background-position: -73px -207px;
+    width: 64px;
+    height: 32px;
+
+    top: 45px;
+}
+
+.polyomino.green-3
+{
+    background-position: -97px -169px;
+    width: 96px;
+    height: 32px;
+
+    top: 45px;
+    left: 76px;
+    
+}
+
+.polyomino.green-4
+{
+    background-position: -97px -96px;
+    width: 96px;
+    height: 64px;
+
+    top: 45px;
+    left:  180px;
+}
+
+.polyomino.green-5
+{
+    background-position: -97px 0px;
+    width: 96px;
+    height: 96px;
+
+    top: 45px;
+    left: 285px;
+}
+
+.polyomino.red-2
+{
+    background-position: -146px -207px;
+    width: 64px;
+    height: 32px;
+
+    top: 136px;
+    left: 0px;
+}
+
+.polyomino.red-3
+{
+    background-position: -365px -34px;
+    width: 64px;
+    height: 63px;
+
+    top: 136px;
+    left: 76px;
+}
+
+.polyomino.red-4
+{
+    background-position: 0px -243px;
+    width: 64px;
+    height: 64px;
+
+    top: 136px;
+    left: 143px;
+}
+
+.polyomino.red-5
+{
+    background-position: 0px -97px;
+    width: 96px;
+    height: 64px;
+
+    top: 136px;
+    left: 218px;
+}
+
+.polyomino.blue-2
+{
+    background-position: -219px -207px;
+    width: 64px;
+    height: 32px;
+
+    top: 213px;
+}
+
+.polyomino.blue-3
+{
+    background-position: -292px -34px;
+    width: 64px;
+    height: 63px;
+
+    top: 213px;
+    left: 78px;
+}
+
+.polyomino.blue-4
+{
+    background-position: -195px -97px;
+    width: 96px;
+    height: 64px;
+
+    top: 213px;
+    left:  169px;
+
+}
+
+.polyomino.blue-5
+{
+    background-position: -195px 0px;
+    width: 96px;
+    height: 96px;
+
+    top: 183px;
+    left: 285px;
+}
+
+.polyomino.yellow-2
+{
+    background-position: -292px -207px;
+    width: 64px;
+    height: 32px;
+
+    top: 311px;
+}
+
+.polyomino.yellow-3
+{
+    background-position: -365px -170px;
+    width: 64px;
+    height: 64px;
+
+    left: 78px;
+    top: 311px;
+}
+
+.polyomino.yellow-4
+{
+    background-position: -292px -97px;
+    width: 96px;
+    height: 64px;
+
+    left:  169px;
+    top: 311px;
+}
+
+.polyomino.yellow-5
+{
+    background-position: 0px 0px;
+    width: 96px;
+    height: 96px;
+
+    left: 285px;
+    top:  279px;
+}
+
+.player_area
+{
+    width: 233px;
+    position: relative;
+    display: inline-block;
+    margin-bottom: 20px;
+}
+
+.playerboard
+{
+    width: 233px;
+    height: 431px;
+    background-image:  url('img/playerboards.png');
+    position: relative;
+}
+
+.playerboard.blue{ background-position: 0px 0px; }
+.playerboard.yellow{ background-position: -238px 0px; }
+.playerboard.green{ background-position: -476px 0px; }
+.playerboard.red{ background-position: -714px 0px; }
+
+
+.board_cell
+{
+    display:  inline-block;
+    position: absolute;
+    width: 32px;
+    height: 32px;
+    background-color: black;
+    cursor: pointer;
+}
+
+.board_cell.full
+{
+    background-color: white;
+}
+
+.board_cell.preview
+{
+    background-color:  blue;
+}
+
+.board_cell.preview.invalid
+{
+    background-color:  red;
+}
+
+
+
+#board_cell_0_8{ top: 63px; left:  17px; }
+#board_cell_0_7{ top: 98px; left:  17px; }
+#board_cell_0_6{ top: 133px; left: 17px; }
+#board_cell_0_5{ top: 167px; left: 17px; }
+#board_cell_0_4{ top: 201px; left: 17px; }
+#board_cell_0_3{ top: 237px; left: 17px; }
+#board_cell_0_2{ top: 271px; left: 17px; }
+#board_cell_0_1{ top: 305px; left: 17px; }
+#board_cell_0_0{ top: 339px; left: 17px; }
+
+#board_cell_1_8{ top: 63px; left:  51px; }
+#board_cell_1_7{ top: 98px; left:  51px; }
+#board_cell_1_6{ top: 133px; left: 51px; }
+#board_cell_1_5{ top: 167px; left: 51px; }
+#board_cell_1_4{ top: 201px; left: 51px; }
+#board_cell_1_3{ top: 237px; left: 51px; }
+#board_cell_1_2{ top: 271px; left: 51px; }
+#board_cell_1_1{ top: 305px; left: 51px; }
+#board_cell_1_0{ top: 339px; left: 51px; }
+
+#board_cell_2_8{ top: 63px; left:  85px; }
+#board_cell_2_7{ top: 98px; left:  85px; }
+#board_cell_2_6{ top: 133px; left: 85px; }
+#board_cell_2_5{ top: 167px; left: 85px; }
+#board_cell_2_4{ top: 201px; left: 85px; }
+#board_cell_2_3{ top: 237px; left: 85px; }
+#board_cell_2_2{ top: 271px; left: 85px; }
+#board_cell_2_1{ top: 305px; left: 85px; }
+#board_cell_2_0{ top: 339px; left: 85px; }
+
+#board_cell_3_8{ top: 63px; left:  119px; }
+#board_cell_3_7{ top: 98px; left:  119px; }
+#board_cell_3_6{ top: 133px; left: 119px; }
+#board_cell_3_5{ top: 167px; left: 119px; }
+#board_cell_3_4{ top: 201px; left: 119px; }
+#board_cell_3_3{ top: 237px; left: 119px; }
+#board_cell_3_2{ top: 271px; left: 119px; }
+#board_cell_3_1{ top: 305px; left: 119px; }
+#board_cell_3_0{ top: 339px; left: 119px; }
+
+#board_cell_4_8{ top: 63px; left:  153px; }
+#board_cell_4_7{ top: 98px; left:  153px; }
+#board_cell_4_6{ top: 133px; left: 153px; }
+#board_cell_4_5{ top: 167px; left: 153px; }
+#board_cell_4_4{ top: 201px; left: 153px; }
+#board_cell_4_3{ top: 237px; left: 153px; }
+#board_cell_4_2{ top: 271px; left: 153px; }
+#board_cell_4_1{ top: 305px; left: 153px; }
+#board_cell_4_0{ top: 339px; left: 153px; }
+
+
+#owned_player_area
+{
+    position: absolute;
+    top: 0px;
+    left: 496px;
+}
+
+#opponent_playerboards
+{
+    position:  absolute;
+    top: 500px;
+    width: 730px;
+}
+
+#opponent_playerboards .playerboard
+{
+    display: inline-block;
+}
+
+#opponent1_playerboard
+{
+   position: relative; 
+}
+
+#opponent2_playerboard
+{
+   position: relative; 
+}
+
+#opponent3_playerboard
+{
+   position: relative; 
+}
+
+
+.ability_tile_area
+{
+    margin-top: 5px;
+}
+
+.ability_tile
+{
+    background-image: url('img/tiles.png');
+    width: 43px;
+    height: 43px;
+    display: inline-block;
+}
+
+.ability_tile.any_cards{
+    background-position: -194px 0px;
+}
+
+.ability_tile.additional_card{
+        background-position: -145.5px 0px;
+}
+.ability_tile.construction_discount{
+        background-position: -97px 0px;
+}
+.ability_tile.change_of_colors{
+        background-position: -48.5px 0px;
+}
+.ability_tile.both_actions{
+        background-position: 0px 0px;
+}
+
+#shadow_box{
+    display:  block;
+    position: fixed;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    opacity: 0;
+    z-index: -1;
+}
+
+.behind_shadow_box{
+    z-index: -2;
+}
+
+
