@@ -338,6 +338,8 @@ function (dojo, declare) {
             dojo.query("#polyominoes").addClass("behind_shadow_box");  
             dojo.query("#opponent_playerboards").addClass("behind_shadow_box");  
 
+            dojo.query("#polyomino_placement_buttons").style("display","block");
+
 
             dojo.animateProperty({
                 node: "shadow_box",
