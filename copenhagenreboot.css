@@ -106,14 +106,16 @@
 {
     width: 28px;
     height: 41px;  
-    background-color: brown; 
+    background-image: url('img/tiny_cards.png');
+    background-position: 0px 0px;
 }
 
 #mermaid_card
 {
     width: 28px;
     height: 41px;
-    background-color: red;
+    background-image: url('img/tiny_cards.png');
+    background-position: 0px -42px;
 }
 
 #harbor_cards
