@@ -90,7 +90,7 @@ function (dojo, declare) {
             this.showPlayerBoardDebug( this.board );
 
 
-            // Setting up player boards
+            // Setting up player boards 
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
@@ -102,9 +102,6 @@ function (dojo, declare) {
             dojo.query(".board_cell").connect( 'onclick', this, 'onPlacePolyomino');
             dojo.query(".board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
             dojo.query("#polyominoes .polyomino").connect( 'onclick', this, 'onSelectPolyomino');
-
-            // DEBUGGING
-            dojo.query("#mermaid_card").connect('onclick', this, "fadeInShadowBox");
 
 
             // TODO: Set up your game interface here, according to "gamedatas"
@@ -338,7 +335,7 @@ function (dojo, declare) {
             dojo.query("#polyominoes").addClass("behind_shadow_box");  
             dojo.query("#opponent_playerboards").addClass("behind_shadow_box");  
 
-            dojo.query("#polyomino_placement_buttons").style("display","block");
+            dojo.query("#polyomino_placement").style("display","block");
 
 
             dojo.animateProperty({
@@ -350,6 +347,26 @@ function (dojo, declare) {
                 }
             }).play();
 
+        },
+
+        fadeOutShadowBox: function()
+        {
+            dojo.query("#harbors").removeClass("behind_shadow_box");
+            dojo.query("#deck_cards").removeClass("behind_shadow_box");
+            dojo.query("#harbor_cards").removeClass("behind_shadow_box");
+            dojo.query("#polyominoes").removeClass("behind_shadow_box");  
+            dojo.query("#opponent_playerboards").removeClass("behind_shadow_box"); 
+
+            dojo.query("#polyomino_placement").style("display","none");
+
+            dojo.animateProperty({
+                node: "shadow_box",
+                duration: 500,
+                properties: 
+                {
+                    opacity: {start: 0.5, end: 0},
+                }
+            }).play(); 
         },
 
 
@@ -403,8 +420,17 @@ function (dojo, declare) {
 
         onSelectPolyomino: function( event )
         {
-            var polyominoName = event.currentTarget.id.split("_")[0];
-            this.selectedPolyomino = this.polyominoShapes[polyominoName];
+
+            this.selectedPolyomino = {};
+
+            this.selectedPolyomino["id"] = event.currentTarget.id;
+            this.selectedPolyomino["name"] = this.selectedPolyomino["id"].split("_")[0];
+            this.selectedPolyomino["shape"] = this.polyominoShapes[this.selectedPolyomino["name"]];
+
+            this.fadeInShadowBox(); // have to fade in the shadow box first - or the display:none css style won't allow the polyomino to slide to the target correctly
+
+            this.attachToNewParent( event.currentTarget, "polyomino_placement");
+            this.slideToObject( this.selectedPolyomino["id"], "polyomino_placement_target", 500 ).play();
         },
 
         onPreviewPlacePolyomino: function( event )
@@ -415,7 +441,7 @@ function (dojo, declare) {
             if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
 
             var coordinates = this.getCoordinatesFromId( event.currentTarget.id);
-            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino, coordinates );
+            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , coordinates );
             var validity = this.isValidPlacementPosition( gridCells );
 
             // DISPLAY PREVIEW
@@ -432,7 +458,7 @@ function (dojo, declare) {
             if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
  
             var coordinates = this.getCoordinatesFromId( event.currentTarget.id);
-            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino, coordinates );
+            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , coordinates );
             var validity = this.isValidPlacementPosition( gridCells );
 
             if( !validity ) return; // can't place polyomino if space isn't valid
@@ -443,6 +469,13 @@ function (dojo, declare) {
             });
 
             this.showPlayerBoardDebug( this.board );
+
+            this.attachToNewParent(  this.selectedPolyomino["id"], "owned_playerboard");
+
+             // TODO: position polyomino correctly
+            this.slideToObject( this.selectedPolyomino["id"], "board_cell_0_0", 500 ).play();
+
+            this.fadeOutShadowBox();
 
         },
 

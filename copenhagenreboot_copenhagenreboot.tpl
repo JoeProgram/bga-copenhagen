@@ -167,9 +167,12 @@
     </div>
 
     <div id="shadow_box"></div>
-    <div id="polyomino_placement_buttons">
-        <div id="polyomino_rotate_button"></div>
-        <div id="polyomino_flip_button"></div>
+    <div id="polyomino_placement">
+        <div id="polyomino_placement_target"></div>
+        <div id="polyomino_placement_buttons">
+            <div id="polyomino_rotate_button"></div>
+            <div id="polyomino_flip_button"></div>
+        </div>
     </div>
 
 </div>

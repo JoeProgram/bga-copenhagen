@@ -143,12 +143,10 @@
     display:  block;
 }
 
-#polyominoes .polyomino
+.polyomino
 {
     background-image: url('img/polyominoes.png');
     position: absolute;
-
-
 }
 
 .polyomino:hover
@@ -536,9 +534,33 @@
     z-index: -2;
 }
 
-#polyomino_placement_buttons
+
+#polyomino_placement
 {
     display:  none;
+    position:  absolute;
+    left:  0px;
+    top:  0px;    
+}
+
+#polyomino_placement_target
+{
+    display:  block;
+    position: absolute;
+    left:  328px;
+    top: 128px;    
+    width: 158px;
+    height: 158px;
+}
+
+#polyomino_placement .polyomino
+{
+    filter:  drop-shadow(0.35rem 0.35rem 0.4rem rgba(0,0,0,0.5));
+}
+
+#polyomino_placement_buttons
+{
+    display:  block;
     position:  absolute;
     left:  0px;
     top:  0px;
@@ -548,8 +570,8 @@
 {
     display:  block;
     position: absolute;
-    left:  390px;
-    top: 187px;
+    left:  348px;
+    top: 286px;
     width: 55px;
     height: 55px;
     background-image: url('img/polyomino_buttons.png');
@@ -567,8 +589,8 @@
 {
     display: block;
     position: absolute;
-    left:  440px;
-    top: 187px;
+    left:  413px;
+    top: 286px;
     width: 55px;
     height: 55px;
     background-image: url('img/polyomino_buttons.png');
