@@ -147,6 +147,7 @@
 {
     background-image: url('img/polyominoes.png');
     position: absolute;
+    perspective: 1000px;
 }
 
 .polyomino:hover

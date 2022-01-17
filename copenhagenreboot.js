@@ -15,6 +15,7 @@
  *
  */
 
+
 define([
     "dojo","dojo/_base/declare",
     "ebg/core/gamegui",
@@ -102,6 +103,8 @@ function (dojo, declare) {
             dojo.query(".board_cell").connect( 'onclick', this, 'onPlacePolyomino');
             dojo.query(".board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
             dojo.query("#polyominoes .polyomino").connect( 'onclick', this, 'onSelectPolyomino');
+            dojo.query("#polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
+            dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
 
             // TODO: Set up your game interface here, according to "gamedatas"
@@ -426,11 +429,67 @@ function (dojo, declare) {
             this.selectedPolyomino["id"] = event.currentTarget.id;
             this.selectedPolyomino["name"] = this.selectedPolyomino["id"].split("_")[0];
             this.selectedPolyomino["shape"] = this.polyominoShapes[this.selectedPolyomino["name"]];
+            this.selectedPolyomino["rotation"] = 0;
+            this.selectedPolyomino["flip"] = 0;
 
             this.fadeInShadowBox(); // have to fade in the shadow box first - or the display:none css style won't allow the polyomino to slide to the target correctly
 
             this.attachToNewParent( event.currentTarget, "polyomino_placement");
             this.slideToObject( this.selectedPolyomino["id"], "polyomino_placement_target", 500 ).play();
+        },
+
+        onRotatePolyomino: function( event )
+        {
+
+            if( this.selectedPolyomino == null ) return;  // make sure a polyomino is selected
+
+            var polyominoNode = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
+
+            var flip = this.selectedPolyomino["flip"];  // need to pass this to a local variable to use it in animation scope
+
+            var rotationDegrees = flip == 0 ? 90 : -90; // if flipped, we need to rotate the other way so that the shape still rotates clockwise
+
+            // CODE SNIPPET FROM: https://forum.boardgamearena.com/viewtopic.php?t=15158
+            var animation = dojo.animateProperty({
+                node: polyominoNode,
+                duration: 500,
+                properties: {
+                    propertyTransform: {start: this.selectedPolyomino["rotation"], end: this.selectedPolyomino["rotation"] + rotationDegrees }
+                },
+                onAnimate: function (values) {
+                    dojo.style(this.node, 'transform', 'rotateY(' + flip + 'deg) rotateZ(' + parseFloat(values.propertyTransform.replace("px", "")) + 'deg)' );
+                }
+            });
+            animation.play();
+
+            this.selectedPolyomino["rotation"] = (this.selectedPolyomino["rotation"] + rotationDegrees) % 360;
+
+        },
+        
+        onFlipPolyomino: function( event )
+        {
+
+            if( this.selectedPolyomino == null ) return;  // make sure a polyomino is selected
+
+            var polyominoNode = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
+
+            var rotation = this.selectedPolyomino["rotation"]; // need to pass this to a local variable to use it in animation scope
+
+            // CODE SNIPPET FROM: https://forum.boardgamearena.com/viewtopic.php?t=15158
+            var animation = dojo.animateProperty({
+                node: polyominoNode,
+                duration: 500,
+                properties: {
+                    propertyTransform: {start: this.selectedPolyomino["flip"], end: this.selectedPolyomino["flip"]+180 }
+                },
+                onAnimate: function (values) {
+                    dojo.style(this.node, 'transform', 'rotateY(' + parseFloat(values.propertyTransform.replace("px", "")) + 'deg) rotateZ(' + rotation + 'deg)');
+                }
+            });
+            animation.play();
+
+            this.selectedPolyomino["flip"] = (this.selectedPolyomino["flip"] + 180) % 360;
+
         },
 
         onPreviewPlacePolyomino: function( event )
