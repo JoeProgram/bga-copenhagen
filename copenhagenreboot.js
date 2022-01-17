@@ -265,7 +265,7 @@ function (dojo, declare) {
             return this.areCellsEmpty( coordinates ) && this.isGroundedPosition( coordinates );
         },
 
-        getGridCellsForPolyominoAtCoordinates: function( polyomino, coordinates )
+        getGridCellsForPolyominoAtCoordinates: function( polyominoShape, coordinates )
         {
 
             results = [];
@@ -275,14 +275,14 @@ function (dojo, declare) {
             var boardHeight = this.boardHeight;
 
             // ADJUST PLACEMENT TO BE ON BOARD
-            var bounds = this.getPolyominoBounds( polyomino );
+            var bounds = this.getPolyominoBounds( polyominoShape );
             
             if( coordinates.x + bounds.min.x < 0 ) coordinates.x = -bounds.min.x; //scootch it to the right
             else if(coordinates.x + bounds.max.x >= boardWidth) coordinates.x = boardWidth - 1 - bounds.max.x; // scootch it to the left
 
             if( coordinates.y + bounds.max.y >= boardHeight) coordinates.y = boardHeight - 1 - bounds.max.y; // scootch it down
 
-            polyomino.forEach( function( polyCoord, index)
+            polyominoShape.forEach( function( polyCoord, index)
             {
 
                 var newCoord = {
@@ -299,14 +299,14 @@ function (dojo, declare) {
         },
 
         // returns the polyomino's rectangular bounds
-        getPolyominoBounds: function( polyomino )
+        getPolyominoBounds: function( polyominoShape )
         {
             var bounds = {
                 min: {x:0,y:0},
                 max: {x:0,y:0},
             };
 
-            polyomino.forEach( function( polyCoord, index)
+            polyominoShape.forEach( function( polyCoord, index)
             {
                 if( polyCoord.x < bounds.min.x ) bounds.min.x = polyCoord.x;
                 if( polyCoord.y < bounds.min.y ) bounds.min.y = polyCoord.y;
@@ -463,19 +463,34 @@ function (dojo, declare) {
 
             if( !validity ) return; // can't place polyomino if space isn't valid
 
-            var board = this.board; // scope issue - need to assign board to temp variable, since context of "this" changes in anonymous function
+            var board = this.board; // NOTE: scope issue - need to assign board to temp variable, since context of "this" changes in anonymous function
             gridCells.forEach( function(item, index){
                 board[item.x][item.y] = true;
             });
 
             this.showPlayerBoardDebug( this.board );
 
-            this.attachToNewParent(  this.selectedPolyomino["id"], "owned_playerboard");
+            // DETERMINE HTML PLACEMENT FOR POLYOMINO
+            var minX = gridCells[0].x;
+            var minY = gridCells[0].y;
+            for( var i = 1; i < gridCells.length; i++)
+            {
+                if( gridCells[i].x < minX) minX = gridCells[i].x;
+                if( gridCells[i].y < minY) minY = gridCells[i].y;
+            }
 
-             // TODO: position polyomino correctly
-            this.slideToObject( this.selectedPolyomino["id"], "board_cell_0_0", 500 ).play();
+            var minCellNode = dojo.query(`#board_cell_${minX}_${minY}`)[0];
+            var minCellNodePosition = dojo.position(minCellNode);
+
+            var htmlX = 0;
+            var htmlY = minCellNodePosition.h - dojo.position(this.selectedPolyomino["id"]).h;
+
+            this.attachToNewParent(  this.selectedPolyomino["id"], "owned_playerboard");
+            this.slideToObjectPos( this.selectedPolyomino["id"],minCellNode, htmlX, htmlY, 500 ).play();
 
             this.fadeOutShadowBox();
+
+            this.selectedPolyomino = null;
 
         },
 
