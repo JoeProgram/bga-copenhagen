@@ -43,13 +43,32 @@
 
     <div id="polyominoes">
         <div id="purple-2_1" class="polyomino purple-2"></div>
+        <div id="purple-2_2" class="polyomino purple-2"></div>
+        <div id="purple-2_3" class="polyomino purple-2 top_of_stack"></div>
+        
         <div id="purple-3_1" class="polyomino purple-3"></div>
+        <div id="purple-3_2" class="polyomino purple-3"></div>
+        <div id="purple-3_3" class="polyomino purple-3"></div>
+
         <div id="purple-4_1" class="polyomino purple-4"></div>
+        <div id="purple-4_2" class="polyomino purple-4"></div>
+        <div id="purple-4_3" class="polyomino purple-4"></div>
+
         <div id="purple-5_1" class="polyomino purple-5"></div>
 
+
         <div id="green-2_1" class="polyomino green-2"></div>
+        <div id="green-2_2" class="polyomino green-2"></div>
+        <div id="green-2_3" class="polyomino green-2"></div>
+
         <div id="green-3_1" class="polyomino green-3"></div>
+        <div id="green-3_2" class="polyomino green-3"></div>
+        <div id="green-3_3" class="polyomino green-3"></div>
+
         <div id="green-4_1" class="polyomino green-4"></div>
+        <div id="green-4_2" class="polyomino green-4"></div>
+        <div id="green-4_3" class="polyomino green-4"></div>
+
         <div id="green-5_1" class="polyomino green-5"></div>
 
         <div id="red-2_1" class="polyomino red-2"></div>

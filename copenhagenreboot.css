@@ -150,9 +150,10 @@
     perspective: 1000px;
 }
 
-.polyomino:hover
+.polyomino.top_of_stack:hover
 {
     filter:  drop-shadow(0px 0px 5px white);
+    cursor:  pointer;
 }
 
 .polyomino.purple-2  
@@ -160,20 +161,22 @@
     background-position: 0px -212px;
     width: 68px;
     height: 34px;
-
-    left: 0px;
-    top: 4px;
 }
+
+#purple-2_1{ left: 0px; top: 4px; }
+#purple-2_2{ left: 2px; top: 2px; }
+#purple-2_3{ left: 4px; top: 0px; }
 
 .polyomino.purple-3
 {
     background-position: 0px -176px;
     width: 102px;
     height: 34px;
-
-    left: 76px;
-    top: 4px;
 }
+
+#purple-3_1{ left: 74px; top: 4px; }
+#purple-3_2{ left: 76px; top: 2px; }
+#purple-3_3{ left: 78px; top: 0px; }
 
 .polyomino.purple-4
 {
@@ -185,13 +188,17 @@
     top: 4px;
 }
 
+#purple-4_1{ left: 181px; top: 4px; }
+#purple-4_2{ left: 183px; top: 2px; }
+#purple-4_3{ left: 185px; top: 0px; }
+
 .polyomino.purple-5
 {
     background-position: -208px -176px;
     width: 170px;
     height: 34px;
 
-    left: 319px;
+    left: 322px;
     top: 4px;
 }
 
@@ -200,30 +207,33 @@
     background-position: -70px -212px;
     width: 68px;
     height: 34px;
-
-    top: 45px;
 }
+
+#green-2_1{ left: 0px; top: 45px; }
+#green-2_2{ left: 2px; top: 43px; }
+#green-2_3{ left: 4px; top: 41px; }
 
 .polyomino.green-3
 {
     background-position: -104px -176px;
     width: 102px;
     height: 34px;
-
-    top: 45px;
-    left: 76px;
-    
 }
+
+#green-3_1{ left: 74px; top: 45px; }
+#green-3_2{ left: 76px; top: 43px; }
+#green-3_3{ left: 78px; top: 41px; }
 
 .polyomino.green-4
 {
     background-position: -104px -106px;
     width: 102px;
     height: 68px;
-
-    top: 45px;
-    left:  180px;
 }
+
+#green-4_1{ left: 181px; top: 45px; }
+#green-4_2{ left: 183px; top: 43px; }
+#green-4_3{ left: 185px; top: 41px; }
 
 .polyomino.green-5
 {
@@ -232,7 +242,7 @@
     height: 102px;
 
     top: 45px;
-    left: 285px;
+    left: 288px;
 }
 
 .polyomino.red-2
