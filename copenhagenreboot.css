@@ -405,6 +405,7 @@
 .board_cell.preview.invalid
 {
     background-color:  red;
+    opacity: 0.25;
 }
 
 
