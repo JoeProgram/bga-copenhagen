@@ -372,6 +372,58 @@ function (dojo, declare) {
             }).play(); 
         },
 
+        // get a copy of the shape,
+        // since we'll be editng it with rotates and flips
+        // and we don't want to mess with the orginal
+        getCopyOfShape: function( polyominoName )
+        {
+            var originalShape = this.polyominoShapes[polyominoName];
+
+            var copy = [];
+            for( var i = 0; i < originalShape.length; i++ )
+            {
+                copy.push({x:originalShape[i].x,y:originalShape[i].y});
+            } 
+            console.log( copy );
+            return copy;
+        },
+
+        rotatePolyominoShape: function( polyominoShape )
+        {
+            for( var i = 0; i < polyominoShape.length; i++)
+            {
+                polyominoShape[i] = { x:polyominoShape[i].y, y:-polyominoShape[i].x};  
+                console.log( polyominoShape[i] );
+            } 
+
+            return this.setNewShapeOrigin( polyominoShape ); 
+        },
+
+        setNewShapeOrigin: function( polyominoShape )
+        {
+            newOrigin = polyominoShape[0];
+
+            // find the lowest, left-most square
+            for( var i = 1; i < polyominoShape.length; i++)
+            {
+                if( 
+                    polyominoShape[i].y < newOrigin.y 
+                    || (polyominoShape[i].y == newOrigin.y && polyominoShape[i].x < newOrigin.x)
+                )
+                {
+                    newOrigin = polyominoShape[i];
+                }
+            }
+
+            // offset the other cells by so the lowest, left-most square is the origin
+            for( var i = 0; i < polyominoShape.length; i++) 
+            {
+                polyominoShape[i] = { x:polyominoShape[i].x - newOrigin.x, y:polyominoShape[i].y - newOrigin.y};
+            }
+
+            return polyominoShape;
+        },
+
 
         ///////////////////////////////////////////////////
         //// Player's action
@@ -428,7 +480,7 @@ function (dojo, declare) {
 
             this.selectedPolyomino["id"] = event.currentTarget.id;
             this.selectedPolyomino["name"] = this.selectedPolyomino["id"].split("_")[0];
-            this.selectedPolyomino["shape"] = this.polyominoShapes[this.selectedPolyomino["name"]];
+            this.selectedPolyomino["shape"] = this.getCopyOfShape(this.selectedPolyomino["name"]);
             this.selectedPolyomino["rotation"] = 0;
             this.selectedPolyomino["flip"] = 0;
 
@@ -463,6 +515,8 @@ function (dojo, declare) {
             animation.play();
 
             this.selectedPolyomino["rotation"] = (this.selectedPolyomino["rotation"] + rotationDegrees) % 360;
+
+            this.rotatePolyominoShape( this.selectedPolyomino["shape"] );
 
         },
         
