@@ -152,14 +152,14 @@
 
 .polyomino:hover
 {
-    border:  1px solid white;
+    /*border:  1px solid white;*/
 }
 
-.polyomino.purple-2
+.polyomino.purple-2  
 {
-    background-position: 0px -207px;
-    width: 64px;
-    height: 32px;
+    background-position: 0px -212px;
+    width: 68px;
+    height: 34px;
 
     left: 0px;
     top: 4px;
@@ -167,9 +167,9 @@
 
 .polyomino.purple-3
 {
-    background-position: 0px -170px;
-    width: 95px;
-    height: 32px;
+    background-position: 0px -176px;
+    width: 102px;
+    height: 34px;
 
     left: 76px;
     top: 4px;
@@ -177,9 +177,9 @@
 
 .polyomino.purple-4
 {
-    background-position: -292px 0px;
-    width: 127px;
-    height: 32px;
+    background-position: -312px 0px;
+    width: 136px;
+    height: 34px;
 
     left: 181px;
     top: 4px;
@@ -187,9 +187,9 @@
 
 .polyomino.purple-5
 {
-    background-position: -195px -170px;
-    width: 158px;
-    height: 32px;
+    background-position: -208px -176px;
+    width: 170px;
+    height: 34px;
 
     left: 319px;
     top: 4px;
@@ -197,18 +197,18 @@
 
 .polyomino.green-2
 {
-    background-position: -73px -207px;
-    width: 64px;
-    height: 32px;
+    background-position: -70px -212px;
+    width: 68px;
+    height: 34px;
 
     top: 45px;
 }
 
 .polyomino.green-3
 {
-    background-position: -97px -169px;
-    width: 96px;
-    height: 32px;
+    background-position: -104px -176px;
+    width: 102px;
+    height: 34px;
 
     top: 45px;
     left: 76px;
@@ -217,9 +217,9 @@
 
 .polyomino.green-4
 {
-    background-position: -97px -96px;
-    width: 96px;
-    height: 64px;
+    background-position: -104px -106px;
+    width: 102px;
+    height: 68px;
 
     top: 45px;
     left:  180px;
@@ -227,9 +227,9 @@
 
 .polyomino.green-5
 {
-    background-position: -97px 0px;
-    width: 96px;
-    height: 96px;
+    background-position: -104px 0px;
+    width: 102px;
+    height: 102px;
 
     top: 45px;
     left: 285px;
@@ -237,9 +237,9 @@
 
 .polyomino.red-2
 {
-    background-position: -146px -207px;
-    width: 64px;
-    height: 32px;
+    background-position: -140px -212px;
+    width: 68px;
+    height: 34px;
 
     top: 136px;
     left: 0px;
@@ -247,9 +247,9 @@
 
 .polyomino.red-3
 {
-    background-position: -365px -34px;
-    width: 64px;
-    height: 63px;
+    background-position: -382px -36px;
+    width: 68px;
+    height: 68px;
 
     top: 136px;
     left: 76px;
@@ -257,9 +257,9 @@
 
 .polyomino.red-4
 {
-    background-position: 0px -243px;
-    width: 64px;
-    height: 64px;
+    background-position: -450px -176px;
+    width: 68px;
+    height: 68px;
 
     top: 136px;
     left: 143px;
@@ -267,9 +267,9 @@
 
 .polyomino.red-5
 {
-    background-position: 0px -97px;
-    width: 96px;
-    height: 64px;
+    background-position: 0px -106px;
+    width: 102px;
+    height: 68px;
 
     top: 136px;
     left: 218px;
@@ -277,18 +277,18 @@
 
 .polyomino.blue-2
 {
-    background-position: -219px -207px;
-    width: 64px;
-    height: 32px;
+    background-position: -210px -212px;
+    width: 68px;
+    height: 34px;
 
     top: 213px;
 }
 
 .polyomino.blue-3
 {
-    background-position: -292px -34px;
-    width: 64px;
-    height: 63px;
+    background-position: -312px -36px;
+    width: 68px;
+    height: 68px;
 
     top: 213px;
     left: 78px;
@@ -296,9 +296,9 @@
 
 .polyomino.blue-4
 {
-    background-position: -195px -97px;
-    width: 96px;
-    height: 64px;
+    background-position: -208px -106px;
+    width: 102px;
+    height: 68px;
 
     top: 213px;
     left:  169px;
@@ -307,9 +307,9 @@
 
 .polyomino.blue-5
 {
-    background-position: -195px 0px;
-    width: 96px;
-    height: 96px;
+    background-position: -208px 0px;
+    width: 102px;
+    height: 102px;
 
     top: 183px;
     left: 285px;
@@ -317,18 +317,18 @@
 
 .polyomino.yellow-2
 {
-    background-position: -292px -207px;
-    width: 64px;
-    height: 32px;
+    background-position: -280px -212px;
+    width: 68px;
+    height: 34px;
 
     top: 311px;
 }
 
 .polyomino.yellow-3
 {
-    background-position: -365px -170px;
-    width: 64px;
-    height: 64px;
+    background-position: -380px -176px;
+    width: 68px;
+    height: 68px;
 
     left: 78px;
     top: 311px;
@@ -336,9 +336,9 @@
 
 .polyomino.yellow-4
 {
-    background-position: -292px -97px;
-    width: 96px;
-    height: 64px;
+    background-position: -312px -106px;
+    width: 102px;
+    height: 68px;
 
     left:  169px;
     top: 311px;
@@ -347,8 +347,8 @@
 .polyomino.yellow-5
 {
     background-position: 0px 0px;
-    width: 96px;
-    height: 96px;
+    width: 102px;
+    height: 102px;
 
     left: 285px;
     top:  279px;
@@ -382,7 +382,7 @@
     position: absolute;
     width: 32px;
     height: 32px;
-    background-color: black;
+    /*background-color: black;*/
     cursor: pointer;
 }
 
