@@ -364,31 +364,37 @@
 
 .playerboard
 {
-    width: 233px;
-    height: 431px;
+    width: 230px;
+    height: 425px;
     background-image:  url('img/playerboards.png');
     position: relative;
 }
 
 .playerboard.blue{ background-position: 0px 0px; }
-.playerboard.yellow{ background-position: -238px 0px; }
-.playerboard.green{ background-position: -476px 0px; }
-.playerboard.red{ background-position: -714px 0px; }
+.playerboard.yellow{ background-position: -230px 0px; }
+.playerboard.green{ background-position: -460px 0px; }
+.playerboard.red{ background-position: -680px 0px; }
 
+
+.playerboard .polyomino
+{
+    z-index: 1; /* Make sure the clickable cells are always in front of place polyominoes */
+}
 
 .board_cell
 {
     display:  inline-block;
     position: absolute;
-    width: 32px;
-    height: 32px;
-    /*background-color: black;*/
+    width: 34px;
+    height: 34px;
+    /*background-color: black; opacity: 0.25;*/
     cursor: pointer;
+    z-index: 2;
 }
 
 .board_cell.full
 {
-    background-color: white;
+    /*background-color: white;*/
 }
 
 .board_cell.preview
@@ -403,55 +409,55 @@
 
 
 
-#board_cell_0_8{ top: 63px; left:  17px; }
-#board_cell_0_7{ top: 98px; left:  17px; }
-#board_cell_0_6{ top: 133px; left: 17px; }
-#board_cell_0_5{ top: 167px; left: 17px; }
-#board_cell_0_4{ top: 201px; left: 17px; }
-#board_cell_0_3{ top: 237px; left: 17px; }
-#board_cell_0_2{ top: 271px; left: 17px; }
-#board_cell_0_1{ top: 305px; left: 17px; }
-#board_cell_0_0{ top: 339px; left: 17px; }
+#board_cell_0_8{ top: 61px; left:  16px; }
+#board_cell_0_7{ top: 95px; left:  16px; }
+#board_cell_0_6{ top: 129px; left: 16px; }
+#board_cell_0_5{ top: 163px; left: 16px; }
+#board_cell_0_4{ top: 197px; left: 16px; }
+#board_cell_0_3{ top: 231px; left: 16px; }
+#board_cell_0_2{ top: 265px; left: 16px; }
+#board_cell_0_1{ top: 299px; left: 16px; }
+#board_cell_0_0{ top: 333px; left: 16px; }
 
-#board_cell_1_8{ top: 63px; left:  51px; }
-#board_cell_1_7{ top: 98px; left:  51px; }
-#board_cell_1_6{ top: 133px; left: 51px; }
-#board_cell_1_5{ top: 167px; left: 51px; }
-#board_cell_1_4{ top: 201px; left: 51px; }
-#board_cell_1_3{ top: 237px; left: 51px; }
-#board_cell_1_2{ top: 271px; left: 51px; }
-#board_cell_1_1{ top: 305px; left: 51px; }
-#board_cell_1_0{ top: 339px; left: 51px; }
+#board_cell_1_8{ top: 61px; left:  50px; }
+#board_cell_1_7{ top: 95px; left:  50px; }
+#board_cell_1_6{ top: 129px; left: 50px; }
+#board_cell_1_5{ top: 163px; left: 50px; }
+#board_cell_1_4{ top: 197px; left: 50px; }
+#board_cell_1_3{ top: 231px; left: 50px; }
+#board_cell_1_2{ top: 265px; left: 50px; }
+#board_cell_1_1{ top: 299px; left: 50px; }
+#board_cell_1_0{ top: 333px; left: 50px; }
 
-#board_cell_2_8{ top: 63px; left:  85px; }
-#board_cell_2_7{ top: 98px; left:  85px; }
-#board_cell_2_6{ top: 133px; left: 85px; }
-#board_cell_2_5{ top: 167px; left: 85px; }
-#board_cell_2_4{ top: 201px; left: 85px; }
-#board_cell_2_3{ top: 237px; left: 85px; }
-#board_cell_2_2{ top: 271px; left: 85px; }
-#board_cell_2_1{ top: 305px; left: 85px; }
-#board_cell_2_0{ top: 339px; left: 85px; }
+#board_cell_2_8{ top: 61px; left:  84px; }
+#board_cell_2_7{ top: 95px; left:  84px; }
+#board_cell_2_6{ top: 129px; left: 84px; }
+#board_cell_2_5{ top: 163px; left: 84px; }
+#board_cell_2_4{ top: 197px; left: 84px; }
+#board_cell_2_3{ top: 231px; left: 84px; }
+#board_cell_2_2{ top: 265px; left: 84px; }
+#board_cell_2_1{ top: 299px; left: 84px; }
+#board_cell_2_0{ top: 333px; left: 84px; }
 
-#board_cell_3_8{ top: 63px; left:  119px; }
-#board_cell_3_7{ top: 98px; left:  119px; }
-#board_cell_3_6{ top: 133px; left: 119px; }
-#board_cell_3_5{ top: 167px; left: 119px; }
-#board_cell_3_4{ top: 201px; left: 119px; }
-#board_cell_3_3{ top: 237px; left: 119px; }
-#board_cell_3_2{ top: 271px; left: 119px; }
-#board_cell_3_1{ top: 305px; left: 119px; }
-#board_cell_3_0{ top: 339px; left: 119px; }
+#board_cell_3_8{ top: 61px; left:  118px; }
+#board_cell_3_7{ top: 95px; left:  118px; }
+#board_cell_3_6{ top: 129px; left: 118px; }
+#board_cell_3_5{ top: 163px; left: 118px; }
+#board_cell_3_4{ top: 197px; left: 118px; }
+#board_cell_3_3{ top: 231px; left: 118px; }
+#board_cell_3_2{ top: 265px; left: 118px; }
+#board_cell_3_1{ top: 299px; left: 118px; }
+#board_cell_3_0{ top: 333px; left: 118px; }
 
-#board_cell_4_8{ top: 63px; left:  153px; }
-#board_cell_4_7{ top: 98px; left:  153px; }
-#board_cell_4_6{ top: 133px; left: 153px; }
-#board_cell_4_5{ top: 167px; left: 153px; }
-#board_cell_4_4{ top: 201px; left: 153px; }
-#board_cell_4_3{ top: 237px; left: 153px; }
-#board_cell_4_2{ top: 271px; left: 153px; }
-#board_cell_4_1{ top: 305px; left: 153px; }
-#board_cell_4_0{ top: 339px; left: 153px; }
+#board_cell_4_8{ top: 61px; left:  152px; }
+#board_cell_4_7{ top: 95px; left:  152px; }
+#board_cell_4_6{ top: 129px; left: 152px; }
+#board_cell_4_5{ top: 163px; left: 152px; }
+#board_cell_4_4{ top: 197px; left: 152px; }
+#board_cell_4_3{ top: 231px; left: 152px; }
+#board_cell_4_2{ top: 265px; left: 152px; }
+#board_cell_4_1{ top: 299px; left: 152px; }
+#board_cell_4_0{ top: 333px; left: 152px; }
 
 
 #owned_player_area
