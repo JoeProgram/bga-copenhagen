@@ -528,6 +528,7 @@ function (dojo, declare) {
             });
 
             this.showPlayerBoardDebug( this.board );
+            dojo.query(".board_cell.preview").removeClass("preview");
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
             var minX = gridCells[0].x;

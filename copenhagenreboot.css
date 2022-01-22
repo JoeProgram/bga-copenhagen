@@ -152,7 +152,7 @@
 
 .polyomino:hover
 {
-    /*border:  1px solid white;*/
+    filter:  drop-shadow(0px 0px 5px white);
 }
 
 .polyomino.purple-2  
