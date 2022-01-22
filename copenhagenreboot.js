@@ -384,7 +384,6 @@ function (dojo, declare) {
             {
                 copy.push({x:originalShape[i].x,y:originalShape[i].y});
             } 
-            console.log( copy );
             return copy;
         },
 
@@ -393,7 +392,16 @@ function (dojo, declare) {
             for( var i = 0; i < polyominoShape.length; i++)
             {
                 polyominoShape[i] = { x:polyominoShape[i].y, y:-polyominoShape[i].x};  
-                console.log( polyominoShape[i] );
+            } 
+
+            return this.setNewShapeOrigin( polyominoShape ); 
+        },
+
+        flipPolyominoShape: function( polyominoShape )
+        {
+            for( var i = 0; i < polyominoShape.length; i++)
+            {
+                polyominoShape[i] = { x:-polyominoShape[i].x, y:polyominoShape[i].y};  
             } 
 
             return this.setNewShapeOrigin( polyominoShape ); 
@@ -543,6 +551,8 @@ function (dojo, declare) {
             animation.play();
 
             this.selectedPolyomino["flip"] = (this.selectedPolyomino["flip"] + 180) % 360;
+
+            this.flipPolyominoShape( this.selectedPolyomino["shape"] );
 
         },
 
