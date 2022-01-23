@@ -158,55 +158,57 @@
         <div id="owned_playerboard" class="playerboard blue">
             <div id="polyomino_preview"></div>
 
-            <div class="board_cell" id="board_cell_0_0"></div>
-            <div class="board_cell" id="board_cell_0_1"></div>
-            <div class="board_cell" id="board_cell_0_2"></div>
-            <div class="board_cell" id="board_cell_0_3"></div>
-            <div class="board_cell" id="board_cell_0_4"></div>
-            <div class="board_cell" id="board_cell_0_5"></div>
-            <div class="board_cell" id="board_cell_0_6"></div>
-            <div class="board_cell" id="board_cell_0_7"></div>
-            <div class="board_cell" id="board_cell_0_8"></div>
+            <div id="board_cells">
+                <div class="board_cell" id="board_cell_0_0"></div>
+                <div class="board_cell" id="board_cell_0_1"></div>
+                <div class="board_cell" id="board_cell_0_2"></div>
+                <div class="board_cell" id="board_cell_0_3"></div>
+                <div class="board_cell" id="board_cell_0_4"></div>
+                <div class="board_cell" id="board_cell_0_5"></div>
+                <div class="board_cell" id="board_cell_0_6"></div>
+                <div class="board_cell" id="board_cell_0_7"></div>
+                <div class="board_cell" id="board_cell_0_8"></div>
 
-            <div class="board_cell" id="board_cell_1_0"></div>
-            <div class="board_cell" id="board_cell_1_1"></div>
-            <div class="board_cell" id="board_cell_1_2"></div>
-            <div class="board_cell" id="board_cell_1_3"></div>
-            <div class="board_cell" id="board_cell_1_4"></div>
-            <div class="board_cell" id="board_cell_1_5"></div>
-            <div class="board_cell" id="board_cell_1_6"></div>
-            <div class="board_cell" id="board_cell_1_7"></div>
-            <div class="board_cell" id="board_cell_1_8"></div>
+                <div class="board_cell" id="board_cell_1_0"></div>
+                <div class="board_cell" id="board_cell_1_1"></div>
+                <div class="board_cell" id="board_cell_1_2"></div>
+                <div class="board_cell" id="board_cell_1_3"></div>
+                <div class="board_cell" id="board_cell_1_4"></div>
+                <div class="board_cell" id="board_cell_1_5"></div>
+                <div class="board_cell" id="board_cell_1_6"></div>
+                <div class="board_cell" id="board_cell_1_7"></div>
+                <div class="board_cell" id="board_cell_1_8"></div>
 
-            <div class="board_cell" id="board_cell_2_0"></div>
-            <div class="board_cell" id="board_cell_2_1"></div>
-            <div class="board_cell" id="board_cell_2_2"></div>
-            <div class="board_cell" id="board_cell_2_3"></div>
-            <div class="board_cell" id="board_cell_2_4"></div>
-            <div class="board_cell" id="board_cell_2_5"></div>
-            <div class="board_cell" id="board_cell_2_6"></div>
-            <div class="board_cell" id="board_cell_2_7"></div>
-            <div class="board_cell" id="board_cell_2_8"></div>
+                <div class="board_cell" id="board_cell_2_0"></div>
+                <div class="board_cell" id="board_cell_2_1"></div>
+                <div class="board_cell" id="board_cell_2_2"></div>
+                <div class="board_cell" id="board_cell_2_3"></div>
+                <div class="board_cell" id="board_cell_2_4"></div>
+                <div class="board_cell" id="board_cell_2_5"></div>
+                <div class="board_cell" id="board_cell_2_6"></div>
+                <div class="board_cell" id="board_cell_2_7"></div>
+                <div class="board_cell" id="board_cell_2_8"></div>
 
-            <div class="board_cell" id="board_cell_3_0"></div>
-            <div class="board_cell" id="board_cell_3_1"></div>
-            <div class="board_cell" id="board_cell_3_2"></div>
-            <div class="board_cell" id="board_cell_3_3"></div>
-            <div class="board_cell" id="board_cell_3_4"></div>
-            <div class="board_cell" id="board_cell_3_5"></div>
-            <div class="board_cell" id="board_cell_3_6"></div>
-            <div class="board_cell" id="board_cell_3_7"></div>
-            <div class="board_cell" id="board_cell_3_8"></div>
+                <div class="board_cell" id="board_cell_3_0"></div>
+                <div class="board_cell" id="board_cell_3_1"></div>
+                <div class="board_cell" id="board_cell_3_2"></div>
+                <div class="board_cell" id="board_cell_3_3"></div>
+                <div class="board_cell" id="board_cell_3_4"></div>
+                <div class="board_cell" id="board_cell_3_5"></div>
+                <div class="board_cell" id="board_cell_3_6"></div>
+                <div class="board_cell" id="board_cell_3_7"></div>
+                <div class="board_cell" id="board_cell_3_8"></div>
 
-            <div class="board_cell" id="board_cell_4_0"></div>
-            <div class="board_cell" id="board_cell_4_1"></div>
-            <div class="board_cell" id="board_cell_4_2"></div>
-            <div class="board_cell" id="board_cell_4_3"></div>
-            <div class="board_cell" id="board_cell_4_4"></div>
-            <div class="board_cell" id="board_cell_4_5"></div>
-            <div class="board_cell" id="board_cell_4_6"></div>
-            <div class="board_cell" id="board_cell_4_7"></div>
-            <div class="board_cell" id="board_cell_4_8"></div>
+                <div class="board_cell" id="board_cell_4_0"></div>
+                <div class="board_cell" id="board_cell_4_1"></div>
+                <div class="board_cell" id="board_cell_4_2"></div>
+                <div class="board_cell" id="board_cell_4_3"></div>
+                <div class="board_cell" id="board_cell_4_4"></div>
+                <div class="board_cell" id="board_cell_4_5"></div>
+                <div class="board_cell" id="board_cell_4_6"></div>
+                <div class="board_cell" id="board_cell_4_7"></div>
+                <div class="board_cell" id="board_cell_4_8"></div>
+            </div>
 
             
         </div>

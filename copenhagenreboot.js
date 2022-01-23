@@ -102,6 +102,7 @@ function (dojo, declare) {
             
             dojo.query(".board_cell").connect( 'onclick', this, 'onPlacePolyomino');
             dojo.query(".board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
+            dojo.query("#board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
             dojo.query("#polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
@@ -445,8 +446,12 @@ function (dojo, declare) {
             return polyominoShape;
         },
 
-        determineHtmlPlacementForPolyominoAtCell: function( gridCells )
+        // Figure out what the css top and left coordinates should be for the polyomino if placed at the list of grid cells
+        //   Passing polyomino is important - since sometimes we're positioning the selected polyomino, and sometimes the polyomino preview
+        //   and the polyomino preview can't use the selected polyomino's properties while it's doing a rotation or flip animation
+        determineHtmlPlacementForPolyominoAtCell: function( polyominoNode, gridCells )
         {
+            // FIND THE GRID CELL AT MINX, MINY BOUNDARY
             var minX = gridCells[0].x;
             var minY = gridCells[0].y;
             for( var i = 1; i < gridCells.length; i++)
@@ -458,8 +463,9 @@ function (dojo, declare) {
             var minCellNode = dojo.query(`#board_cell_${minX}_${minY}`)[0];
             var minCellNodePosition = dojo.position(minCellNode);
 
+            // POSITION POLYOMINO AT THAT GRID CELL
             var htmlX = 0;
-            var htmlY = minCellNodePosition.h - dojo.position(this.selectedPolyomino["id"]).h;
+            var htmlY = minCellNodePosition.h - dojo.position(polyominoNode).h;
 
             return {htmlX:htmlX, htmlY:htmlY, minCellNode:minCellNode};
         },
@@ -528,6 +534,13 @@ function (dojo, declare) {
 
             this.attachToNewParent( event.currentTarget, "polyomino_placement");
             this.slideToObject( this.selectedPolyomino["id"], "polyomino_placement_target", 500 ).play();
+
+            // prepare polyomino preview for use
+            var polyomino = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
+            dojo.style("polyomino_preview","background-position", dojo.getStyle(polyomino, "background-position"));
+            dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
+            dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
+            dojo.style("polyomino_preview","transform",""); // reset the transform from whatever it was before
         },
 
         onRotatePolyomino: function( event )
@@ -544,7 +557,7 @@ function (dojo, declare) {
             // CODE SNIPPET FROM: https://forum.boardgamearena.com/viewtopic.php?t=15158
             var animation = dojo.animateProperty({
                 node: polyominoNode,
-                duration: 250,
+                duration: 500,
                 properties: {
                     propertyTransform: {start: this.selectedPolyomino["rotation"], end: this.selectedPolyomino["rotation"] + rotationDegrees }
                 },
@@ -558,6 +571,9 @@ function (dojo, declare) {
 
             this.rotatePolyominoShape( this.selectedPolyomino["shape"] );
 
+            // prepare preview polyomino - set in final position
+            dojo.style("polyomino_preview","transform", `rotateY(${this.selectedPolyomino["flip"]}deg) rotateZ(${this.selectedPolyomino["rotation"]}deg)`);
+
         },
         
         onFlipPolyomino: function( event )
@@ -570,9 +586,10 @@ function (dojo, declare) {
             var rotation = this.selectedPolyomino["rotation"]; // need to pass this to a local variable to use it in animation scope
 
             // CODE SNIPPET FROM: https://forum.boardgamearena.com/viewtopic.php?t=15158
+
             var animation = dojo.animateProperty({
                 node: polyominoNode,
-                duration: 250,
+                duration: 500,
                 properties: {
                     propertyTransform: {start: this.selectedPolyomino["flip"], end: this.selectedPolyomino["flip"]+180 }
                 },
@@ -585,6 +602,9 @@ function (dojo, declare) {
             this.selectedPolyomino["flip"] = (this.selectedPolyomino["flip"] + 180) % 360;
 
             this.flipPolyominoShape( this.selectedPolyomino["shape"] );
+
+            // prepare preview polyomino - set in final position
+            dojo.style("polyomino_preview","transform", `rotateY(${this.selectedPolyomino["flip"]}deg) rotateZ(${this.selectedPolyomino["rotation"]}deg)`);
 
         },
 
@@ -610,22 +630,22 @@ function (dojo, declare) {
             // SHOW IF VALID
             else
             {
-                var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCell( gridCells );
+                
+                dojo.style("polyomino_preview","display","block"); // have to display node before placing it - or we can't get the height of it correctly for htmlPlacement
 
-                var polyomino = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
-
-                // copy the style of the selected polyomino onto the preview
-                dojo.style("polyomino_preview","display","block");
-                dojo.style("polyomino_preview","background-position", dojo.getStyle(polyomino, "background-position"));
-                dojo.style("polyomino_preview","transform", dojo.getStyle(polyomino, "transform"));
-                dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
-                dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
+                var polyominoPreviewNode = dojo.query("#polyomino_preview")[0];
+                var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCell( polyominoPreviewNode, gridCells );
 
                 this.slideToObjectPos( "polyomino_preview",htmlPlacement.minCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 0).play(); // use this instead of placeOnObjectPos, as I placeOnObjectPos does centering I don't want
 
             }
 
 
+        },
+
+        onClearPreviewPolyomino: function( event )
+        {
+            this.clearPreview();
         },
 
         onPlacePolyomino: function( event )
@@ -646,10 +666,12 @@ function (dojo, declare) {
 
             this.showPlayerBoardDebug( this.board );
             dojo.query(".board_cell.preview").removeClass("preview");
-            dojo.query(`#${this.selectedPolyomino["id"]}`).removeClass("top_of_stack");
+
+            var polyominoNode = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
+            dojo.removeClass(polyominoNode, "top_of_stack");
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
-            var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCell( gridCells );
+            var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCell( polyominoNode, gridCells );
 
             this.attachToNewParent(  this.selectedPolyomino["id"], "owned_playerboard");
             this.slideToObjectPos( this.selectedPolyomino["id"],htmlPlacement.minCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ).play();
