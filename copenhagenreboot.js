@@ -41,6 +41,8 @@ function (dojo, declare) {
             this.maxHandSizeDiscardHandlers = []; // keep track of the events we attach to cards to allow the player to discard - since we'll want to disconnect them afterwards
 
             this.cardColorOrder = ["red_card", "yellow_card", "green_card", "blue_card", "purple_card"];
+            this.adjacentOffsets = [{x:1,y:0}, {x:0,y:-1}, {x:-1,y:0}, {x:0,y:1}];
+
 
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
@@ -385,12 +387,13 @@ function (dojo, declare) {
             return polyominoId.split('-')[1].split('_')[0];
         },
 
-        payPolyominoCost: function( polyominoId )
+        payPolyominoCost: function( polyominoId, gridCells )
         {
             var color = this.getPolyominoColorFromId( polyominoId );
             var squares = this.getPolyominoSquaresFromId( polyominoId );
 
             var cost = squares;
+            if( this.isAdjacentToSameColor( gridCells, color)) cost -= 1;
 
             for( var i = 0; i < cost; i++ ) this.discardCardOfColor( color );
         },
@@ -457,8 +460,25 @@ function (dojo, declare) {
             return false;
         },
 
-        isAdjacentToSameColor: function( coordinates, color )
+        isAdjacentToSameColor: function( gridCells, color )
         {
+            for( var i = 0; i < gridCells.length; i++ )
+            {
+                if( this.isCellAdjacentToSameColor( gridCells[i], color )) return true;
+            }
+            return false;
+        },
+
+        isCellAdjacentToSameColor: function( coordinate, color )
+        {
+            for( var i = 0; i < this.adjacentOffsets.length ; i++)
+            {
+                var x = coordinate.x + this.adjacentOffsets[i].x;
+                var y = coordinate.y + this.adjacentOffsets[i].y;
+
+                if(dojo.query( `#board_cell_${x}_${y}.${color}_cell`).length > 0) return true;
+            }
+
             return false;
         },
 
@@ -888,7 +908,7 @@ function (dojo, declare) {
 
             this.fadeOutShadowBox();
 
-            this.payPolyominoCost( this.selectedPolyomino.id );
+            this.payPolyominoCost( this.selectedPolyomino.id, gridCells );
 
             // handle the new top of stack
             var newTopOfStack = this.determineTopPolyominoInStack( this.selectedPolyomino["name"]);
