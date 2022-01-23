@@ -39,7 +39,11 @@ class CopenhagenReboot extends Table
             //    "my_first_game_variant" => 100,
             //    "my_second_game_variant" => 101,
             //      ...
-        ) );        
+        ) );   
+
+        $this->cards = self::getNew( "module.common.deck" );
+        $this->cards->init( "card" );
+
 	}
 	
     protected function getGameName( )
@@ -88,12 +92,28 @@ class CopenhagenReboot extends Table
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
         // TODO: setup the initial game situation here
-       
+        $cards = array();
+        foreach( $this->colors as  $color_id => $color ) // spade, heart, diamond, club
+        {
+            for( $value=2; $value<=14; $value++ )   //  2, 3, 4, ... K, A
+            {
+                $cards[] = array( 'type' => $color_id, 'type_arg' => $value, 'nbr' => 1);
+            }
+        }
 
-        // Activate first player (which is in general a good idea :) )
+        $this->cards->createCards( $cards, 'deck' );
+
+        // Activate first player
         $this->activeNextPlayer();
 
         /************ End of the game initialization *****/
+    }
+
+    protected function setupDeck()
+    {
+        /*$cards = array();
+
+        $cards[] = array( 'type' => "purple", 'nbr' => 14);  /* The empty brackets means PHP will autogenerate a key for the entry*/
     }
 
     /*
