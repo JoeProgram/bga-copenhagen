@@ -102,13 +102,11 @@ function (dojo, declare) {
             
             dojo.query(".board_cell").connect( 'onclick', this, 'onPlacePolyomino');
             dojo.query(".board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
-            dojo.query("#polyominoes .polyomino").connect( 'onclick', this, 'onSelectPolyomino');
             dojo.query("#polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
-
-            // TODO: Set up your game interface here, according to "gamedatas"
-            
+            this.determineTopPolyominoInEveryStack();
+            dojo.query("#polyominoes .polyomino.top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
  
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -208,6 +206,20 @@ function (dojo, declare) {
             script.
         
         */
+
+        determineTopPolyominoInEveryStack: function()
+        {
+
+            for( const [key, value] of Object.entries(this.polyominoShapes))
+            {
+                this.determineTopPolyominoInStack( key );
+            }
+        },
+
+        determineTopPolyominoInStack: function( polyominoClass )
+        {
+            return dojo.query( `.${polyominoClass}:last-child` ).addClass("top_of_stack");
+        },
 
         showPlayerBoardDebug: function( board )
         {
@@ -593,6 +605,7 @@ function (dojo, declare) {
 
             this.showPlayerBoardDebug( this.board );
             dojo.query(".board_cell.preview").removeClass("preview");
+            dojo.query(`#${this.selectedPolyomino["id"]}`).removeClass("top_of_stack");
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
             var minX = gridCells[0].x;
@@ -613,6 +626,10 @@ function (dojo, declare) {
             this.slideToObjectPos( this.selectedPolyomino["id"],minCellNode, htmlX, htmlY, 500 ).play();
 
             this.fadeOutShadowBox();
+
+            // handle the new top of stack
+            var newTopOfStack = this.determineTopPolyominoInStack( this.selectedPolyomino["name"]);
+            dojo.query(`.${this.selectedPolyomino["name"]}.top_of_stack`).connect( 'onclick', this, 'onSelectPolyomino');            
 
             this.selectedPolyomino = null;
 
