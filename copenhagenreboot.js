@@ -473,8 +473,11 @@ function (dojo, declare) {
         {
             for( var i = 0; i < this.adjacentOffsets.length ; i++)
             {
+
                 var x = coordinate.x + this.adjacentOffsets[i].x;
                 var y = coordinate.y + this.adjacentOffsets[i].y;
+
+                console.log( `Checking ${x},${y} for ${color}`);
 
                 if(dojo.query( `#board_cell_${x}_${y}.${color}_cell`).length > 0) return true;
             }
@@ -894,6 +897,10 @@ function (dojo, declare) {
 
             if( !validity ) return; // can't place polyomino if space isn't valid
 
+            // PAY THE COST
+            //   do this first, so that the polyomino doesn't count itself when determining if adjacent to a similar color.
+            this.payPolyominoCost( this.selectedPolyomino.id, gridCells );
+
             // UPDATE BOARD DATA
             var polyominoNode = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
             this.updateBoardCells(polyominoNode, gridCells, this.board);
@@ -907,8 +914,6 @@ function (dojo, declare) {
             this.slideToObjectPos( this.selectedPolyomino["id"],htmlPlacement.minCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ).play();
 
             this.fadeOutShadowBox();
-
-            this.payPolyominoCost( this.selectedPolyomino.id, gridCells );
 
             // handle the new top of stack
             var newTopOfStack = this.determineTopPolyominoInStack( this.selectedPolyomino["name"]);
