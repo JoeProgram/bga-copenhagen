@@ -359,6 +359,22 @@ function (dojo, declare) {
             });
         },
 
+        payPolyominoCost: function( polyominoId )
+        {
+            var color = polyominoId.split('-')[0];
+            var squares = polyominoId.split('-')[1].split('_')[0];
+
+            var cost = squares;
+
+            for( var i = 0; i < cost; i++ ) this.discardCardOfColor( color );
+        },
+
+        discardCardOfColor: function( color )
+        {
+            var card = dojo.query(`#hand .card.${color}_card:first-child`)[0];
+            dojo.destroy( card );
+        },
+
         showPlayerBoardDebug: function( board )
         {
 
@@ -607,7 +623,6 @@ function (dojo, declare) {
             return {htmlX:htmlX, htmlY:htmlY, minCellNode:minCellNode};
         },
 
-
         ///////////////////////////////////////////////////
         //// Player's action
         
@@ -843,9 +858,14 @@ function (dojo, declare) {
 
             this.fadeOutShadowBox();
 
+            this.payPolyominoCost( this.selectedPolyomino.id );
+
             // handle the new top of stack
             var newTopOfStack = this.determineTopPolyominoInStack( this.selectedPolyomino["name"]);
             dojo.query(`.${this.selectedPolyomino["name"]}.top_of_stack`).connect( 'onclick', this, 'onSelectPolyomino');            
+
+            // recalculate what you can afford
+            this.determineUsablePolyominoes();
 
             this.selectedPolyomino = null;
 
