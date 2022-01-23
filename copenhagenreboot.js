@@ -33,6 +33,9 @@ function (dojo, declare) {
             this.boardWidth = 5;
             this.boardHeight = 9;
 
+            this.harborCardsToRefill = [];
+            this.cardWidth = 66;
+
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
                 "purple-3":[{x:0,y:0},{x:1,y:0},{x:2,y:0}],
@@ -106,15 +109,19 @@ function (dojo, declare) {
             dojo.query("#polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
+            dojo.query("#harbor_cards .card").connect('onclick',this, 'onTakeHarborCard');
+
             this.determineTopPolyominoInEveryStack();
             dojo.query("#polyominoes .polyomino.top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
  
+            // DEBUG
+            dojo.query("#deck").connect("onclick",this,"refillHarborCards");
+
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
             console.log( "Ending game setup" );
-        },
-       
+        },       
 
         ///////////////////////////////////////////////////
         //// Game & client states
@@ -207,6 +214,27 @@ function (dojo, declare) {
             script.
         
         */
+
+        refillHarborCards: function ()
+        {
+            var game = this;
+
+            this.harborCardsToRefill.forEach( function(harborPosition)
+            {
+
+                // CREATE A NEW CARD
+                var cardHtml = game.format_block('jstpl_card',{}); // make the html in memory
+                var card = dojo.place( cardHtml, harborPosition);  // put it in the html dom
+
+                //ANIMATE IT FROM DECK TO CORRECT SPOT
+                game.placeOnObject( card, "deck" ); // we use some visual illusion here.  The card starts on its final parent, but we snap it to the deck, then animate its slide back to its actual parent
+                game.slideToObject( card, harborPosition ).play();
+
+                dojo.connect(card, "onclick", game, "onTakeHarborCard");
+            });
+
+            this.harborCardsToRefill = [];
+        },
 
         determineTopPolyominoInEveryStack: function()
         {
@@ -518,6 +546,14 @@ function (dojo, declare) {
         },        
         
         */
+
+        onTakeHarborCard: function( event )
+        {
+            this.harborCardsToRefill.push(event.currentTarget.parentNode);
+
+            var card = this.attachToNewParent( event.currentTarget, "hand");
+            this.slideToObject( card, "hand", 500 ).play();
+        },
 
         onSelectPolyomino: function( event )
         {

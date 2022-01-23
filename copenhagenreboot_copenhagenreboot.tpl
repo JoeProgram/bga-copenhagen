@@ -30,13 +30,27 @@
     </div>
 
     <div id="harbor_cards">
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
-        <div class="card"></div>
+        <div id="harbor_position_0" class="harbor_position">
+            <div class="card"></div>
+        </div>
+        <div id="harbor_position_1" class="harbor_position">
+            <div class="card"></div>
+        </div>
+        <div id="harbor_position_2" class="harbor_position">
+            <div class="card"></div>
+        </div>
+        <div id="harbor_position_3" class="harbor_position">
+            <div class="card"></div>
+        </div>
+        <div id="harbor_position_4" class="harbor_position">
+            <div class="card"></div>
+        </div>
+        <div id="harbor_position_5" class="harbor_position">
+            <div class="card"></div>
+        </div>
+        <div id="harbor_position_6" class="harbor_position">
+            <div class="card"></div>
+        </div>
     </div>
 
     <br/>
@@ -154,6 +168,7 @@
         </div>
     </div>
 
+    <div id="hand"></div>
     <div id="owned_player_area" class="player_area">
         <div id="owned_playerboard" class="playerboard blue">
             <div id="polyomino_preview"></div>
@@ -269,13 +284,8 @@
 
 <script type="text/javascript">
 
-// Javascript HTML templates
-
-/*
-// Example:
-var jstpl_some_game_item='<div class="my_game_item" id="my_game_item_${MY_ITEM_ID}"></div>';
-
-*/
+/****************************** JAVASCRIPT HTML TEMPLATES ******************************/
+var jstpl_card='<div class="card"></div>';
 
 </script>  
 

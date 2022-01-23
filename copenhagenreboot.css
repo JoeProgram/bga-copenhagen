@@ -14,30 +14,6 @@
  */
 
 /*
-    This is the CSS stylesheet of your game User Interface.
-    
-    Styles defined on this file will be applied to the HTML elements you define in your
-    HTML template (copenhagenreboot_copenhagenreboot.tpl), and to HTML elements you create dynamically
-    (in copenhagenreboot.js).
-    
-    Usually, you are using CSS to:
-    
-    1°) define the overall layout of your game
-        (ex: place the board on the top left, place player's hand beside, place the deck on the right, ...).
-
-    2°) create your CSS-sprites:
-        All images of your games should be gathered into a small number of image files. Then, using
-        background-image and background-position CSS properties, you create HTML blocks that can 
-        display these images correctly (see example below).
-    
-    3°) ... anything else:
-        It is really easy to add and remove CSS classes dynamically from your Javascript with
-        dojo.addClass and dojo.removeClass. It is also easy to check if an element has a class
-        (dojo.hasClass) or to get all elements with a specific class (dojo.query). This is why,
-        very often, using CSS classes for the logic of your user interface allow you to do complex
-        thing easily.
-        
-        
      Note: on the production platform, this file will be compressed and comments will be removed.
            Consequently, don't hesitate to put as many comments as necessary.
 */
@@ -46,39 +22,17 @@
 /* Note: you must not use any @import directive */
 
 
-/********* You can start writing your CSS below this line: **********/
-
-
-/*
-    Example of CSS sprites (a black token and a white token, 20x20px each, embedded in the same "tokens.png" 40x20px image):
-
-    .white_token {
-        background-image: url('img/tokens.png');
-        background-position: 0px 0px;
-    }
-    .black_token {
-        background-image: url('img/tokens.png');
-        background-position: -20px 0px;
-    }
-    .token {
-        width: 20px;
-        height: 20px;
-        background-repeat: none;
-    }
-*/
-
 #playspace
 {
     width: 730px;
     height: 1000px;
-    border:  1px solid white;
 }
 
 #harbors
 {
     position: relative;
     display:  inline-block;
-    margin-left: 30px;
+    left: 31px;
     height: 7px;
     width: 462px;
     font-size: 0px; /* used to ignore whitespace, keep HTML readable */
@@ -89,7 +43,7 @@
 {
     display: inline-block;
     width: 66px;
-    height: 7px;
+    height: 6px;
     background-image:  url('img/harbor.png');
     background-repeat: no-repeat;
 
@@ -120,27 +74,60 @@
 
 #harbor_cards
 {
-    position:  relative;
-    display: inline-block;
-    font-size: 0px; /* used to ignore whitespace, keep HTML readable */
+    position:  absolute;
+    display: block;
+    width:  462px;
+    height: 101px;
+    top: 7px;
+    left: 31px;
 }
 
 #harbor_cards .card
 {
-    width: 65px;
-    height: 94px;
-    background-image:  url('img/cards.png');
-    display: inline-block;
-    margin:  0px;
-    padding:  0px;
+    top: 0px;
 }
+
+.card
+{
+    display: block;
+    position:  absolute;
+    width: 66px;
+    height: 101px;
+    background-image:  url('img/cards.png');
+}
+
+#harbor_cards .card:hover
+{
+    filter:  drop-shadow(0px 0px 5px white);
+    cursor:  pointer;
+}
+
+.harbor_position
+{
+    display: block;
+    position: absolute;
+    width: 66px;
+    height: 101px;
+}
+
+#harbor_position_0{ left:0px; }
+#harbor_position_1{ left:66px; }
+#harbor_position_2{ left:132px; }
+#harbor_position_3{ left:198px; }
+#harbor_position_4{ left:264px; }
+#harbor_position_5{ left:330px; }
+#harbor_position_6{ left:396px; }
 
 #polyominoes
 {
+    display:  block;
     position: absolute;
+
+    top: 112px;
+
     width:  477px;
     height:  370px;
-    display:  block;
+    
 }
 
 .polyomino
@@ -380,6 +367,18 @@
     position: relative;
     display: inline-block;
     margin-bottom: 20px;
+}
+
+#hand
+{
+    display: block;
+    position: absolute;
+
+    background-color:  rgba(255,255,255,0.5);
+    top: 225px;
+    left: 430px;
+    width: 66px;
+    height: 200px;
 }
 
 .playerboard
