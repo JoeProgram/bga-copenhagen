@@ -215,6 +215,18 @@ function (dojo, declare) {
         
         */
 
+        // When you get HTML children, you also get text nodes - which in this use case is usually some useless blank space
+        //   this helper function returns just the element nodes
+        getChildElementNodes: function( node )
+        {
+            var childElementNodes = [];
+            for( var i = 0; i < node.childNodes.length; i++ )
+            {
+                if(  node.childNodes[i].nodeType == Node.ELEMENT_NODE) childElementNodes.push(  node.childNodes[i]);
+            } 
+            return childElementNodes;
+        },
+
         refillHarborCards: function ()
         {
             var game = this;
@@ -235,6 +247,23 @@ function (dojo, declare) {
 
             this.harborCardsToRefill = [];
         },
+
+        splayCardsInHand: function()
+        {
+            var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
+            var cardsInHand = this.getChildElementNodes( cardsInHandNode );
+
+            var lastCard = cardsInHand[ cardsInHand.length - 1];
+            var lastCardTop = dojo.position( lastCard ).y;
+            this.placeOnObject(lastCard, "hand_bottom_card_target");
+            for( var i = cardsInHand.length - 1; i >= 0; i-- )
+            {
+                this.placeOnObjectPos( cardsInHand[i], "hand_bottom_card_target", 0, -i * 20 )
+            }
+
+        },
+
+
 
         determineTopPolyominoInEveryStack: function()
         {
@@ -551,8 +580,10 @@ function (dojo, declare) {
         {
             this.harborCardsToRefill.push(event.currentTarget.parentNode);
 
-            var card = this.attachToNewParent( event.currentTarget, "hand");
-            this.slideToObject( card, "hand", 500 ).play();
+            var card = this.attachToNewParent( event.currentTarget, "cards_in_hand");
+            //this.slideToObject( card, "cards_in_hand", 500 ).play();
+
+            this.splayCardsInHand();
         },
 
         onSelectPolyomino: function( event )

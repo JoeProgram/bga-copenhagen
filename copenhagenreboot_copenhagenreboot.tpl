@@ -168,7 +168,10 @@
         </div>
     </div>
 
-    <div id="hand"></div>
+    <div id="hand">
+        <div id="hand_bottom_card_target"></div>
+        <div id="cards_in_hand"></div>
+    </div>
     <div id="owned_player_area" class="player_area">
         <div id="owned_playerboard" class="playerboard blue">
             <div id="polyomino_preview"></div>
