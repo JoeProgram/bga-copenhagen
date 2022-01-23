@@ -353,10 +353,18 @@ function (dojo, declare) {
                 var squares = polyomino.id.split('-')[1].split('_')[0];
                 var cardsOfColor = game.countColoredCardsInHand( color );
 
+                var cost = squares;
+                if( game.hasPolyominoOfColorOnBoard( color ) ) cost -= 1; // reduce cost by 1 if there's any matching polyominoes on board
+
                 // see if player can afford polyomino
-                if( cardsOfColor >= squares ) dojo.addClass( polyomino, "usable");
+                if( cardsOfColor >= cost ) dojo.addClass( polyomino, "usable");
                 else dojo.addClass(polyomino, "unusable");
             });
+        },
+
+        hasPolyominoOfColorOnBoard: function( color )
+        {
+            return dojo.query(`#owned_playerboard .${color}_polyomino`).length >= 1;
         },
 
         payPolyominoCost: function( polyominoId )
@@ -371,7 +379,9 @@ function (dojo, declare) {
 
         discardCardOfColor: function( color )
         {
-            var card = dojo.query(`#hand .card.${color}_card:first-child`)[0];
+            console.log( `discarding ${color} card`);
+
+            var card = dojo.query(`#hand .card.${color}_card`)[0];
             dojo.destroy( card );
         },
 
@@ -574,6 +584,8 @@ function (dojo, declare) {
             return this.setNewShapeOrigin( polyominoShape ); 
         },
 
+        // When we're rotating and flipping the shape,
+        //   we create a new "shape" data list, and reorder it so the bottom-left square is the origin 
         setNewShapeOrigin: function( polyominoShape )
         {
             newOrigin = polyominoShape[0];

@@ -58,113 +58,113 @@
     <div id="polyominoes">
 
         <div id="purple-2_stack">
-            <div id="purple-2_1" class="polyomino purple-2"></div>
-            <div id="purple-2_2" class="polyomino purple-2"></div>
-            <div id="purple-2_3" class="polyomino purple-2"></div>
+            <div id="purple-2_1" class="polyomino purple_polyomino purple-2"></div>
+            <div id="purple-2_2" class="polyomino purple_polyomino purple-2"></div>
+            <div id="purple-2_3" class="polyomino purple_polyomino purple-2"></div>
         </div>
         
         <div id="purple-3_stack">
-            <div id="purple-3_1" class="polyomino purple-3"></div>
-            <div id="purple-3_2" class="polyomino purple-3"></div>
-            <div id="purple-3_3" class="polyomino purple-3"></div>
+            <div id="purple-3_1" class="polyomino purple_polyomino purple-3"></div>
+            <div id="purple-3_2" class="polyomino purple_polyomino purple-3"></div>
+            <div id="purple-3_3" class="polyomino purple_polyomino purple-3"></div>
         </div>
 
         <div id="purple-4_stack">
-            <div id="purple-4_1" class="polyomino purple-4"></div>
-            <div id="purple-4_2" class="polyomino purple-4"></div>
-            <div id="purple-4_3" class="polyomino purple-4"></div>
+            <div id="purple-4_1" class="polyomino purple_polyomino purple-4"></div>
+            <div id="purple-4_2" class="polyomino purple_polyomino purple-4"></div>
+            <div id="purple-4_3" class="polyomino purple_polyomino purple-4"></div>
         </div>
 
         <div id="purple-5_stack">
-            <div id="purple-5_1" class="polyomino purple-5"></div>
+            <div id="purple-5_1" class="polyomino purple_polyomino purple-5"></div>
         </div>
 
         <div id="green-2_stack">
-            <div id="green-2_1" class="polyomino green-2"></div>
-            <div id="green-2_2" class="polyomino green-2"></div>
-            <div id="green-2_3" class="polyomino green-2"></div>
+            <div id="green-2_1" class="polyomino green_polyomino green-2"></div>
+            <div id="green-2_2" class="polyomino green_polyomino green-2"></div>
+            <div id="green-2_3" class="polyomino green_polyomino green-2"></div>
         </div>
 
         <div id="green-3_stack">
-            <div id="green-3_1" class="polyomino green-3"></div>
-            <div id="green-3_2" class="polyomino green-3"></div>
-            <div id="green-3_3" class="polyomino green-3"></div>
+            <div id="green-3_1" class="polyomino green_polyomino green-3"></div>
+            <div id="green-3_2" class="polyomino green_polyomino green-3"></div>
+            <div id="green-3_3" class="polyomino green_polyomino green-3"></div>
         </div>
 
         <div id="green-4_stack">
-            <div id="green-4_1" class="polyomino green-4"></div>
-            <div id="green-4_2" class="polyomino green-4"></div>
-            <div id="green-4_3" class="polyomino green-4"></div>
+            <div id="green-4_1" class="polyomino green_polyomino green-4"></div>
+            <div id="green-4_2" class="polyomino green_polyomino green-4"></div>
+            <div id="green-4_3" class="polyomino green_polyomino green-4"></div>
         </div>
 
         <div id="green-5_stack">
-            <div id="green-5_1" class="polyomino green-5"></div>
+            <div id="green-5_1" class="polyomino green_polyomino green-5"></div>
         </div>
 
         <div id="red-2_stack">
-            <div id="red-2_1" class="polyomino red-2"></div>
-            <div id="red-2_2" class="polyomino red-2"></div>
-            <div id="red-2_3" class="polyomino red-2"></div>
+            <div id="red-2_1" class="polyomino red_polyomino red-2"></div>
+            <div id="red-2_2" class="polyomino red_polyomino red-2"></div>
+            <div id="red-2_3" class="polyomino red_polyomino red-2"></div>
         </div>
 
         <div id="red-3_stack">
-            <div id="red-3_1" class="polyomino red-3"></div>
-            <div id="red-3_2" class="polyomino red-3"></div>
-            <div id="red-3_3" class="polyomino red-3"></div>
+            <div id="red-3_1" class="polyomino red_polyomino red-3"></div>
+            <div id="red-3_2" class="polyomino red_polyomino red-3"></div>
+            <div id="red-3_3" class="polyomino red_polyomino red-3"></div>
         </div>
 
         <div id="red-4_stack">
-            <div id="red-4_1" class="polyomino red-4"></div>
-            <div id="red-4_2" class="polyomino red-4"></div>
-            <div id="red-4_3" class="polyomino red-4"></div>
+            <div id="red-4_1" class="polyomino red_polyomino red-4"></div>
+            <div id="red-4_2" class="polyomino red_polyomino red-4"></div>
+            <div id="red-4_3" class="polyomino red_polyomino red-4"></div>
         </div>
 
         <div id="red-5_stack">
-            <div id="red-5_1" class="polyomino red-5"></div>
+            <div id="red-5_1" class="polyomino red_polyomino red-5"></div>
         </div>
 
         <div id="blue-2_stack">
-            <div id="blue-2_1" class="polyomino blue-2"></div>
-            <div id="blue-2_2" class="polyomino blue-2"></div>
-            <div id="blue-2_3" class="polyomino blue-2"></div>
+            <div id="blue-2_1" class="polyomino blue_polyomino blue-2"></div>
+            <div id="blue-2_2" class="polyomino blue_polyomino blue-2"></div>
+            <div id="blue-2_3" class="polyomino blue_polyomino blue-2"></div>
         </div>
 
         <div id="blue-3_stack">
-            <div id="blue-3_1" class="polyomino blue-3"></div>
-            <div id="blue-3_2" class="polyomino blue-3"></div>
-            <div id="blue-3_3" class="polyomino blue-3"></div>
+            <div id="blue-3_1" class="polyomino blue_polyomino blue-3"></div>
+            <div id="blue-3_2" class="polyomino blue_polyomino blue-3"></div>
+            <div id="blue-3_3" class="polyomino blue_polyomino blue-3"></div>
         </div>
         
         <div id="blue-4_stack">
-            <div id="blue-4_1" class="polyomino blue-4"></div>
-            <div id="blue-4_2" class="polyomino blue-4"></div>
-            <div id="blue-4_3" class="polyomino blue-4"></div>
+            <div id="blue-4_1" class="polyomino blue_polyomino blue-4"></div>
+            <div id="blue-4_2" class="polyomino blue_polyomino blue-4"></div>
+            <div id="blue-4_3" class="polyomino blue_polyomino blue-4"></div>
         </div>
 
         <div id="blue-5_stack">
-            <div id="blue-5_1" class="polyomino blue-5"></div>
+            <div id="blue-5_1" class="polyomino blue_polyomino blue-5"></div>
         </div>
 
         <div id="yellow-2_stack">
-            <div id="yellow-2_1" class="polyomino yellow-2"></div>
-            <div id="yellow-2_2" class="polyomino yellow-2"></div>
-            <div id="yellow-2_3" class="polyomino yellow-2"></div>
+            <div id="yellow-2_1" class="polyomino yellow_polyomino yellow-2"></div>
+            <div id="yellow-2_2" class="polyomino yellow_polyomino yellow-2"></div>
+            <div id="yellow-2_3" class="polyomino yellow_polyomino yellow-2"></div>
         </div>
 
         <div id="yellow-3_stack">
-            <div id="yellow-3_1" class="polyomino yellow-3"></div>
-            <div id="yellow-3_2" class="polyomino yellow-3"></div>
-            <div id="yellow-3_3" class="polyomino yellow-3"></div>
+            <div id="yellow-3_1" class="polyomino yellow_polyomino yellow-3"></div>
+            <div id="yellow-3_2" class="polyomino yellow_polyomino yellow-3"></div>
+            <div id="yellow-3_3" class="polyomino yellow_polyomino yellow-3"></div>
         </div>
 
         <div id="yellow-4_stack">
-            <div id="yellow-4_1" class="polyomino yellow-4"></div>
-            <div id="yellow-4_2" class="polyomino yellow-4"></div>
-            <div id="yellow-4_3" class="polyomino yellow-4"></div>
+            <div id="yellow-4_1" class="polyomino yellow_polyomino yellow-4"></div>
+            <div id="yellow-4_2" class="polyomino yellow_polyomino yellow-4"></div>
+            <div id="yellow-4_3" class="polyomino yellow_polyomino yellow-4"></div>
         </div>
 
         <div id="yellow-5_stack">
-            <div id="yellow-5_1" class="polyomino yellow-5"></div>
+            <div id="yellow-5_1" class="polyomino yellow_polyomino yellow-5"></div>
         </div>
     </div>
 
