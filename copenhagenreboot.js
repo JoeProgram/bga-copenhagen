@@ -1,3 +1,4 @@
+
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
@@ -36,6 +37,8 @@ function (dojo, declare) {
             this.harborCardsToRefill = [];
             this.cardWidth = 66;
             this.cardSplayDistance = 20;
+
+            this.cardColorOrder = ["red_card", "yellow_card", "green_card", "blue_card", "purple_card"];
 
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
@@ -232,7 +235,7 @@ function (dojo, declare) {
         {
             var game = this;
 
-            this.harborCardsToRefill.forEach( function(harborPosition)
+            this.harborCardsToRefill.forEach( function(harborPosition, index)
             {
 
                 // CREATE A NEW CARD
@@ -244,12 +247,32 @@ function (dojo, declare) {
 
                 //ANIMATE IT FROM DECK TO CORRECT SPOT
                 game.placeOnObject( card, "deck" ); // we use some visual illusion here.  The card starts on its final parent, but we snap it to the deck, then animate its slide back to its actual parent
-                game.slideToObject( card, harborPosition ).play();
+                game.slideToObject( card, harborPosition, 500  ).play();
 
                 dojo.connect(card, "onclick", game, "onTakeHarborCard");
             });
 
             this.harborCardsToRefill = [];
+        },
+
+        // we want to keep cards organized by color in hand
+        //   we'll do that when we add the card to the hand
+        findPositionForNewCardInHand: function( card )
+        {
+            var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
+            var cardsInHand = this.getChildElementNodes( cardsInHandNode );
+
+            var position = 0;
+
+            for( var i = 0; i < this.cardColorOrder.length; i++)
+            {
+                var color = this.cardColorOrder[i];
+
+                if( dojo.hasClass( card, color)) return position;
+                position += dojo.query(`#cards_in_hand .${color}`).length;
+            }
+
+            return -1; // something went wrong - the card didn't have a color class
         },
 
         splayCardsInHand: function()
@@ -259,11 +282,11 @@ function (dojo, declare) {
 
             var lastCard = cardsInHand[ cardsInHand.length - 1];
             var lastCardTop = dojo.position( lastCard ).y;
-            this.placeOnObject(lastCard, "hand_bottom_card_target");
+            this.slideToObject(lastCard, "hand_bottom_card_target").play();
 
             for( var i = 0; i < cardsInHand.length; i++)
             {
-                this.placeOnObjectPos( cardsInHand[i], "hand_bottom_card_target", 0, -this.cardSplayDistance * (cardsInHand.length - 1 - i) )
+                this.slideToObjectPos( cardsInHand[i], "hand_bottom_card_target", 0, -this.cardSplayDistance * (cardsInHand.length - 1 - i) ).play();
             }
 
         },
@@ -586,7 +609,7 @@ function (dojo, declare) {
             this.harborCardsToRefill.push(event.currentTarget.parentNode);
 
             var card = this.attachToNewParent( event.currentTarget, "cards_in_hand");
-            //this.slideToObject( card, "cards_in_hand", 500 ).play();
+            dojo.place( card, "cards_in_hand", this.findPositionForNewCardInHand( card ));
 
             this.splayCardsInHand();
         },
