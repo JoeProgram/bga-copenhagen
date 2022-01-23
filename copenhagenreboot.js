@@ -119,6 +119,8 @@ function (dojo, declare) {
 
             this.determineTopPolyominoInEveryStack();
             dojo.query("#polyominoes .polyomino.top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
+
+            this.determineUsablePolyominoes();
  
             // DEBUG
             dojo.query("#deck").connect("onclick",this,"refillHarborCards");
@@ -292,6 +294,11 @@ function (dojo, declare) {
 
         },
 
+        countColoredCardsInHand: function( color )
+        {
+            return dojo.query(`#cards_in_hand .card.${color}_card`).length;
+        },
+
         hasTooManyCardsInHand: function()
         {
             return dojo.query("#cards_in_hand .card").length > this.maxHandSize;
@@ -329,6 +336,27 @@ function (dojo, declare) {
         determineTopPolyominoInStack: function( polyominoClass )
         {
             return dojo.query( `.${polyominoClass}:last-child` ).addClass("top_of_stack");
+        },
+
+        determineUsablePolyominoes: function()
+        {
+            var game = this;
+
+            dojo.query(".polyomino.top_of_stack").forEach(function(polyomino)
+            {
+                // clear previously let classes
+                dojo.removeClass(polyomino, "usable");
+                dojo.removeClass(polyomino, "unusable");
+
+                // gather the information
+                var color = polyomino.id.split('-')[0];
+                var squares = polyomino.id.split('-')[1].split('_')[0];
+                var cardsOfColor = game.countColoredCardsInHand( color );
+
+                // see if player can afford polyomino
+                if( cardsOfColor >= squares ) dojo.addClass( polyomino, "usable");
+                else dojo.addClass(polyomino, "unusable");
+            });
         },
 
         showPlayerBoardDebug: function( board )
@@ -639,6 +667,8 @@ function (dojo, declare) {
 
             this.splayCardsInHand();
             this.checkHandSize();
+
+            if( !this.hasTooManyCardsInHand()) this.determineUsablePolyominoes();
         },
 
         onDiscardCardOverMaxHandSize: function( event )
@@ -648,10 +678,13 @@ function (dojo, declare) {
             dojo.destroy( event.currentTarget );
             dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
             this.splayCardsInHand();
+            this.determineUsablePolyominoes();
         },
 
         onSelectPolyomino: function( event )
         {
+
+            if( !dojo.hasClass(event.currentTarget, "usable")) return; // make sure we can afford this polyomino before selecting it
 
             this.selectedPolyomino = {};
 
@@ -672,6 +705,7 @@ function (dojo, declare) {
             dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
             dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
             dojo.style("polyomino_preview","transform",""); // reset the transform from whatever it was before
+            dojo.style("polyomino_preview","display","none"); // not ready to show yet - turn off
         },
 
         onRotatePolyomino: function( event )
