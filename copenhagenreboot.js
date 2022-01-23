@@ -336,6 +336,7 @@ function (dojo, declare) {
         clearPreview: function()
         {
             dojo.query(".preview").removeClass("invalid").removeClass("preview");
+            dojo.query("#polyomino_preview").style("display","none");
         },
 
         fadeInShadowBox: function()
@@ -444,6 +445,25 @@ function (dojo, declare) {
             return polyominoShape;
         },
 
+        determineHtmlPlacementForPolyominoAtCell: function( gridCells )
+        {
+            var minX = gridCells[0].x;
+            var minY = gridCells[0].y;
+            for( var i = 1; i < gridCells.length; i++)
+            {
+                if( gridCells[i].x < minX) minX = gridCells[i].x;
+                if( gridCells[i].y < minY) minY = gridCells[i].y;
+            }
+
+            var minCellNode = dojo.query(`#board_cell_${minX}_${minY}`)[0];
+            var minCellNodePosition = dojo.position(minCellNode);
+
+            var htmlX = 0;
+            var htmlY = minCellNodePosition.h - dojo.position(this.selectedPolyomino["id"]).h;
+
+            return {htmlX:htmlX, htmlY:htmlY, minCellNode:minCellNode};
+        },
+
 
         ///////////////////////////////////////////////////
         //// Player's action
@@ -524,7 +544,7 @@ function (dojo, declare) {
             // CODE SNIPPET FROM: https://forum.boardgamearena.com/viewtopic.php?t=15158
             var animation = dojo.animateProperty({
                 node: polyominoNode,
-                duration: 500,
+                duration: 250,
                 properties: {
                     propertyTransform: {start: this.selectedPolyomino["rotation"], end: this.selectedPolyomino["rotation"] + rotationDegrees }
                 },
@@ -552,7 +572,7 @@ function (dojo, declare) {
             // CODE SNIPPET FROM: https://forum.boardgamearena.com/viewtopic.php?t=15158
             var animation = dojo.animateProperty({
                 node: polyominoNode,
-                duration: 500,
+                duration: 250,
                 properties: {
                     propertyTransform: {start: this.selectedPolyomino["flip"], end: this.selectedPolyomino["flip"]+180 }
                 },
@@ -579,12 +599,33 @@ function (dojo, declare) {
             var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , coordinates );
             var validity = this.isValidPlacementPosition( gridCells );
 
-            // DISPLAY PREVIEW
-            gridCells.forEach( function(cell, index){
-                var query = dojo.query(`#board_cell_${cell.x}_${cell.y}`); // the backticks here are for "template literals" - in case I forget javascript has those
-                query.addClass("preview");
-                if( !validity ) query.addClass("invalid");
-            });
+            // SHOW IF INVALID
+            if( !validity )
+            {
+                gridCells.forEach( function(cell, index){
+                    var query = dojo.query(`#board_cell_${cell.x}_${cell.y}`); // the backticks here are for "template literals" - in case I forget javascript has those
+                    query.addClass("preview").addClass("invalid");
+                });    
+            }
+            // SHOW IF VALID
+            else
+            {
+                var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCell( gridCells );
+
+                var polyomino = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
+
+                // copy the style of the selected polyomino onto the preview
+                dojo.style("polyomino_preview","display","block");
+                dojo.style("polyomino_preview","background-position", dojo.getStyle(polyomino, "background-position"));
+                dojo.style("polyomino_preview","transform", dojo.getStyle(polyomino, "transform"));
+                dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
+                dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
+
+                this.slideToObjectPos( "polyomino_preview",htmlPlacement.minCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 0).play(); // use this instead of placeOnObjectPos, as I placeOnObjectPos does centering I don't want
+
+            }
+
+
         },
 
         onPlacePolyomino: function( event )
@@ -608,22 +649,10 @@ function (dojo, declare) {
             dojo.query(`#${this.selectedPolyomino["id"]}`).removeClass("top_of_stack");
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
-            var minX = gridCells[0].x;
-            var minY = gridCells[0].y;
-            for( var i = 1; i < gridCells.length; i++)
-            {
-                if( gridCells[i].x < minX) minX = gridCells[i].x;
-                if( gridCells[i].y < minY) minY = gridCells[i].y;
-            }
-
-            var minCellNode = dojo.query(`#board_cell_${minX}_${minY}`)[0];
-            var minCellNodePosition = dojo.position(minCellNode);
-
-            var htmlX = 0;
-            var htmlY = minCellNodePosition.h - dojo.position(this.selectedPolyomino["id"]).h;
+            var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCell( gridCells );
 
             this.attachToNewParent(  this.selectedPolyomino["id"], "owned_playerboard");
-            this.slideToObjectPos( this.selectedPolyomino["id"],minCellNode, htmlX, htmlY, 500 ).play();
+            this.slideToObjectPos( this.selectedPolyomino["id"],htmlPlacement.minCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ).play();
 
             this.fadeOutShadowBox();
 

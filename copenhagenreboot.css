@@ -412,14 +412,12 @@
     z-index: 2;
 }
 
-.board_cell.full
+#polyomino_preview
 {
-    /*background-color: white;*/
-}
-
-.board_cell.preview
-{
-    background-color:  blue;
+    opacity: 0.5;
+    background-image: url('img/polyominoes.png');
+    position: absolute;
+    display: block;
 }
 
 .board_cell.preview.invalid

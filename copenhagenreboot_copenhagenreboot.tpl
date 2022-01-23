@@ -156,6 +156,8 @@
 
     <div id="owned_player_area" class="player_area">
         <div id="owned_playerboard" class="playerboard blue">
+            <div id="polyomino_preview"></div>
+
             <div class="board_cell" id="board_cell_0_0"></div>
             <div class="board_cell" id="board_cell_0_1"></div>
             <div class="board_cell" id="board_cell_0_2"></div>
