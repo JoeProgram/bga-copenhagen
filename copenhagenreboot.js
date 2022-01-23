@@ -37,6 +37,8 @@ function (dojo, declare) {
             this.harborCardsToRefill = [];
             this.cardWidth = 66;
             this.cardSplayDistance = 20;
+            this.maxHandSize = 7;
+            this.maxHandSizeDiscardHandlers = []; // keep track of the events we attach to cards to allow the player to discard - since we'll want to disconnect them afterwards
 
             this.cardColorOrder = ["red_card", "yellow_card", "green_card", "blue_card", "purple_card"];
 
@@ -239,7 +241,6 @@ function (dojo, declare) {
             {
 
                 // CREATE A NEW CARD
-
                 var cardHtml = game.format_block('jstpl_card',{   // make the html in memory
                     color: "yellow_card",
                 }); 
@@ -291,6 +292,29 @@ function (dojo, declare) {
 
         },
 
+        hasTooManyCardsInHand: function()
+        {
+            return dojo.query("#cards_in_hand .card").length > this.maxHandSize;
+        },
+
+        checkHandSize: function()
+        {
+            if( this.hasTooManyCardsInHand())
+            {
+
+                dojo.addClass("hand","over_max_hand_size");
+
+                var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
+                var cardsInHand = this.getChildElementNodes( cardsInHandNode );
+
+                for( var i = 0; i < cardsInHand.length; i++ )
+                {
+                    // have to connect this a little differently, since we want to remove thse handlers later
+                    var discardHandler = dojo.connect( cardsInHand[i], "onclick", this, "onDiscardCardOverMaxHandSize");
+                    this.maxHandSizeDiscardHandlers.push( discardHandler ); 
+                }
+            }
+        },
 
 
         determineTopPolyominoInEveryStack: function()
@@ -606,11 +630,23 @@ function (dojo, declare) {
 
         onTakeHarborCard: function( event )
         {
+            if( this.hasTooManyCardsInHand()) return; // doesn't work if your hand is full
+
             this.harborCardsToRefill.push(event.currentTarget.parentNode);
 
             var card = this.attachToNewParent( event.currentTarget, "cards_in_hand");
             dojo.place( card, "cards_in_hand", this.findPositionForNewCardInHand( card ));
 
+            this.splayCardsInHand();
+            this.checkHandSize();
+        },
+
+        onDiscardCardOverMaxHandSize: function( event )
+        {
+            dojo.removeClass("hand","over_max_hand_size");
+
+            dojo.destroy( event.currentTarget );
+            dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
             this.splayCardsInHand();
         },
 

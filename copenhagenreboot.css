@@ -380,11 +380,16 @@
     display: block;
     position: absolute;
 
-    background-color:  rgba(255,255,255,0.5);
-    top: 225px;
+    /*background-color:  rgba(255,255,255,0.5);*/
+    top: 184px;
     left: 430px;
     width: 66px;
-    height: 200px;
+    height: 241px;
+}
+
+#hand.over_max_hand_size
+{
+    filter:  drop-shadow(0px 0px 5px red);
 }
 
 #cards_in_hand
@@ -401,7 +406,7 @@
     display:  block;
     position:  absolute;
 
-    top: 99px;
+    top: 140px;
     width:  66px;
     height: 101px;
 }
