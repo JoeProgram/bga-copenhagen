@@ -35,6 +35,7 @@ function (dojo, declare) {
 
             this.harborCardsToRefill = [];
             this.cardWidth = 66;
+            this.cardSplayDistance = 20;
 
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
@@ -256,9 +257,10 @@ function (dojo, declare) {
             var lastCard = cardsInHand[ cardsInHand.length - 1];
             var lastCardTop = dojo.position( lastCard ).y;
             this.placeOnObject(lastCard, "hand_bottom_card_target");
-            for( var i = cardsInHand.length - 1; i >= 0; i-- )
+
+            for( var i = 0; i < cardsInHand.length; i++)
             {
-                this.placeOnObjectPos( cardsInHand[i], "hand_bottom_card_target", 0, -i * 20 )
+                this.placeOnObjectPos( cardsInHand[i], "hand_bottom_card_target", 0, -this.cardSplayDistance * (cardsInHand.length - 1 - i) )
             }
 
         },
