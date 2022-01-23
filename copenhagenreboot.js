@@ -236,7 +236,10 @@ function (dojo, declare) {
             {
 
                 // CREATE A NEW CARD
-                var cardHtml = game.format_block('jstpl_card',{}); // make the html in memory
+
+                var cardHtml = game.format_block('jstpl_card',{   // make the html in memory
+                    color: "yellow_card",
+                }); 
                 var card = dojo.place( cardHtml, harborPosition);  // put it in the html dom
 
                 //ANIMATE IT FROM DECK TO CORRECT SPOT

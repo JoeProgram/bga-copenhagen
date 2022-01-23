@@ -102,6 +102,12 @@
     cursor:  pointer;
 }
 
+.card.red_card { background-position: 0px 0px; }
+.card.yellow_card { background-position: -70px 0px; }
+.card.green_card { background-position: -140px 0px; }
+.card.blue_card { background-position: -210px 0px; }
+.card.purple_card { background-position: -280px 0px; }
+
 .harbor_position
 {
     display: block;
@@ -395,9 +401,7 @@
     display:  block;
     position:  absolute;
 
-    background-color:  black;
     top: 99px;
-
     width:  66px;
     height: 101px;
 }
