@@ -72,18 +72,45 @@
         <div id="green-5_1" class="polyomino green-5"></div>
 
         <div id="red-2_1" class="polyomino red-2"></div>
+        <div id="red-2_2" class="polyomino red-2"></div>
+        <div id="red-2_3" class="polyomino red-2"></div>
+
         <div id="red-3_1" class="polyomino red-3"></div>
-        <div id="red-4_1" class="polyomino red-4"></div>
+        <div id="red-3_2" class="polyomino red-3"></div>
+        <div id="red-3_3" class="polyomino red-3"></div>
+
+        <div id="red-4_1" class="polyomino red-4"></div>\
+        <div id="red-4_2" class="polyomino red-4"></div>
+        <div id="red-4_3" class="polyomino red-4"></div>
+
         <div id="red-5_1" class="polyomino red-5"></div>
 
         <div id="blue-2_1" class="polyomino blue-2"></div>
+        <div id="blue-2_2" class="polyomino blue-2"></div>
+        <div id="blue-2_3" class="polyomino blue-2"></div>
+
         <div id="blue-3_1" class="polyomino blue-3"></div>
+        <div id="blue-3_2" class="polyomino blue-3"></div>
+        <div id="blue-3_3" class="polyomino blue-3"></div>
+        
         <div id="blue-4_1" class="polyomino blue-4"></div>
+        <div id="blue-4_2" class="polyomino blue-4"></div>
+        <div id="blue-4_3" class="polyomino blue-4"></div>
+
         <div id="blue-5_1" class="polyomino blue-5"></div>
 
         <div id="yellow-2_1" class="polyomino yellow-2"></div>
+        <div id="yellow-2_2" class="polyomino yellow-2"></div>
+        <div id="yellow-2_3" class="polyomino yellow-2"></div>
+
         <div id="yellow-3_1" class="polyomino yellow-3"></div>
+        <div id="yellow-3_2" class="polyomino yellow-3"></div>
+        <div id="yellow-3_3" class="polyomino yellow-3"></div>
+
         <div id="yellow-4_1" class="polyomino yellow-4"></div>
+        <div id="yellow-4_2" class="polyomino yellow-4"></div>
+        <div id="yellow-4_3" class="polyomino yellow-4"></div>
+
         <div id="yellow-5_1" class="polyomino yellow-5"></div>
     </div>
 

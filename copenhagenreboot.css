@@ -242,7 +242,7 @@
     height: 102px;
 
     top: 45px;
-    left: 288px;
+    left: 293px;
 }
 
 .polyomino.red-2
@@ -250,30 +250,33 @@
     background-position: -140px -212px;
     width: 68px;
     height: 34px;
-
-    top: 136px;
-    left: 0px;
 }
+
+#red-2_1{ left: 0px; top: 136px; }
+#red-2_2{ left: 2px; top: 134px; }
+#red-2_3{ left: 4px; top: 132px; }
 
 .polyomino.red-3
 {
     background-position: -382px -36px;
     width: 68px;
     height: 68px;
-
-    top: 136px;
-    left: 76px;
 }
+
+#red-3_1{ left: 74px; top: 136px; }
+#red-3_2{ left: 76px; top: 134px; }
+#red-3_3{ left: 78px; top: 132px; }
 
 .polyomino.red-4
 {
     background-position: -450px -176px;
     width: 68px;
     height: 68px;
-
-    top: 136px;
-    left: 143px;
 }
+
+#red-4_1{ left: 148px; top: 136px; }
+#red-4_2{ left: 150px; top: 134px; }
+#red-4_3{ left: 152px; top: 132px; }
 
 .polyomino.red-5
 {
@@ -282,7 +285,7 @@
     height: 68px;
 
     top: 136px;
-    left: 218px;
+    left: 223px;
 }
 
 .polyomino.blue-2
@@ -290,30 +293,33 @@
     background-position: -210px -212px;
     width: 68px;
     height: 34px;
-
-    top: 213px;
 }
+
+#blue-2_1{ left: 0px; top: 213px; }
+#blue-2_2{ left: 2px; top: 211px; }
+#blue-2_3{ left: 4px; top: 209px; }
 
 .polyomino.blue-3
 {
     background-position: -312px -36px;
     width: 68px;
     height: 68px;
-
-    top: 213px;
-    left: 78px;
 }
+
+#blue-3_1{ left: 74px; top: 213px; }
+#blue-3_2{ left: 76px; top: 211px; }
+#blue-3_3{ left: 78px; top: 209px; }
 
 .polyomino.blue-4
 {
     background-position: -208px -106px;
     width: 102px;
     height: 68px;
-
-    top: 213px;
-    left:  169px;
-
 }
+
+#blue-4_1{ left: 169px; top: 213px; }
+#blue-4_2{ left: 171px; top: 211px; }
+#blue-4_3{ left: 173px; top: 209px; }
 
 .polyomino.blue-5
 {
@@ -322,7 +328,7 @@
     height: 102px;
 
     top: 183px;
-    left: 285px;
+    left: 293px;
 }
 
 .polyomino.yellow-2
@@ -330,29 +336,33 @@
     background-position: -280px -212px;
     width: 68px;
     height: 34px;
-
-    top: 311px;
 }
+
+#yellow-2_1{ left: 0px; top: 311px; }
+#yellow-2_2{ left: 2px; top: 309px; }
+#yellow-2_3{ left: 4px; top: 307px; }
 
 .polyomino.yellow-3
 {
     background-position: -380px -176px;
     width: 68px;
     height: 68px;
-
-    left: 78px;
-    top: 311px;
 }
+
+#yellow-3_1{ left: 74px; top: 311px; }
+#yellow-3_2{ left: 76px; top: 309px; }
+#yellow-3_3{ left: 78px; top: 307px; }
 
 .polyomino.yellow-4
 {
     background-position: -312px -106px;
     width: 102px;
     height: 68px;
-
-    left:  169px;
-    top: 311px;
 }
+
+#yellow-4_1{ left: 169px; top: 311px; }
+#yellow-4_2{ left: 171px; top: 309px; }
+#yellow-4_3{ left: 173px; top: 307px; }
 
 .polyomino.yellow-5
 {
@@ -360,7 +370,7 @@
     width: 102px;
     height: 102px;
 
-    left: 285px;
+    left: 293px;
     top:  279px;
 }
 
