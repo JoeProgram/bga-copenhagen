@@ -90,15 +90,7 @@ function (dojo, declare) {
         {
             console.log( "Starting game setup" );
             
-            // logic for setting up data of playboard
-            this.board = [];
-            for( var x = 0; x < 5; x++)
-            {
-                this.board[x] = [];
-                for( var y = 0; y < 9; y++ ) this.board[x][y] = false;
-            } 
-            this.showPlayerBoardDebug( this.board );
-
+            this.setupBoard( gamedatas );
 
             // Setting up player boards 
             for( var player_id in gamedatas.players )
@@ -109,6 +101,7 @@ function (dojo, declare) {
                 // TODO: Setting up players boards if needed
             }
             
+            // CONNECT INTERACTIVE ELEMENTS
             dojo.query(".board_cell").connect( 'onclick', this, 'onPlacePolyomino');
             dojo.query(".board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
             dojo.query("#board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
@@ -129,7 +122,21 @@ function (dojo, declare) {
             this.setupNotifications();
 
             console.log( "Ending game setup" );
-        },       
+        },    
+
+        setupBoard: function( gamedatas )
+        {
+            // logic for setting up data of playboard
+            this.board = [];
+            for( var x = 0; x < this.boardWidth; x++)
+            {
+                this.board[x] = [];
+                for( var y = 0; y < this.boardHeight; y++ )
+                {
+                    this.board[x][y] = dojo.query(`#board_cell_${x}_${y}`);
+                } 
+            }
+        },   
 
         ///////////////////////////////////////////////////
         //// Game & client states
@@ -340,6 +347,7 @@ function (dojo, declare) {
 
         determineUsablePolyominoes: function()
         {
+
             var game = this;
 
             dojo.query(".polyomino.top_of_stack").forEach(function(polyomino)
@@ -349,8 +357,8 @@ function (dojo, declare) {
                 dojo.removeClass(polyomino, "unusable");
 
                 // gather the information
-                var color = polyomino.id.split('-')[0];
-                var squares = polyomino.id.split('-')[1].split('_')[0];
+                var color = game.getPolyominoColorFromId( polyomino.id );
+                var squares = game.getPolyominoSquaresFromId( polyomino.id );
                 var cardsOfColor = game.countColoredCardsInHand( color );
 
                 var cost = squares;
@@ -367,10 +375,20 @@ function (dojo, declare) {
             return dojo.query(`#owned_playerboard .${color}_polyomino`).length >= 1;
         },
 
+        getPolyominoColorFromId: function( polyominoId )
+        {
+            return polyominoId.split('-')[0];
+        },
+
+        getPolyominoSquaresFromId: function( polyominoId )
+        {
+            return polyominoId.split('-')[1].split('_')[0];
+        },
+
         payPolyominoCost: function( polyominoId )
         {
-            var color = polyominoId.split('-')[0];
-            var squares = polyominoId.split('-')[1].split('_')[0];
+            var color = this.getPolyominoColorFromId( polyominoId );
+            var squares = this.getPolyominoSquaresFromId( polyominoId );
 
             var cost = squares;
 
@@ -385,18 +403,18 @@ function (dojo, declare) {
             dojo.destroy( card );
         },
 
-        showPlayerBoardDebug: function( board )
+        updateBoardCells: function( polyomino, gridCells, board )
         {
 
-            for( var x = 0; x < board.length; x++)
-            {
-                for( var y = 0; y < board[x].length; y++ )
-                {
-                    if( board[x][y] == true) dojo.query( "#board_cell_" + x + "_" + y).addClass("full");
-                }
-            }
+            console.log( polyomino );
+            var color = this.getPolyominoColorFromId( polyomino.id );
 
-            dojo.query()
+            gridCells.forEach( function( gridCell )
+            {
+                dojo.query( `#board_cell_${gridCell.x}_${gridCell.y}`).addClass("full").addClass(`${color}_cell`);
+            });
+
+            dojo.query(".board_cell.preview").removeClass("preview");
         },
 
         getCoordinatesFromId: function( id )
@@ -410,7 +428,7 @@ function (dojo, declare) {
 
         isCellEmpty: function( coordinates )
         {
-            return this.board[coordinates.x][coordinates.y] == false;
+            return !dojo.hasClass(`board_cell_${coordinates.x}_${coordinates.y}`,"full");
         },
 
         areCellsEmpty: function( coordinates )
@@ -436,6 +454,11 @@ function (dojo, declare) {
                 if( !this.isCellEmpty(coordBelow)) return true;
             }
 
+            return false;
+        },
+
+        isAdjacentToSameColor: function( coordinates, color )
+        {
             return false;
         },
 
@@ -851,15 +874,10 @@ function (dojo, declare) {
 
             if( !validity ) return; // can't place polyomino if space isn't valid
 
-            var board = this.board; // NOTE: scope issue - need to assign board to temp variable, since context of "this" changes in anonymous function
-            gridCells.forEach( function(item, index){
-                board[item.x][item.y] = true;
-            });
-
-            this.showPlayerBoardDebug( this.board );
-            dojo.query(".board_cell.preview").removeClass("preview");
-
+            // UPDATE BOARD DATA
             var polyominoNode = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
+            this.updateBoardCells(polyominoNode, gridCells, this.board);
+           
             dojo.removeClass(polyominoNode, "top_of_stack");
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
