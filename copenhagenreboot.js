@@ -487,7 +487,27 @@ function (dojo, declare) {
 
         isValidPlacementPosition: function( coordinates )
         {
-            return this.areCellsEmpty( coordinates ) && this.isGroundedPosition( coordinates );
+            
+            // CHECK EASY CONDITIONS FIRST
+            if( !this.areCellsEmpty( coordinates ) || !this.isGroundedPosition( coordinates )) return false; 
+
+
+
+            // CHECK IF WE CAN AFFORD IT
+            var color = this.getPolyominoColorFromId( this.selectedPolyomino.id);
+            var cardsOfColor = this.countColoredCardsInHand( color );
+            var squares = this.getPolyominoSquaresFromId( this.selectedPolyomino.id);
+
+            console.log( `cardsOfColor ${cardsOfColor}`);
+            console.log( `squares ${squares}`);
+            console.log( `color ${color}`);
+
+            var cost = squares;
+            if( this.isAdjacentToSameColor( coordinates, color)) cost -= 1;
+
+            console.log( `cost ${cost}`);
+
+            return cardsOfColor >= cost;
         },
 
         getGridCellsForPolyominoAtCoordinates: function( polyominoShape, coordinates )
