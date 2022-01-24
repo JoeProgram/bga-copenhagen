@@ -105,16 +105,18 @@ class CopenhagenReboot extends Table
         $this->cards->moveAllCardsInLocation( null, "deck" );
         $this->cards->shuffle( 'deck' );
 
-        $players = self::loadPlayersBasicInfos();
-        foreach( $players as $player_id => $player )
-        {
-            $cards = $this->cards->pickCards( 7, 'deck', $player_id );
-        }  
-
+        // LAYOUT HARBOR CARDS
         for( $i = 0; $i < 7; $i++)
         {
             $cards = $this->cards->pickCardForLocation('deck', 'harbor');
         }
+
+        // SET PLAYER STARTING HANDS
+        $players = self::loadPlayersBasicInfos();
+        foreach( $players as $player_id => $player )
+        {
+            $cards = $this->cards->pickCards( 2, 'deck', $player_id ); 
+        }  
 
         // Activate first player
         $this->activeNextPlayer();

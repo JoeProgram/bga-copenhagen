@@ -98,10 +98,11 @@ function (dojo, declare) {
 
             // HARBOR CARDS
             var index = 0;
-            for( var cardId in gamedatas.hand )
+            for( var cardId in gamedatas.harbor )
             {
-                var cardData = gamedatas.hand[cardId];
+                var cardData = gamedatas.harbor[cardId];
                 var cardHtml = this.format_block('jstpl_card',{   // make the html in memory
+                    id: cardId,
                     color: cardData.type,                   // set the color
                 }); 
 
@@ -125,6 +126,7 @@ function (dojo, declare) {
                 var cardData = gamedatas.hand[cardId];
 
                 var cardHtml = this.format_block('jstpl_card',{   // make the html in memory
+                    id: cardId,
                     color: cardData.type,                   // set the color
                 }); 
                 var card = dojo.place( cardHtml, "cards_in_hand");
@@ -282,6 +284,7 @@ function (dojo, declare) {
 
                 // CREATE A NEW CARD
                 var cardHtml = game.format_block('jstpl_card',{   // make the html in memory
+                    id: 0,
                     color: "yellow",
                 }); 
                 var card = dojo.place( cardHtml, harborPosition);  // put it in the html dom
