@@ -288,7 +288,7 @@
 <script type="text/javascript">
 
 /****************************** JAVASCRIPT HTML TEMPLATES ******************************/
-var jstpl_card='<div class="card ${color}"></div>';
+var jstpl_card='<div class="card ${color}_card"></div>';
 
 </script>  
 

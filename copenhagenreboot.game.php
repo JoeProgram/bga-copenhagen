@@ -95,17 +95,26 @@ class CopenhagenReboot extends Table
 
         // SETUP DECK
         $cards = array();
-        $cards[] = array( 'type' => "purple", 'type_arg' => 1,  'nbr' => 14);
+        $cards[] = array( 'type' => "red", 'type_arg' => 0,  'nbr' => 14);
+        $cards[] = array( 'type' => "yellow", 'type_arg' => 0,  'nbr' => 14);
+        $cards[] = array( 'type' => "green", 'type_arg' => 0,  'nbr' => 14);
+        $cards[] = array( 'type' => "blue", 'type_arg' => 0,  'nbr' => 14);
+        $cards[] = array( 'type' => "purple", 'type_arg' => 0,  'nbr' => 14);
         $this->cards->createCards( $cards, 'deck' );
 
         $this->cards->moveAllCardsInLocation( null, "deck" );
         $this->cards->shuffle( 'deck' );
 
-       $players = self::loadPlayersBasicInfos();
+        $players = self::loadPlayersBasicInfos();
         foreach( $players as $player_id => $player )
         {
-            $cards = $this->cards->pickCards( 2, 'deck', $player_id );
+            $cards = $this->cards->pickCards( 7, 'deck', $player_id );
         }  
+
+        for( $i = 0; $i < 7; $i++)
+        {
+            $cards = $this->cards->pickCardForLocation('deck', 'harbor');
+        }
 
         // Activate first player
         $this->activeNextPlayer();
@@ -136,6 +145,7 @@ class CopenhagenReboot extends Table
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
         
         $result['hand'] = $this->cards->getCardsInLocation( 'hand', $current_player_id );
+        $result['harbor'] = $this->cards->getCardsInLocation( 'harbor' );
 
         return $result;
     }

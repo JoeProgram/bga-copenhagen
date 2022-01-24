@@ -92,22 +92,45 @@ function (dojo, declare) {
         {
             console.log( "Starting game setup" );
             
-            this.setupBoard( gamedatas );
+            this.setupBoard();
 
-            // Setting up player boards 
+            console.log( gamedatas);
+
+            // HARBOR CARDS
+            var index = 0;
+            for( var cardId in gamedatas.hand )
+            {
+                var cardData = gamedatas.hand[cardId];
+                var cardHtml = this.format_block('jstpl_card',{   // make the html in memory
+                    color: cardData.type,                   // set the color
+                }); 
+
+                var card = dojo.place( cardHtml, `harbor_position_${index}`);
+                this.placeOnObject( card, "deck" ); // we use some visual illusion here.  The card starts on its final parent, but we snap it to the deck, then animate its slide back to its actual parent
+                this.slideToObject( card, `harbor_position_${index}`, 500  ).play();
+                dojo.connect(card, "onclick", this, "onTakeHarborCard");
+
+                index ++;
+            }
+
+            // PLAYER BOARDS 
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
             }
 
-            for( var card in gamedatas.hand )
+            // CARDS IN HAND
+            for( var cardId in gamedatas.hand )
             {
+                var cardData = gamedatas.hand[cardId];
+
                 var cardHtml = this.format_block('jstpl_card',{   // make the html in memory
-                    color: "yellow_card",
+                    color: cardData.type,                   // set the color
                 }); 
                 var card = dojo.place( cardHtml, "cards_in_hand");
                 this.placeOnObject( card, "hand_bottom_card_target" );
             }
+            this.splayCardsInHand();
             
             // CONNECT INTERACTIVE ELEMENTS
             dojo.query(".board_cell").connect( 'onclick', this, 'onPlacePolyomino');
@@ -132,7 +155,7 @@ function (dojo, declare) {
             console.log( "Ending game setup" );
         },    
 
-        setupBoard: function( gamedatas )
+        setupBoard: function()
         {
             // logic for setting up data of playboard
             this.board = [];
@@ -259,7 +282,7 @@ function (dojo, declare) {
 
                 // CREATE A NEW CARD
                 var cardHtml = game.format_block('jstpl_card',{   // make the html in memory
-                    color: "yellow_card",
+                    color: "yellow",
                 }); 
                 var card = dojo.place( cardHtml, harborPosition);  // put it in the html dom
 
