@@ -141,8 +141,6 @@ function (dojo, declare) {
             dojo.query("#polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
-            dojo.query("#harbor_cards .card").connect('onclick',this, 'onTakeHarborCard');
-
             this.determineTopPolyominoInEveryStack();
             dojo.query("#polyominoes .polyomino.top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
 
@@ -183,20 +181,12 @@ function (dojo, declare) {
             
             switch( stateName )
             {
-            
-            /* Example:
-            
-            case 'myGameState':
-            
-                // Show some HTML block at this game state
-                dojo.style( 'my_html_block_id', 'display', 'block' );
-                
-                break;
-           */
+
+                case 'playerTurn':
+                    break;
            
-           
-            case 'dummmy':
-                break;
+                case 'dummmy':
+                    break;
             }
         },
 
@@ -783,17 +773,19 @@ function (dojo, declare) {
 
         onTakeHarborCard: function( event )
         {
+
+            dojo.stopEvent( event );
+
             if( this.hasTooManyCardsInHand()) return; // doesn't work if your hand is full
 
-            this.harborCardsToRefill.push(event.currentTarget.parentNode);
-
-            var card = this.attachToNewParent( event.currentTarget, "cards_in_hand");
-            dojo.place( card, "cards_in_hand", this.findPositionForNewCardInHand( card ));
-
-            this.splayCardsInHand();
-            this.checkHandSize();
-
-            if( !this.hasTooManyCardsInHand()) this.determineUsablePolyominoes();
+            if( this.checkAction('takeCard'))
+            {
+                this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeCard.html",
+                {
+                    id:event.currentTarget.id.split("_")[1],
+                }, this, function( result ){} ); 
+            }
+ 
         },
 
         onDiscardCardOverMaxHandSize: function( event )
@@ -997,15 +989,9 @@ function (dojo, declare) {
             
             // TODO: here, associate your game notifications with local methods
             
-            // Example 1: standard notification handling
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
+            dojo.subscribe( 'takeCard', this, 'notif_takeCard' );
+            this.notifqueue.setSynchronous( 'takeCard', 500 );
             
-            // Example 2: standard notification handling + tell the user interface to wait
-            //            during 3 seconds after calling the method in order to let the players
-            //            see what is happening in the game.
-            // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-            // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-            // 
         },  
         
         // TODO: from this point and below, you can write your game notifications handling methods
@@ -1024,5 +1010,17 @@ function (dojo, declare) {
         },    
         
         */
+
+        notif_takeCard: function(notif)
+        {
+
+            var card = this.attachToNewParent( `card_${notif.args.id}`, "cards_in_hand");
+            dojo.place( card, "cards_in_hand", this.findPositionForNewCardInHand( card ));
+
+            this.splayCardsInHand();
+            this.checkHandSize();
+
+            if( !this.hasTooManyCardsInHand()) this.determineUsablePolyominoes();
+        }
    });             
 });

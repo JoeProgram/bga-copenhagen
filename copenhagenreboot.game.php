@@ -215,13 +215,20 @@ class CopenhagenReboot extends Table
     
     */
 
-    function drawCard()
+    function takeCard( $id )
     {
-        self::checkAction( 'drawCard');
+        self::checkAction( 'takeCard' );
 
         $player_id = self::getActivePlayerId();
 
+        $this->cards->getCard( $id ); // TODO: Make sure card is in harbor
+        $this->cards->moveCard( $id, "hand", $player_id );
 
+        self::notifyPlayer( $player_id, "takeCard", "", array(
+            "id" => $id
+        ));
+
+        $this->gamestate->nextState( "takeCard");
     }
 
     
@@ -276,7 +283,13 @@ class CopenhagenReboot extends Table
 
     function stNextPlayer()
     {
-        //$this->gamestate->nextState("playerTurn");
+
+        $player_id = self::activeNextPlayer(); // this sets the turn to the next player
+
+        // TODO: Check if game is over
+        //$this->gamestate->nextState( 'endGame' );
+
+        $this->gamestate->nextState("playerTurn");
     }
 
 //////////////////////////////////////////////////////////////////////////////

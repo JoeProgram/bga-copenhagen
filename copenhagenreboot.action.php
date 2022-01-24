@@ -63,11 +63,12 @@
     
     */
 
-    public function drawCard()
+    public function takeCard()
     {
         self::setAjaxMode();  
 
-        $this->game->drawCard();
+        $id = self::getArg( "id", AT_posint, true );
+        $this->game->takeCard( $id );
 
         self::ajaxResponse(); 
     }
