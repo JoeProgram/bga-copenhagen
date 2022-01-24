@@ -98,9 +98,15 @@ function (dojo, declare) {
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
-                     
+            }
 
-                // TODO: Setting up players boards if needed
+            for( var card in gamedatas.hand )
+            {
+                var cardHtml = this.format_block('jstpl_card',{   // make the html in memory
+                    color: "yellow_card",
+                }); 
+                var card = dojo.place( cardHtml, "cards_in_hand");
+                this.placeOnObject( card, "hand_bottom_card_target" );
             }
             
             // CONNECT INTERACTIVE ELEMENTS

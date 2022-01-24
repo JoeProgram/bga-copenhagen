@@ -63,6 +63,15 @@
     
     */
 
+    public function drawCard()
+    {
+        self::setAjaxMode();  
+
+        $this->game->drawCard();
+
+        self::ajaxResponse(); 
+    }
+
   }
   
 

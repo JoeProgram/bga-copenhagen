@@ -92,28 +92,25 @@ class CopenhagenReboot extends Table
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
         // TODO: setup the initial game situation here
-        $cards = array();
-        foreach( $this->colors as  $color_id => $color ) // spade, heart, diamond, club
-        {
-            for( $value=2; $value<=14; $value++ )   //  2, 3, 4, ... K, A
-            {
-                $cards[] = array( 'type' => $color_id, 'type_arg' => $value, 'nbr' => 1);
-            }
-        }
 
+        // SETUP DECK
+        $cards = array();
+        $cards[] = array( 'type' => "purple", 'type_arg' => 1,  'nbr' => 14);
         $this->cards->createCards( $cards, 'deck' );
+
+        $this->cards->moveAllCardsInLocation( null, "deck" );
+        $this->cards->shuffle( 'deck' );
+
+       $players = self::loadPlayersBasicInfos();
+        foreach( $players as $player_id => $player )
+        {
+            $cards = $this->cards->pickCards( 2, 'deck', $player_id );
+        }  
 
         // Activate first player
         $this->activeNextPlayer();
 
         /************ End of the game initialization *****/
-    }
-
-    protected function setupDeck()
-    {
-        /*$cards = array();
-
-        $cards[] = array( 'type' => "purple", 'nbr' => 14);  /* The empty brackets means PHP will autogenerate a key for the entry*/
     }
 
     /*
@@ -137,7 +134,9 @@ class CopenhagenReboot extends Table
         $result['players'] = self::getCollectionFromDb( $sql );
   
         // TODO: Gather all information about current game situation (visible by player $current_player_id).
-  
+        
+        $result['hand'] = $this->cards->getCardsInLocation( 'hand', $current_player_id );
+
         return $result;
     }
 
@@ -204,6 +203,15 @@ class CopenhagenReboot extends Table
     
     */
 
+    function drawCard()
+    {
+        self::checkAction( 'drawCard');
+
+        $player_id = self::getActivePlayerId();
+
+
+    }
+
     
 //////////////////////////////////////////////////////////////////////////////
 //////////// Game state arguments
@@ -253,6 +261,11 @@ class CopenhagenReboot extends Table
         $this->gamestate->nextState( 'some_gamestate_transition' );
     }    
     */
+
+    function stNextPlayer()
+    {
+        //$this->gamestate->nextState("playerTurn");
+    }
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Zombie
