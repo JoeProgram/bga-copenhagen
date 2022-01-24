@@ -93,7 +93,8 @@ function (dojo, declare) {
             
             this.setupBoard();
 
-            console.log( gamedatas);
+            // DEBUG - see all game data in console
+            //console.log( gamedatas);
 
             // HARBOR CARDS
             for( var cardId in gamedatas.harbor )
@@ -171,9 +172,29 @@ function (dojo, declare) {
 
                 case 'playerTurn':
                     break;
+
+                case 'discardDownToMaxHandSize':
+                    this.onEnteringStateDiscardDownToMaxHandSize( args );
+                    break;
            
                 case 'dummmy':
                     break;
+            }
+        },
+
+        onEnteringStateDiscardDownToMaxHandSize( args )
+        {
+
+            dojo.addClass("hand","over_max_hand_size");
+
+            var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
+            var cardsInHand = this.getChildElementNodes( cardsInHandNode );
+
+            for( var i = 0; i < cardsInHand.length; i++ )
+            {
+                // have to connect this a little differently, since we want to remove thse handlers later
+                var discardHandler = dojo.connect( cardsInHand[i], "onclick", this, "onDiscardCardOverMaxHandSize");
+                this.maxHandSizeDiscardHandlers.push( discardHandler ); 
             }
         },
 
@@ -187,21 +208,22 @@ function (dojo, declare) {
             switch( stateName )
             {
             
-            /* Example:
-            
-            case 'myGameState':
-            
-                // Hide the HTML block we are displaying only during this game state
-                dojo.style( 'my_html_block_id', 'display', 'none' );
-                
+           case 'discardDownToMaxHandSize':
+                this.onLeavingStateDiscardDownToMaxHandSize();
                 break;
-           */
-           
            
             case 'dummmy':
                 break;
             }               
         }, 
+
+        onLeavingStateDiscardDownToMaxHandSize()
+        {
+            dojo.removeClass("hand","over_max_hand_size");
+            dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
+            this.splayCardsInHand();
+            this.determineUsablePolyominoes();
+        },
 
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
         //                        action status bar (ie: the HTML links in the status bar).
@@ -333,25 +355,6 @@ function (dojo, declare) {
         hasTooManyCardsInHand: function()
         {
             return dojo.query("#cards_in_hand .card").length > this.maxHandSize;
-        },
-
-        checkHandSize: function()
-        {
-            if( this.hasTooManyCardsInHand())
-            {
-
-                dojo.addClass("hand","over_max_hand_size");
-
-                var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
-                var cardsInHand = this.getChildElementNodes( cardsInHandNode );
-
-                for( var i = 0; i < cardsInHand.length; i++ )
-                {
-                    // have to connect this a little differently, since we want to remove thse handlers later
-                    var discardHandler = dojo.connect( cardsInHand[i], "onclick", this, "onDiscardCardOverMaxHandSize");
-                    this.maxHandSizeDiscardHandlers.push( discardHandler ); 
-                }
-            }
         },
 
 
@@ -776,13 +779,15 @@ function (dojo, declare) {
 
             dojo.stopEvent( event );
 
-            if( this.hasTooManyCardsInHand()) return; // doesn't work if your hand is full
+            // CLIENT-SIDE VALIDATION
+            if( this.hasTooManyCardsInHand()) return; // doesn't work if your hand already has too many cards
 
+            // SEND SERVER REQUEST
             if( this.checkAction('takeCard'))
             {
                 this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeCard.html",
                 {
-                    id:event.currentTarget.id.split("_")[1],
+                    card_id:event.currentTarget.id.split("_")[1],
                 }, this, function( result ){} ); 
             }
  
@@ -790,12 +795,17 @@ function (dojo, declare) {
 
         onDiscardCardOverMaxHandSize: function( event )
         {
-            dojo.removeClass("hand","over_max_hand_size");
+            dojo.stopEvent( event );
 
-            dojo.destroy( event.currentTarget );
-            dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
-            this.splayCardsInHand();
-            this.determineUsablePolyominoes();
+            // SEND SERVER REQUEST
+            if( this.checkAction('discardedAndDone'))
+            {
+
+                this.ajaxcall( "/copenhagenreboot/copenhagenreboot/discardDownToMaxHandSize.html",
+                {
+                    card_id:event.currentTarget.id.split("_")[1],
+                }, this, function( result ){} ); 
+            }
         },
 
         onSelectPolyomino: function( event )
@@ -988,27 +998,15 @@ function (dojo, declare) {
                      
             dojo.subscribe( 'takeCard', this, 'notif_takeCard' );
             this.notifqueue.setSynchronous( 'takeCard', 500 ); // this forces a wait time for this action so players can process what's happening on screen
-            
+
+            dojo.subscribe( 'discardDownToMaxHandSize', this, 'notif_discardDownToMaxHandSize' );
+            this.notifqueue.setSynchronous( 'discardDownToMaxHandSize', 500 );
+
             dojo.subscribe( 'refillHarbor', this, 'notif_refillHarbor' );
             this.notifqueue.setSynchronous( 'refillHarbor', 500 );
         },  
         
         // TODO: from this point and below, you can write your game notifications handling methods
-        
-        /*
-        Example:
-        
-        notif_cardPlayed: function( notif )
-        {
-            console.log( 'notif_cardPlayed' );
-            console.log( notif );
-            
-            // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-            
-            // TODO: play the card in the user interface.
-        },    
-        
-        */
 
         notif_takeCard: function(notif)
         {
@@ -1028,8 +1026,17 @@ function (dojo, declare) {
                 this.slideToObjectAndDestroy( `card_${notif.args.card_id}`, `overall_player_board_${notif.args.player_id}`)
             }
 
-            //this.checkHandSize();
             //if( !this.hasTooManyCardsInHand()) this.determineUsablePolyominoes();
+        },
+
+        notif_discardDownToMaxHandSize: function(notif)
+        {
+            // IF IT'S YOUR CARD
+            if( notif.args.player_id == this.player_id )
+            {
+                dojo.destroy( `card_${notif.args.card_id}` );
+                this.splayCardsInHand();
+            }
         },
 
         notif_refillHarbor: function(notif)
@@ -1039,5 +1046,7 @@ function (dojo, declare) {
                 this.makeHarborCard( notif.args.harbor[cardId] );
             }
         },
+
+
    });             
 });

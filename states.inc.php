@@ -74,14 +74,57 @@ $machinestates = array(
     
     3 => array(
         "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must play a card or pass'),
-        "descriptionmyturn" => clienttranslate('${you} must play a card or pass'),
+        "description" => clienttranslate('${actplayer} must take a card'),
+        "descriptionmyturn" => clienttranslate('${you} must take a card'),
         "type" => "activeplayer",
         "possibleactions" => array( "takeCard" ),
         "transitions" => array(  "takeCard" => 4 )
     ), 
 
     4 => array(
+        "name" => "checkHandSize",
+        "description" => "",
+        "type" => "game",
+        "action" => "stCheckHandSize",
+        "possibleactions" => array( 
+            "takeAdjacentCard",
+            "discardDownToMaxHandSize",
+            "refillHarbor"
+         ),
+        "transitions" => array( 
+            //"takeAdjacentCard" => 5,
+            "discardDownToMaxHandSize" => 6,
+            "refillHarbor" => 50
+         ),
+    ), 
+
+/*
+    5 => array(
+        "name" => "takeAdjacentCard",
+        "description" => clienttranslate('${actplayer} must take another card'),
+        "descriptionmyturn" => clienttranslate('${you} must take another card next to the one you just took.'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "takeCard" ),
+        "transitions" => array(  "takeCard" => 4 )
+    ), 
+    */
+
+    6 => array(
+        "name" => "discardDownToMaxHandSize",
+        "description" => clienttranslate('${actplayer} must discard a card'),
+        "descriptionmyturn" => clienttranslate('${you} must discard a card. You can only have 7 cards in hand.'),
+        "type" => "activeplayer",
+        "possibleactions" => array( 
+    //        "discardedAndTakeAnother",
+            "discardedAndDone",
+         ),
+        "transitions" => array(  
+            //"discardedAndTakeAnother" => 5,
+            "discardedAndDone" => 50, 
+        )
+    ), 
+
+    50 => array(
         "name" => "refillHarbor",
         "description" => "",
         "type" => "game",

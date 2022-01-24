@@ -33,7 +33,7 @@ class CopenhagenReboot extends Table
         parent::__construct();
         
         self::initGameStateLabels( array( 
-            //    "my_first_global_variable" => 10,
+            "cardsTakenThisTurn" => 10,  // keep track of how many cards have been taken this turn.  10 is not the value to track - just an internal ID
             //    "my_second_global_variable" => 11,
             //      ...
             //    "my_first_game_variant" => 100,
@@ -83,15 +83,14 @@ class CopenhagenReboot extends Table
         
         /************ Start the game initialization *****/
 
-        // Init global values with their initial values
-        //self::setGameStateInitialValue( 'my_first_global_variable', 0 );
-        
-        // Init game statistics
+        // INITIALIZE GLOBAL VALUES
+        self::setGameStateValue( 'cardsTakenThisTurn', 0 );
+
+        // INITIALIZE GAME STATISTICS
         // (note: statistics used in this file must be defined in your stats.inc.php file)
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
 
-        // TODO: setup the initial game situation here
 
         // SETUP DECK
         $cards = array();
@@ -106,7 +105,7 @@ class CopenhagenReboot extends Table
         $this->cards->shuffle( 'deck' );
 
         // LAYOUT HARBOR CARDS
-        for( $i = 0; $i < 7; $i++)
+        for( $i = 0; $i < $this->maxHandSize; $i++)
         {
             $cards = $this->cards->pickCardForLocation('deck', 'harbor', $i);
         }
@@ -215,30 +214,74 @@ class CopenhagenReboot extends Table
     
     */
 
-    function takeCard( $id )
+    function takeCard( $card_id )
     {
         self::checkAction( 'takeCard' );
 
         $player_id = self::getActivePlayerId();
 
-        // Make sure card is in harbor
-        $card = $this->cards->getCard( $id ); 
+        // MAKE SURE CARD IS IN HARBOR
+        $card = $this->cards->getCard( $card_id ); 
         if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
 
+        $this->cards->moveCard( $card_id, "hand", $player_id );
 
-        $this->cards->moveCard( $id, "hand", $player_id );
+        $cardsTakenThisTurn = self::getGameStateValue( "cardsTakenThisTurn" );
+        self::setGameStateValue( 'cardsTakenThisTurn', $cardsTakenThisTurn + 1 );
 
         self::notifyAllPlayers( 
             "takeCard", 
-            clienttranslate('${player_name} takes a card.'),
+            clienttranslate('${player_name} takes a ${color} card.'),
             array(
-                "card_id" => $id,
+                "card_id" => $card_id,
                 "player_id" => $player_id,
-                "player_name" => self::getActivePlayerName()
+                "player_name" => self::getActivePlayerName(),
+                "color" => $card["type"]
             )   
         );
 
         $this->gamestate->nextState( "takeCard");
+    }
+
+    function discardDownToMaxHandSize( $card_id )
+    {
+
+        self::checkAction( 'discardedAndDone' ); // I think I only need to check one of the actions for this particular case
+
+        $player_id = self::getActivePlayerId();
+        $card = $this->cards->getCard( $card_id ); 
+
+        // MAKE SURE CARD IS IN PLAYER'S HAND
+        if( $card['location'] != 'hand' && $card['location_arg'] == $player_id) throw new feException( self::_("That card is not in your hand."));
+
+        // MAKE SURE WE'RE ACTUALLY OVER THE HAND LIMIT
+        $cardsInHand = $this->cards->countCardInLocation( "hand", $player_id);
+        if( $cardsInHand <= $this->maxHandSize ) throw new feException( self::_("You are not over the hand limit size."));
+
+        // DISCARD THE CARD
+        $this->cards->moveCard( $card_id, "discard");
+
+        // TELL THE CLIENTS
+        //   Cards are discarded face up, so it's okay to notify all players of the specific card discarded
+        self::notifyAllPlayers( 
+            "discardDownToMaxHandSize", 
+            clienttranslate('${player_name} discards a ${color} card.'),
+            array(
+                "player_id" => $player_id,
+                "player_name" => self::getActivePlayerName(),
+                "card_id" => $card_id,
+                "color" => $card["type"]
+            )   
+        );
+
+        $this->gamestate->nextState( "discardedAndDone");
+        // NEXT PHASE
+        /*
+        $cardsTakenThisTurn = self::getGameStateValue( "cardsTakenThisTurn" );
+        if( $cardsTakenThisTurn == 1 ) $this->gamestate->nextState( "discardedAndTakeAnother");
+        else $this->gamestate->nextState( "discardedAndDone");
+        */
+
     }
 
     
@@ -277,19 +320,6 @@ class CopenhagenReboot extends Table
         Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
         The action method of state X is called everytime the current game state is set to X.
     */
-    
-    /*
-    
-    Example for game state "MyGameState":
-
-    function stMyGameState()
-    {
-        // Do some stuff ...
-        
-        // (very often) go to another gamestate
-        $this->gamestate->nextState( 'some_gamestate_transition' );
-    }    
-    */
 
     function stNextPlayer()
     {
@@ -299,15 +329,40 @@ class CopenhagenReboot extends Table
         // TODO: Check if game is over
         //$this->gamestate->nextState( 'endGame' );
 
+        // NEXT PLAYER'S TURN
+        self::setGameStateValue( 'cardsTakenThisTurn', 0 );
+
         $this->gamestate->nextState("playerTurn");
     }
+
+    function stCheckHandSize()
+    {
+        $player_id = self::getActivePlayerId();
+
+        $cardsInHand = $this->cards->countCardInLocation( "hand", $player_id);
+        if( $cardsInHand > $this->maxHandSize ) $this->gamestate->nextState("discardDownToMaxHandSize");
+        else
+        {
+            $this->gamestate->nextState("refillHarbor");
+            // PLAYER DOESN'T HAVE TOO MANY CARDS
+            /*
+            $cardsTakenThisTurn = self::getGameStateValue( "cardsTakenThisTurn" );
+            if( $cardsTakenThisTurn == 1 ) $this->gamestate->nextState("takeAdjacentCard");
+            else $this->gamestate->nextState("refillHarbor");
+            */
+        }
+        
+        
+    }
+
+
 
     function stRefillHarbor()
     {
 
         $cards = [];
 
-        for( $i = 0; $i < 7; $i ++)
+        for( $i = 0; $i < $this->maxHandSize; $i ++)
         {
             if( $this->cards->countCardInLocation("harbor", $i) == 0 )
             {
