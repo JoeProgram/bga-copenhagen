@@ -34,7 +34,6 @@ function (dojo, declare) {
             this.boardWidth = 5;
             this.boardHeight = 9;
 
-            this.harborCardsToRefill = [];
             this.cardWidth = 66;
             this.cardSplayDistance = 20;
             this.maxHandSize = 7;
@@ -97,21 +96,9 @@ function (dojo, declare) {
             console.log( gamedatas);
 
             // HARBOR CARDS
-            var index = 0;
             for( var cardId in gamedatas.harbor )
             {
-                var cardData = gamedatas.harbor[cardId];
-                var cardHtml = this.format_block('jstpl_card',{   // make the html in memory
-                    id: cardId,
-                    color: cardData.type,                   // set the color
-                }); 
-
-                var card = dojo.place( cardHtml, `harbor_position_${index}`);
-                this.placeOnObject( card, "deck" ); // we use some visual illusion here.  The card starts on its final parent, but we snap it to the deck, then animate its slide back to its actual parent
-                this.slideToObject( card, `harbor_position_${index}`, 500  ).play();
-                dojo.connect(card, "onclick", this, "onTakeHarborCard");
-
-                index ++;
+                this.makeHarborCard( gamedatas.harbor[cardId] );
             }
 
             // PLAYER BOARDS 
@@ -263,6 +250,19 @@ function (dojo, declare) {
                 if(  node.childNodes[i].nodeType == Node.ELEMENT_NODE) childElementNodes.push(  node.childNodes[i]);
             } 
             return childElementNodes;
+        },
+
+        makeHarborCard: function( cardData )
+        {
+                var cardHtml = this.format_block('jstpl_card',{   // make the html in memory
+                    id: cardData.id,
+                    color: cardData.type,                   // set the color
+                }); 
+
+                var card = dojo.place( cardHtml, `harbor_position_${cardData.location_arg}`);
+                this.placeOnObject( card, "deck" ); // we use some visual illusion here.  The card starts on its final parent, but we snap it to the deck, then animate its slide back to its actual parent
+                this.slideToObject( card, `harbor_position_${cardData.location_arg}`, 500  ).play();
+                dojo.connect(card, "onclick", this, "onTakeHarborCard");
         },
 
         refillHarborCards: function ()
@@ -985,13 +985,12 @@ function (dojo, declare) {
         */
         setupNotifications: function()
         {
-            console.log( 'notifications subscriptions setup' );
-            
-            // TODO: here, associate your game notifications with local methods
-            
+                     
             dojo.subscribe( 'takeCard', this, 'notif_takeCard' );
-            this.notifqueue.setSynchronous( 'takeCard', 500 );
+            this.notifqueue.setSynchronous( 'takeCard', 500 ); // this forces a wait time for this action so players can process what's happening on screen
             
+            dojo.subscribe( 'refillHarbor', this, 'notif_refillHarbor' );
+            this.notifqueue.setSynchronous( 'refillHarbor', 500 );
         },  
         
         // TODO: from this point and below, you can write your game notifications handling methods
@@ -1031,6 +1030,14 @@ function (dojo, declare) {
 
             //this.checkHandSize();
             //if( !this.hasTooManyCardsInHand()) this.determineUsablePolyominoes();
-        }
+        },
+
+        notif_refillHarbor: function(notif)
+        {
+            for( var cardId in notif.args.harbor )
+            {
+                this.makeHarborCard( notif.args.harbor[cardId] );
+            }
+        },
    });             
 });

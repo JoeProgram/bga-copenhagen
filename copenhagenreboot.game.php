@@ -108,7 +108,7 @@ class CopenhagenReboot extends Table
         // LAYOUT HARBOR CARDS
         for( $i = 0; $i < 7; $i++)
         {
-            $cards = $this->cards->pickCardForLocation('deck', 'harbor');
+            $cards = $this->cards->pickCardForLocation('deck', 'harbor', $i);
         }
 
         // SET PLAYER STARTING HANDS
@@ -300,6 +300,30 @@ class CopenhagenReboot extends Table
         //$this->gamestate->nextState( 'endGame' );
 
         $this->gamestate->nextState("playerTurn");
+    }
+
+    function stRefillHarbor()
+    {
+
+        $cards = [];
+
+        for( $i = 0; $i < 7; $i ++)
+        {
+            if( $this->cards->countCardInLocation("harbor", $i) == 0 )
+            {
+                $cards[] = $this->cards->pickCardForLocation('deck', 'harbor', $i);
+            }            
+        }
+
+        self::notifyAllPlayers( 
+            "refillHarbor", 
+            "",
+            array(
+                "harbor" => $cards
+            )   
+        );
+
+        $this->gamestate->nextState("nextPlayer");
     }
 
 //////////////////////////////////////////////////////////////////////////////
