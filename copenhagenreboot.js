@@ -1014,13 +1014,23 @@ function (dojo, declare) {
         notif_takeCard: function(notif)
         {
 
-            var card = this.attachToNewParent( `card_${notif.args.id}`, "cards_in_hand");
-            dojo.place( card, "cards_in_hand", this.findPositionForNewCardInHand( card ));
+            // IF ITS YOUR CARD
+            if( notif.args.player_id == this.player_id )
+            {
+                var card = this.attachToNewParent( `card_${notif.args.card_id}`, "cards_in_hand");
+                dojo.place( card, "cards_in_hand", this.findPositionForNewCardInHand( card ));
 
-            this.splayCardsInHand();
-            this.checkHandSize();
+                this.splayCardsInHand();
+            }
 
-            if( !this.hasTooManyCardsInHand()) this.determineUsablePolyominoes();
+            // IF ITS AN OPPONENTS CARD
+            else
+            {
+                this.slideToObjectAndDestroy( `card_${notif.args.card_id}`, `overall_player_board_${notif.args.player_id}`)
+            }
+
+            //this.checkHandSize();
+            //if( !this.hasTooManyCardsInHand()) this.determineUsablePolyominoes();
         }
    });             
 });

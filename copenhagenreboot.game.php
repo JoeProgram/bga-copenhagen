@@ -221,12 +221,22 @@ class CopenhagenReboot extends Table
 
         $player_id = self::getActivePlayerId();
 
-        $this->cards->getCard( $id ); // TODO: Make sure card is in harbor
+        // Make sure card is in harbor
+        $card = $this->cards->getCard( $id ); 
+        if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
+
+
         $this->cards->moveCard( $id, "hand", $player_id );
 
-        self::notifyPlayer( $player_id, "takeCard", "", array(
-            "id" => $id
-        ));
+        self::notifyAllPlayers( 
+            "takeCard", 
+            clienttranslate('${player_name} takes a card.'),
+            array(
+                "card_id" => $id,
+                "player_id" => $player_id,
+                "player_name" => self::getActivePlayerName()
+            )   
+        );
 
         $this->gamestate->nextState( "takeCard");
     }
