@@ -94,7 +94,7 @@ function (dojo, declare) {
             this.setupBoard();
 
             // DEBUG - see all game data in console
-            //console.log( gamedatas);
+            console.log( gamedatas);
 
             // DECK
             this.updateDeckDisplay(gamedatas.cards_in_deck);
@@ -112,6 +112,10 @@ function (dojo, declare) {
             for( var player_id in gamedatas.players )
             {
                 var player = gamedatas.players[player_id];
+                if( player_id == this.player_id)
+                {
+                    dojo.addClass("owned_playerboard",`playerboard_color_${player.color}`);
+                }
             }
 
             // CARDS IN HAND

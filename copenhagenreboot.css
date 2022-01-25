@@ -431,11 +431,10 @@
     position: relative;
 }
 
-.playerboard.blue{ background-position: 0px 0px; }
-.playerboard.yellow{ background-position: -230px 0px; }
-.playerboard.green{ background-position: -460px 0px; }
-.playerboard.red{ background-position: -690px 0px; }
-
+.playerboard_color_3785bd{ background-position: 0px 0px; }     /* blue */
+.playerboard_color_fbcc3c{ background-position: -230px 0px; }  /* yellow */
+.playerboard_color_3da045{ background-position: -460px 0px; }  /* green */
+.playerboard_color_e2474a{ background-position: -690px 0px; }  /* red */
 
 .playerboard .polyomino
 {
