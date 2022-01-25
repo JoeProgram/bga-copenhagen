@@ -129,9 +129,11 @@ class CopenhagenReboot extends Table
 
         // SET PLAYER STARTING HANDS
         $players = self::loadPlayersBasicInfos();
+
         foreach( $players as $player_id => $player )
         {
-            $cards = $this->cards->pickCards( 2, 'deck', $player_id ); 
+            $number_of_starting_cards = $this->getStartingCardsForPlayerNumber( $player["player_no"], count($players) );
+            $cards = $this->cards->pickCards( $number_of_starting_cards, 'deck', $player_id ); 
         }  
 
         // Activate first player
@@ -192,6 +194,41 @@ class CopenhagenReboot extends Table
 //////////////////////////////////////////////////////////////////////////////
 //////////// Utility functions
 ////////////    
+
+
+
+    function getStartingCardsForPlayerNumber( $player_number, $player_count )
+    {
+
+        // NOTE: I think "2" is the first player - that 1 gets skipped over, and becomes the last player
+        //   so first, let's remap it to something more intuitive
+        $player_number -= 1;
+        if( $player_number == 0 ) $player_number = $player_count;
+
+        // RETURN HOW MANY CARDS THEY GET
+        switch( $player_number )
+        {
+            case 1:
+                return 2;
+                break;
+            case 2:
+                return 3;
+                break;
+            case 3:
+                return 3;
+                break;
+            case 4:
+                return 4;
+                break;
+        }
+
+        return 0;
+    }
+
+        function mapPlayerNumberToPlayerOrder( $player_number, $player_count )
+    {
+
+    }
 
     function shuffleDiscardIntoDeck()
     {
