@@ -117,7 +117,8 @@ function (dojo, declare) {
                     id: cardId,
                     color: cardData.type,                   // set the color
                 }); 
-                var card = dojo.place( cardHtml, "cards_in_hand");
+                var card = dojo.place( cardHtml, "hand");       // temporarily place it just under the "hand" node.  Our position function expects a node, not just an html string 
+                dojo.place( card, "cards_in_hand", this.findPositionForNewCardInHand( card ));
                 this.placeOnObject( card, "hand_bottom_card_target" );
             }
             this.splayCardsInHand();
