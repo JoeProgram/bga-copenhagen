@@ -111,6 +111,7 @@ $machinestates = array(
 
     6 => array(
         "name" => "discardDownToMaxHandSize",
+        "args" => "argDiscardDownToMaxHandSize",
         "description" => clienttranslate('${actplayer} must discard a card'),
         "descriptionmyturn" => clienttranslate('${you} must discard a card. You can only have 7 cards in hand.'),
         "type" => "activeplayer",

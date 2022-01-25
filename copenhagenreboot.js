@@ -185,16 +185,19 @@ function (dojo, declare) {
         onEnteringStateDiscardDownToMaxHandSize( args )
         {
 
-            dojo.addClass("hand","over_max_hand_size");
-
-            var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
-            var cardsInHand = this.getChildElementNodes( cardsInHandNode );
-
-            for( var i = 0; i < cardsInHand.length; i++ )
+            if( args.args.player_id == this.player_id )             // notice there are two levels of args
             {
-                // have to connect this a little differently, since we want to remove thse handlers later
-                var discardHandler = dojo.connect( cardsInHand[i], "onclick", this, "onDiscardCardOverMaxHandSize");
-                this.maxHandSizeDiscardHandlers.push( discardHandler ); 
+                dojo.addClass("hand","over_max_hand_size");
+
+                var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
+                var cardsInHand = this.getChildElementNodes( cardsInHandNode );
+
+                for( var i = 0; i < cardsInHand.length; i++ )
+                {
+                    // have to connect this a little differently, since we want to remove thse handlers later
+                    var discardHandler = dojo.connect( cardsInHand[i], "onclick", this, "onDiscardCardOverMaxHandSize");
+                    this.maxHandSizeDiscardHandlers.push( discardHandler ); 
+                }
             }
         },
 
@@ -219,10 +222,14 @@ function (dojo, declare) {
 
         onLeavingStateDiscardDownToMaxHandSize()
         {
-            dojo.removeClass("hand","over_max_hand_size");
-            dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
-            this.splayCardsInHand();
-            this.determineUsablePolyominoes();
+
+            if( this.maxHandSizeDiscardHandlers.length > 0 )
+            {
+                dojo.removeClass("hand","over_max_hand_size");
+                dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
+                this.splayCardsInHand();
+                this.determineUsablePolyominoes();
+            }
         },
 
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the

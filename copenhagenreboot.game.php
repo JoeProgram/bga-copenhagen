@@ -312,6 +312,13 @@ class CopenhagenReboot extends Table
     }    
     */
 
+    function argDiscardDownToMaxHandSize()
+    {
+        return array(
+            "player_id" => self::getActivePlayerId(),
+        );
+    }
+
 //////////////////////////////////////////////////////////////////////////////
 //////////// Game state actions
 ////////////
