@@ -13,25 +13,25 @@
 $gameinfos = array( 
 
 // Name of the game in English (will serve as the basis for translation) 
-'game_name' => "My Great Game",
+'game_name' => "Copenhagen",
 
 // Game designer (or game designers, separated by commas)
-'designer' => 'John Doe',       
+'designer' => 'Asger Harding Granerud, Daniel Skjold Pedersen',       
 
 // Game artist (or game artists, separated by commas)
-'artist' => 'Jane Doe',         
+'artist' => 'Markus Erdt',         
 
 // Year of FIRST publication of this game. Can be negative.
-'year' => 2000,                 
+'year' => 2019,                 
 
 // Game publisher (use empty string if there is no publisher)
-'publisher' => 'My Publishing Company',                     
+'publisher' => 'Queen Games',                     
 
 // Url of game publisher website
-'publisher_website' => 'http://www.mypublishingcompany.com/',   
+'publisher_website' => 'http://queen-games.com',   
 
 // Board Game Geek ID of the publisher
-'publisher_bgg_id' => 1234,
+'publisher_bgg_id' => 47,
 
 // Board game geek ID of the game
 'bgg_id' => 269595,
@@ -88,7 +88,7 @@ $gameinfos = array(
 'language_dependency' => false,
 
 // Complexity of the game, from 0 (extremely simple) to 5 (extremely complex)
-'complexity' => 3,    
+'complexity' => 2,    
 
 // Luck of the game, from 0 (absolutely no luck in this game) to 5 (totally luck driven)
 'luck' => 3,    
@@ -97,10 +97,15 @@ $gameinfos = array(
 'strategy' => 3,    
 
 // Diplomacy of the game, from 0 (no interaction in this game) to 5 (totally based on interaction and discussion between players)
-'diplomacy' => 3,    
+'diplomacy' => 1,    
 
 // Colors attributed to players
-'player_colors' => array( "ff0000", "008000", "0000ff", "ffa500", "773300" ),
+'player_colors' => array( 
+    "3785bd", // blue
+    "fbcc3c", // yellow
+    "3da045", // green
+    "e2474a", // red
+),
 
 // Favorite colors support : if set to "true", support attribution of favorite colors based on player's preferences (see reattributeColorsBasedOnPreferences PHP method)
 // NB: this parameter is used only to flag games supporting this feature; you must use (or not use) reattributeColorsBasedOnPreferences PHP method to actually enable or disable the feature.
