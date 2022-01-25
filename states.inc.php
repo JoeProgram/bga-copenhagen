@@ -69,7 +69,7 @@ $machinestates = array(
         "type" => "game",
         "action" => "stNextPlayer",
         "updateGameProgression" => true,   
-        "transitions" => array( "endGame" => 99, "playerTurn" => 3 )
+        "transitions" => array( "playerTurn" => 3 )
     ),
     
     3 => array(
@@ -131,7 +131,7 @@ $machinestates = array(
         "type" => "game",
         "action" => "stRefillHarbor",
         "possibleactions" => array( "nextPlayer" ),
-        "transitions" => array(  "nextPlayer" => 2 )
+        "transitions" => array(  "nextPlayer" => 2, "endGame" => 99 )
     ), 
 
   

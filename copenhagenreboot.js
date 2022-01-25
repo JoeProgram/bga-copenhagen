@@ -96,6 +96,9 @@ function (dojo, declare) {
             // DEBUG - see all game data in console
             //console.log( gamedatas);
 
+            // DECK
+            this.updateDeckDisplay(gamedatas.cards_in_deck);
+
             // MERMAID CARD
             if( gamedatas.mermaid_card == "deck") dojo.style("small_mermaid_card","display","none");
 
@@ -137,9 +140,6 @@ function (dojo, declare) {
             dojo.query("#polyominoes .polyomino.top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
 
             this.determineUsablePolyominoes();
- 
-            // DEBUG
-            dojo.query("#deck").connect("onclick",this,"refillHarborCards");
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -283,6 +283,13 @@ function (dojo, declare) {
                 if(  node.childNodes[i].nodeType == Node.ELEMENT_NODE) childElementNodes.push(  node.childNodes[i]);
             } 
             return childElementNodes;
+        },
+
+        updateDeckDisplay: function( numberCardsInDeck )
+        {
+            if( numberCardsInDeck == 0 ) dojo.style("deck","display","none");
+            else dojo.style("deck","display","block");
+            this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in deck"));
         },
 
         makeHarborCard: function( cardData )
@@ -1056,6 +1063,15 @@ function (dojo, declare) {
             {
                 this.makeHarborCard( notif.args.harbor[cardId] );
             }
+
+            
+
+            if( notif.args.mermaid_card == "deck" && dojo.query("small_mermaid_card").length > 0)
+            {
+                this.slideToObjectAndDestroy( "small_mermaid_card", "deck");
+            } 
+
+            this.updateDeckDisplay( notif.args.cards_in_deck);
         },
 
 

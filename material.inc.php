@@ -20,7 +20,6 @@
  */
 
 $this->max_hand_size = 7;
-$this->mermaid_card_id = 1;
 
 
 

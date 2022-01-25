@@ -58,6 +58,7 @@
 
 #deck
 {
+    position: absolute;
     width: 28px;
     height: 41px;  
     background-image: url('img/tiny_cards.png');
@@ -67,8 +68,10 @@
 #small_mermaid_card
 {
     display: block;
+    position:  absolute;
     width: 28px;
     height: 41px;
+    top: 41px;
     background-image: url('img/tiny_cards.png');
     background-position: 0px -42px;
 }

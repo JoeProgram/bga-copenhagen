@@ -32,10 +32,13 @@ class CopenhagenReboot extends Table
         // Note: afterwards, you can get/set the global variables with getGameStateValue/setGameStateInitialValue/setGameStateValue
         parent::__construct();
         
-        self::initGameStateLabels( array( 
-            "cardsTakenThisTurn" => 10,  // keep track of how many cards have been taken this turn.  10 is not the value to track - just an internal ID
-            //    "my_second_global_variable" => 11,
-            //      ...
+        self::initGameStateLabels( array(
+
+            // GLOBAL VARIABLES 
+            "cards_taken_this_turn" => 10,  // keep track of how many cards have been taken this turn.  10 is not the value to track - just an internal ID
+            "mermaid_card_id" => 11,
+            
+            // VARIANTS
             //    "my_first_game_variant" => 100,
             //    "my_second_game_variant" => 101,
             //      ...
@@ -84,7 +87,7 @@ class CopenhagenReboot extends Table
         /************ Start the game initialization *****/
 
         // INITIALIZE GLOBAL VALUES
-        self::setGameStateValue( 'cardsTakenThisTurn', 0 );
+        self::setGameStateValue( 'cards_taken_this_turn', 0 );
 
         // INITIALIZE GAME STATISTICS
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -99,14 +102,21 @@ class CopenhagenReboot extends Table
 
         $cards = array();
         $cards[] = array( 'type' => "mermaid", 'type_arg' => 0, 'nbr' => 1);
-        $cards[] = array( 'type' => "red", 'type_arg' => 0,  'nbr' => 14);
-        $cards[] = array( 'type' => "yellow", 'type_arg' => 0,  'nbr' => 14);
-        $cards[] = array( 'type' => "green", 'type_arg' => 0,  'nbr' => 14);
-        $cards[] = array( 'type' => "blue", 'type_arg' => 0,  'nbr' => 14);
-        $cards[] = array( 'type' => "purple", 'type_arg' => 0,  'nbr' => 14);
-        
+        $cards[] = array( 'type' => "red", 'type_arg' => 0,  'nbr' => $cards_per_color);
+        $cards[] = array( 'type' => "yellow", 'type_arg' => 0,  'nbr' => $cards_per_color);
+        $cards[] = array( 'type' => "green", 'type_arg' => 0,  'nbr' => $cards_per_color);
+        $cards[] = array( 'type' => "blue", 'type_arg' => 0,  'nbr' => $cards_per_color);
+        $cards[] = array( 'type' => "purple", 'type_arg' => 0,  'nbr' => $cards_per_color);
         $this->cards->createCards( $cards, 'deck' );
-        $this->cards->moveCard($this->mermaid_card_id, "mermaid_pile");
+
+        // STORE MERMAID CARD ID
+        $sql = "SELECT card_id FROM card WHERE card_type = 'mermaid';";  // remember SQL uses one equals sign, not two
+        $database_result = self::getObjectFromDB( $sql );
+        $mermaid_card_id = $database_result['card_id'];
+        self::setGameStateValue( 'mermaid_card_id', $mermaid_card_id );
+
+        // PREPARE CARDS
+        $this->cards->moveCard($mermaid_card_id, "mermaid_pile");
         $this->cards->shuffle( 'deck' );
 
         if( count($players) == 2) $this->shuffleInMermaidCard();
@@ -155,7 +165,9 @@ class CopenhagenReboot extends Table
         $result['hand'] = $this->cards->getCardsInLocation( 'hand', $current_player_id );
         $result['harbor'] = $this->cards->getCardsInLocation( 'harbor' );
 
-        $result['mermaid_card'] = $this->cards->getCard( $this->mermaid_card_id )["location"];
+        $mermaid_card_id = self::getGameStateValue( 'mermaid_card_id' );
+        $result['mermaid_card'] = $this->cards->getCard( $mermaid_card_id )["location"];
+        $result['cards_in_deck'] = $this->cards->countCardInLocation("deck");
         return $result;
     }
 
@@ -180,6 +192,13 @@ class CopenhagenReboot extends Table
 //////////////////////////////////////////////////////////////////////////////
 //////////// Utility functions
 ////////////    
+
+    function shuffleDiscardIntoDeck()
+    {
+        $this->cards->moveAllCardsInLocation( "discard", "deck");
+        $this->cards->shuffle( "deck");
+        $this->shuffleInMermaidCard();
+    }
 
     function shuffleInMermaidCard()
     {
@@ -245,8 +264,8 @@ class CopenhagenReboot extends Table
 
         $this->cards->moveCard( $card_id, "hand", $player_id );
 
-        $cardsTakenThisTurn = self::getGameStateValue( "cardsTakenThisTurn" );
-        self::setGameStateValue( 'cardsTakenThisTurn', $cardsTakenThisTurn + 1 );
+        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+        self::setGameStateValue( 'cards_taken_this_turn', $cards_taken_this_turn + 1 );
 
         self::notifyAllPlayers( 
             "takeCard", 
@@ -296,8 +315,8 @@ class CopenhagenReboot extends Table
         $this->gamestate->nextState( "discardedAndDone");
         // NEXT PHASE
         /*
-        $cardsTakenThisTurn = self::getGameStateValue( "cardsTakenThisTurn" );
-        if( $cardsTakenThisTurn == 1 ) $this->gamestate->nextState( "discardedAndTakeAnother");
+        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+        if( $cards_taken_this_turn == 1 ) $this->gamestate->nextState( "discardedAndTakeAnother");
         else $this->gamestate->nextState( "discardedAndDone");
         */
 
@@ -356,7 +375,7 @@ class CopenhagenReboot extends Table
         //$this->gamestate->nextState( 'endGame' );
 
         // NEXT PLAYER'S TURN
-        self::setGameStateValue( 'cardsTakenThisTurn', 0 );
+        self::setGameStateValue( 'cards_taken_this_turn', 0 );
 
         $this->gamestate->nextState("playerTurn");
     }
@@ -372,8 +391,8 @@ class CopenhagenReboot extends Table
             $this->gamestate->nextState("refillHarbor");
             // PLAYER DOESN'T HAVE TOO MANY CARDS
             /*
-            $cardsTakenThisTurn = self::getGameStateValue( "cardsTakenThisTurn" );
-            if( $cardsTakenThisTurn == 1 ) $this->gamestate->nextState("takeAdjacentCard");
+            $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+            if( $cards_taken_this_turn == 1 ) $this->gamestate->nextState("takeAdjacentCard");
             else $this->gamestate->nextState("refillHarbor");
             */
         }
@@ -392,19 +411,33 @@ class CopenhagenReboot extends Table
         {
             if( $this->cards->countCardInLocation("harbor", $i) == 0 )
             {
+
+                // prepare deck
+                if( $this->cards->countCardInLocation("deck") == 0 ) $this->shuffleDiscardIntoDeck();
                 $cards[] = $this->cards->pickCardForLocation('deck', 'harbor', $i);
             }            
         }
+
+        // NOTIFY CLIENTS
+        $mermaid_card_id = self::getGameStateValue( "mermaid_card_id" );
+        $mermaid_card = $this->cards->getCard( $mermaid_card_id );
 
         self::notifyAllPlayers( 
             "refillHarbor", 
             "",
             array(
-                "harbor" => $cards
+                "harbor" => $cards,
+                "cards_in_deck" => $this->cards->countCardInLocation("deck"),
+                "mermaid_card" => $mermaid_card["location"]
             )   
         );
 
-        $this->gamestate->nextState("nextPlayer");
+        
+
+
+
+        if( $this->cards->getCard($mermaid_card_id)["location"] == "harbor") $this->gamestate->nextState("endGame"); // end game if we draw mermaid card
+        else $this->gamestate->nextState("nextPlayer");
     }
 
 //////////////////////////////////////////////////////////////////////////////
