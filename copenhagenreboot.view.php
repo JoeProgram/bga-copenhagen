@@ -39,6 +39,16 @@
 
         /*********** Place your code below:  ************/
 
+        // BUILD PLAYERBOARDS
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "playerboard");
+        for( $i = 1; $i < $players_nbr; $i++ )
+        {
+            $this->page->insert_block( "playerboard", array(
+ 
+            ));
+        }
+
+        // BUILDS CELLS OF PLAYERBOARD
         $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "board_cell");
 
         for( $x = 0; $x < 5; $x++ )

@@ -197,38 +197,21 @@
     </div>
 
     <div id="opponent_playerboards">
-        <div class="player_area">
-            <div class="playerboard yellow"></div>
-            <div class="ability_tile_area">
-                <div class="ability_tile any_cards"></div>
-                <div class="ability_tile additional_card"></div>
-                <div class="ability_tile construction_discount"></div>
-                <div class="ability_tile change_of_colors"></div>
-                <div class="ability_tile both_actions"></div>
-            </div>
-        </div>
 
-        <div class="player_area">
-            <div class="playerboard green"></div>
-            <div class="ability_tile_area">
-                <div class="ability_tile any_cards"></div>
-                <div class="ability_tile additional_card"></div>
-                <div class="ability_tile construction_discount"></div>
-                <div class="ability_tile change_of_colors"></div>
-                <div class="ability_tile both_actions"></div>
+        <!-- BEGIN playerboard -->
+            <div class="player_area">
+                <div class="playerboard playerboard_color_yellow"></div>
+                <div class="ability_tile_area">
+                    <div class="ability_tile any_cards"></div>
+                    <div class="ability_tile additional_card"></div>
+                    <div class="ability_tile construction_discount"></div>
+                    <div class="ability_tile change_of_colors"></div>
+                    <div class="ability_tile both_actions"></div>
+                </div>
+                <div id="board_cell_{X}_{Y}" class="board_cell"></div>
             </div>
-        </div>
-
-        <div class="player_area">
-            <div class="playerboard red"></div>
-            <div class="ability_tile_area">
-                <div class="ability_tile any_cards"></div>
-                <div class="ability_tile additional_card"></div>
-                <div class="ability_tile construction_discount"></div>
-                <div class="ability_tile change_of_colors"></div>
-                <div class="ability_tile both_actions"></div>
-            </div>
-        </div> 
+        <!-- END playerboard -->
+        
     </div>
 
     <div id="shadow_box"></div>
