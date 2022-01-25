@@ -96,10 +96,13 @@ function (dojo, declare) {
             // DEBUG - see all game data in console
             //console.log( gamedatas);
 
+            // MERMAID CARD
+            if( gamedatas.mermaid_card == "deck") dojo.style("small_mermaid_card","display","none");
+
             // HARBOR CARDS
-            for( var cardId in gamedatas.harbor )
+            for( var card_id in gamedatas.harbor )
             {
-                this.makeHarborCard( gamedatas.harbor[cardId] );
+                this.makeHarborCard( gamedatas.harbor[card_id] );
             }
 
             // PLAYER BOARDS 

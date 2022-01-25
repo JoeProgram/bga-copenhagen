@@ -93,19 +93,26 @@ class CopenhagenReboot extends Table
 
 
         // SETUP DECK
+
+        $cards_per_color = 14;
+        if( count($players) == 3 ) $cards_per_color = 12;
+
         $cards = array();
+        $cards[] = array( 'type' => "mermaid", 'type_arg' => 0, 'nbr' => 1);
         $cards[] = array( 'type' => "red", 'type_arg' => 0,  'nbr' => 14);
         $cards[] = array( 'type' => "yellow", 'type_arg' => 0,  'nbr' => 14);
         $cards[] = array( 'type' => "green", 'type_arg' => 0,  'nbr' => 14);
         $cards[] = array( 'type' => "blue", 'type_arg' => 0,  'nbr' => 14);
         $cards[] = array( 'type' => "purple", 'type_arg' => 0,  'nbr' => 14);
+        
         $this->cards->createCards( $cards, 'deck' );
-
-        $this->cards->moveAllCardsInLocation( null, "deck" );
+        $this->cards->moveCard($this->mermaid_card_id, "mermaid_pile");
         $this->cards->shuffle( 'deck' );
 
+        if( count($players) == 2) $this->shuffleInMermaidCard();
+
         // LAYOUT HARBOR CARDS
-        for( $i = 0; $i < $this->maxHandSize; $i++)
+        for( $i = 0; $i < 7; $i++)
         {
             $cards = $this->cards->pickCardForLocation('deck', 'harbor', $i);
         }
@@ -148,6 +155,7 @@ class CopenhagenReboot extends Table
         $result['hand'] = $this->cards->getCardsInLocation( 'hand', $current_player_id );
         $result['harbor'] = $this->cards->getCardsInLocation( 'harbor' );
 
+        $result['mermaid_card'] = $this->cards->getCard( $this->mermaid_card_id )["location"];
         return $result;
     }
 
@@ -173,9 +181,20 @@ class CopenhagenReboot extends Table
 //////////// Utility functions
 ////////////    
 
-    /*
-        In this space, you can put any utility methods useful for your game logic
-    */
+    function shuffleInMermaidCard()
+    {
+        // mix in the mermaid card with other cards
+        $this->cards->pickCardsForLocation( 9, "deck", "mermaid_pile");
+        $this->cards->shuffle("mermaid_pile");
+
+        // move cards to bottom of draw pile
+        $cards = $this->cards->getCardsInLocation("mermaid_pile");
+
+        foreach( $cards as $card )
+        {
+            $this->cards->insertCardOnExtremePosition( $card["id"], "deck", false);
+        }
+    }
 
 
 
@@ -256,7 +275,7 @@ class CopenhagenReboot extends Table
 
         // MAKE SURE WE'RE ACTUALLY OVER THE HAND LIMIT
         $cardsInHand = $this->cards->countCardInLocation( "hand", $player_id);
-        if( $cardsInHand <= $this->maxHandSize ) throw new feException( self::_("You are not over the hand limit size."));
+        if( $cardsInHand <= $this->max_hand_size ) throw new feException( self::_("You are not over the hand limit size."));
 
         // DISCARD THE CARD
         $this->cards->moveCard( $card_id, "discard");
@@ -346,8 +365,8 @@ class CopenhagenReboot extends Table
     {
         $player_id = self::getActivePlayerId();
 
-        $cardsInHand = $this->cards->countCardInLocation( "hand", $player_id);
-        if( $cardsInHand > $this->maxHandSize ) $this->gamestate->nextState("discardDownToMaxHandSize");
+        $cards_in_hand = $this->cards->countCardInLocation( "hand", $player_id);
+        if( $cards_in_hand > $this->max_hand_size ) $this->gamestate->nextState("discardDownToMaxHandSize");
         else
         {
             $this->gamestate->nextState("refillHarbor");
@@ -369,7 +388,7 @@ class CopenhagenReboot extends Table
 
         $cards = [];
 
-        for( $i = 0; $i < $this->maxHandSize; $i ++)
+        for( $i = 0; $i < 7; $i ++)
         {
             if( $this->cards->countCardInLocation("harbor", $i) == 0 )
             {

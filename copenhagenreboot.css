@@ -64,8 +64,9 @@
     background-position: 0px 0px;
 }
 
-#mermaid_card
+#small_mermaid_card
 {
+    display: block;
     width: 28px;
     height: 41px;
     background-image: url('img/tiny_cards.png');
@@ -107,6 +108,7 @@
 .card.green_card { background-position: -140px 0px; }
 .card.blue_card { background-position: -210px 0px; }
 .card.purple_card { background-position: -280px 0px; }
+.card.mermaid_card {  background-position: -350px 0px; }
 
 .harbor_position
 {
