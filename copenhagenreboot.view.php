@@ -39,6 +39,18 @@
 
         /*********** Place your code below:  ************/
 
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "board_cell");
+
+        for( $x = 0; $x < 5; $x++ )
+        {
+            for( $y = 0; $y < 9 ; $y++)
+            {
+                $this->page->insert_block( "board_cell", array(
+                    'X' => $x,
+                    'Y' => $y,
+                ));
+            }
+        }
 
         /*
         

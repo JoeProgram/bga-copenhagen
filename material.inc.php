@@ -21,6 +21,8 @@
 
 $this->max_hand_size = 7;
 
+$this->board_height = 9;
+$this->board_width = 5;
 
 
 
