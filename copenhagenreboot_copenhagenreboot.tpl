@@ -198,9 +198,9 @@
 
     <div id="opponent_playerboards">
 
-        <!-- BEGIN playerboard -->
-            <div class="player_area">
-                <div class="playerboard playerboard_color_yellow"></div>
+        <!-- BEGIN opponent_playerboard -->
+            <div id="player_area_{ID}" class="player_area">
+                <div class="playerboard playerboard_color_{COLOR}"></div>
                 <div class="ability_tile_area">
                     <div class="ability_tile any_cards"></div>
                     <div class="ability_tile additional_card"></div>
@@ -210,7 +210,7 @@
                 </div>
                 <div id="board_cell_{X}_{Y}" class="board_cell"></div>
             </div>
-        <!-- END playerboard -->
+        <!-- END opponent_playerboard -->
         
     </div>
 

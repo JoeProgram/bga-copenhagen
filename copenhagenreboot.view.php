@@ -26,11 +26,16 @@
   
   require_once( APP_BASE_PATH."view/common/game.view.php" );
   
+
   class view_copenhagenreboot_copenhagenreboot extends game_view
   {
+
     function getGameName() {
         return "copenhagenreboot";
-    }    
+    }     
+
+    
+
   	function build_page( $viewArgs )
   	{		
   	    // Get players & players number
@@ -39,12 +44,37 @@
 
         /*********** Place your code below:  ************/
 
-        // BUILD PLAYERBOARDS
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "playerboard");
-        for( $i = 1; $i < $players_nbr; $i++ )
+        // PUT THE PLAYERS IN RELATIVE TURN ORDER, WITH CURRENT PLAYER FIRST
+        //  We want the order of the opponent boards to match the order of the players listed in the UI
+        //  which means it needs to be customized to each player/
+        //  Taking the current player (the one requesting the page), we use getPlayerAfter
+        //  to build a dictionary (associative array in PHP) where 0 is the current player
+        //  1 is the player after them, 2 the player after them, and so on.
+        //  We then use that when building the templates for the playerboards.
+        global $g_user;
+        $current_player_id = $g_user->get_id();
+        $relative_player_sequence = array();
+        $relative_player_sequence[0] = $current_player_id;
+        $prev_player = $current_player_id;
+        for( $i = 1; $i < $players_nbr; $i++ ) 
         {
-            $this->page->insert_block( "playerboard", array(
- 
+            $relative_player_sequence[$i] = $this->game->getPlayerAfter($prev_player);
+            $prev_player = $relative_player_sequence[$i];
+        }
+
+        // BUILD PLAYERBOARDS
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "opponent_playerboard");
+        for($i = 1; $i < $players_nbr; $i++ )
+        {
+
+            $player_id = $relative_player_sequence[$i];
+            $player = $players[$player_id];
+
+            self::debug( implode(" ",$player) );
+
+            $this->page->insert_block( "opponent_playerboard", array(
+                'ID' => $player_id,
+                'COLOR' => $player["player_color"],
             ));
         }
 
