@@ -1,4 +1,5 @@
 
+
 -- ------
 -- BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
 -- CopenhagenReboot implementation : © <Your name here> <Your email address here>
@@ -40,4 +41,16 @@ CREATE TABLE IF NOT EXISTS `card` (
   `card_location` varchar(16) NOT NULL,
   `card_location_arg` int(11) NOT NULL,
   PRIMARY KEY (`card_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+CREATE TABLE IF NOT EXISTS `polyomino` (
+  `id` tinyint(4) unsigned NOT NULL AUTO_INCREMENT,
+  `color` varchar(6) NOT NULL,
+  `squares` tinyint(4) unsigned NOT NULL,
+  `copy` tinyint(4) unsigned NOT NULL,
+  `owner` int(11),
+  `rotation` smallint(4) NOT NULL,
+  `flip` smallint(4) NOT NULL,
+
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
