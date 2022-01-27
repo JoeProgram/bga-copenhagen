@@ -81,9 +81,9 @@
         // BUILDS CELLS OF PLAYERBOARD
         $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "board_cell");
 
-        for( $x = 0; $x < 5; $x++ )
+        for( $x = 0; $x < $this->game->board_width; $x++ )
         {
-            for( $y = 0; $y < 9 ; $y++)
+            for( $y = 0; $y < $this->game->board_width ; $y++)
             {
                 $this->page->insert_block( "board_cell", array(
                     'X' => $x,

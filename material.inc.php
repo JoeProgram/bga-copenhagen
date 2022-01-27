@@ -19,6 +19,8 @@
  *
  */
 
+// CONSTANT GLOBALS
+$this->harbor_number = 7;
 $this->max_hand_size = 7;
 
 $this->board_height = 9;

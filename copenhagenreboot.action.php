@@ -39,14 +39,14 @@
       }
   	} 
   	
-  	// TODO: defines your action entry points there
+  	// TODO: define your action entry points there
 
     public function takeCard()
     {
         self::setAjaxMode();  
 
-        $id = self::getArg( "card_id", AT_posint, true );
-        $this->game->takeCard( $id );
+        $card_id = self::getArg( "card_id", AT_posint, true );
+        $this->game->takeCard( $card_id );
 
         self::ajaxResponse(); 
     }
@@ -54,6 +54,9 @@
     public function takeAdjacentCard()
     {
         self::setAjaxMode();  
+
+        $card_id = self::getArg( "card_id", AT_posint, true );
+        $this->game->takeAdjacentCard( $card_id );
 
         self::ajaxResponse(); 
     }

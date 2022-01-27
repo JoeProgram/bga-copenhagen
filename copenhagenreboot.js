@@ -39,6 +39,8 @@ function (dojo, declare) {
             this.maxHandSize = 7;
             this.maxHandSizeDiscardHandlers = []; // keep track of the events we attach to cards to allow the player to discard - since we'll want to disconnect them afterwards
 
+            this.stateName = "";
+
             this.cardColorOrder = ["red_card", "yellow_card", "green_card", "blue_card", "purple_card"];
             this.adjacentOffsets = [{x:1,y:0}, {x:0,y:-1}, {x:-1,y:0}, {x:0,y:1}];
 
@@ -175,6 +177,8 @@ function (dojo, declare) {
         {
             console.log( 'Entering state: '+stateName );
             
+            this.stateName = stateName;
+
             switch( stateName )
             {
 
@@ -183,6 +187,10 @@ function (dojo, declare) {
 
                 case 'discardDownToMaxHandSize':
                     this.onEnteringStateDiscardDownToMaxHandSize( args );
+                    break;
+
+                case 'takeAdjacentCard':
+                    this.onEnteringTakeAdjacentCard( args );
                     break;
            
                 case 'dummmy':
@@ -209,25 +217,6 @@ function (dojo, declare) {
             }
         },
 
-        // onLeavingState: this method is called each time we are leaving a game state.
-        //                 You can use this method to perform some user interface changes at this moment.
-        //
-        onLeavingState: function( stateName )
-        {
-            console.log( 'Leaving state: '+stateName );
-            
-            switch( stateName )
-            {
-            
-           case 'discardDownToMaxHandSize':
-                this.onLeavingStateDiscardDownToMaxHandSize();
-                break;
-           
-            case 'dummmy':
-                break;
-            }               
-        }, 
-
         onLeavingStateDiscardDownToMaxHandSize()
         {
 
@@ -239,6 +228,41 @@ function (dojo, declare) {
                 this.determineUsablePolyominoes();
             }
         },
+
+        onEnteringTakeAdjacentCard( args )
+        {
+
+        },
+
+        onLeavingTakeAdjacentCard( args )
+        {
+
+        },
+
+        // onLeavingState: this method is called each time we are leaving a game state.
+        //                 You can use this method to perform some user interface changes at this moment.
+        //
+        onLeavingState: function( stateName )
+        {
+            console.log( 'Leaving state: '+stateName );
+            
+            switch( stateName )
+            {
+            
+                case 'discardDownToMaxHandSize':
+                    this.onLeavingStateDiscardDownToMaxHandSize();
+                    break;
+
+                case 'takeAdjacentCard':
+                    this.onLeavingTakeAdjacentCard();
+                    break;
+               
+                case 'dummmy':
+                    break;
+            }               
+        }, 
+
+
 
         // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
         //                        action status bar (ie: the HTML links in the status bar).
@@ -807,10 +831,22 @@ function (dojo, declare) {
             // SEND SERVER REQUEST
             if( this.checkAction('takeCard'))
             {
-                this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeCard.html",
+
+                // WE SEND TO DIFFERENT SERVER POINTS FOR FIRST AND SECOND CARD
+                if( this.stateName == "playerTurn")
                 {
-                    card_id:event.currentTarget.id.split("_")[1],
-                }, this, function( result ){} ); 
+                    this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeCard.html",
+                    {
+                        card_id:event.currentTarget.id.split("_")[1],
+                    }, this, function( result ){} ); 
+                } 
+                else if( this.stateName == "takeAdjacentCard")
+                {
+                    this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeAdjacentCard.html",
+                    {
+                        card_id:event.currentTarget.id.split("_")[1],
+                    }, this, function( result ){} ); 
+                }
             }
  
         },

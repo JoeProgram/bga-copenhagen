@@ -122,7 +122,7 @@ class CopenhagenReboot extends Table
         if( count($players) == 2) $this->shuffleInMermaidCard();
 
         // LAYOUT HARBOR CARDS
-        for( $i = 0; $i < 7; $i++)
+        for( $i = 0; $i < $this->harbor_number; $i++)
         {
             $cards = $this->cards->pickCardForLocation('deck', 'harbor', $i);
         }
@@ -225,9 +225,26 @@ class CopenhagenReboot extends Table
         return 0;
     }
 
-        function mapPlayerNumberToPlayerOrder( $player_number, $player_count )
+    // RETURN WHICH HARBORS ARE EMPTY
+    //   this removes elements from an array, which works differently in PHP than other languages
+    //   that's because a PHP array is more like a dictionary than a list
+    //   so if you have a list of numbers, the PHP way to think of it is [0] => 0, [1] => 1, [2] = 2,
+    //   and if you "unset" [1], the array is then [0] => 0, [2] => 2
+    //   which makes it easy to remove elements, but then would also make it easy to have a gap in something you'd like to iterate over
+    //   so you can use array_values() to reassign elements indexes from 0 to n-1.
+    //   note that dictionary-like-arrays in PHP are ordered - which is also quite different from other languages.
+    function getEmptyHarbors()
     {
+        $empty_harbors = [];
+        for( $i = 0; $i < $this->harbor_number; $i++) $empty_harbors[] = $i;
 
+        $cards_in_harbor = $this->cards->getCardsInLocation( "harbor", null, "location_arg");
+        foreach( $cards_in_harbor as $card )
+        {
+            unset($empty_harbors[ $card["location_arg"]]);
+        }
+
+        return array_values( $empty_harbors ); 
     }
 
     function shuffleDiscardIntoDeck()
@@ -295,9 +312,55 @@ class CopenhagenReboot extends Table
 
         $player_id = self::getActivePlayerId();
 
+        // CAN'T HAVE TAKEN ANY CARDS THIS TURN
+        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+        if ($cards_taken_this_turn != 0 ) throw new feException( self::_("You've already taken your first card this turn."));
+
+        // MAKE SURE CARD IS IN HARBOR
+        $card = $this->cards->getCard( $card_id ); 
+        self::warn( "Attempt to take card " . $card_id . " which is in location " . $card["location"]);
+        if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
+
+        $this->cards->moveCard( $card_id, "hand", $player_id );
+
+        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+        self::setGameStateValue( 'cards_taken_this_turn', $cards_taken_this_turn + 1 );
+
+        self::notifyAllPlayers( 
+            "takeCard", 
+            clienttranslate('${player_name} takes a ${color} card.'),
+            array(
+                "card_id" => $card_id,
+                "player_id" => $player_id,
+                "player_name" => self::getActivePlayerName(),
+                "color" => $card["type"]
+            )   
+        );
+
+        $this->gamestate->nextState( "takeCard");
+    }
+
+     function takeAdjacentCard( $card_id )
+    {
+        self::checkAction( 'takeCard' );
+
+        $player_id = self::getActivePlayerId();
+
+        // MUST HAVE TAKEN 1 CARD ALREADY
+        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+        if ($cards_taken_this_turn != 1 ) throw new feException( self::_("You're trying to take your second card before your first."));
+
         // MAKE SURE CARD IS IN HARBOR
         $card = $this->cards->getCard( $card_id ); 
         if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
+
+        // MAKE SURE WE ONLY HAVE 1 EMPTY HARBOR
+        $empty_harbors = $this->getEmptyHarbors();
+        if( count($empty_harbors) > 1 ) throw new feException( self::_("You have more than one empty harbor."));
+
+        // MAKE SURE TAKEN CARD IS ADJACENT TO PREVIOUSLY TAKEN CARD
+        $is_adjacent = $empty_harbors[0] + 1 == $card["location_arg"] || $empty_harbors[0] - 1 == $card["location_arg"];
+        if( ! $is_adjacent) throw new feException( self::_("You're trying to take a card that's not adjacent to the first taken card."));
 
         $this->cards->moveCard( $card_id, "hand", $player_id );
 
@@ -350,12 +413,11 @@ class CopenhagenReboot extends Table
         );
 
         $this->gamestate->nextState( "discardedAndDone");
+        
         // NEXT PHASE
-        /*
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
         if( $cards_taken_this_turn == 1 ) $this->gamestate->nextState( "discardedAndTakeAnother");
         else $this->gamestate->nextState( "discardedAndDone");
-        */
 
     }
 
@@ -368,23 +430,6 @@ class CopenhagenReboot extends Table
         Here, you can create methods defined as "game state arguments" (see "args" property in states.inc.php).
         These methods function is to return some additional information that is specific to the current
         game state.
-    */
-
-    /*
-    
-    Example for game state "MyGameState":
-    
-    function argMyGameState()
-    {
-        // Get some values from the current game situation in database...
-    
-        // return values:
-        return array(
-            'variable1' => $value1,
-            'variable2' => $value2,
-            ...
-        );
-    }    
     */
 
     function argDiscardDownToMaxHandSize()
@@ -408,9 +453,6 @@ class CopenhagenReboot extends Table
 
         $player_id = self::activeNextPlayer(); // this sets the turn to the next player
 
-        // TODO: Check if game is over
-        //$this->gamestate->nextState( 'endGame' );
-
         // NEXT PLAYER'S TURN
         self::setGameStateValue( 'cards_taken_this_turn', 0 );
 
@@ -425,13 +467,10 @@ class CopenhagenReboot extends Table
         if( $cards_in_hand > $this->max_hand_size ) $this->gamestate->nextState("discardDownToMaxHandSize");
         else
         {
-            $this->gamestate->nextState("refillHarbor");
             // PLAYER DOESN'T HAVE TOO MANY CARDS
-            /*
             $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
             if( $cards_taken_this_turn == 1 ) $this->gamestate->nextState("takeAdjacentCard");
             else $this->gamestate->nextState("refillHarbor");
-            */
         }
         
         
@@ -444,7 +483,7 @@ class CopenhagenReboot extends Table
 
         $cards = [];
 
-        for( $i = 0; $i < 7; $i ++)
+        for( $i = 0; $i < $this->harbor_number; $i ++)
         {
             if( $this->cards->countCardInLocation("harbor", $i) == 0 )
             {
@@ -468,10 +507,6 @@ class CopenhagenReboot extends Table
                 "mermaid_card" => $mermaid_card["location"]
             )   
         );
-
-        
-
-
 
         if( $this->cards->getCard($mermaid_card_id)["location"] == "harbor") $this->gamestate->nextState("endGame"); // end game if we draw mermaid card
         else $this->gamestate->nextState("nextPlayer");

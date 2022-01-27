@@ -30,27 +30,13 @@
     </div>
 
     <div id="harbor_cards">
-        <div id="harbor_position_0" class="harbor_position">
-            <div class="card red_card"></div>
-        </div>
-        <div id="harbor_position_1" class="harbor_position">
-            <div class="card yellow_card"></div>
-        </div>
-        <div id="harbor_position_2" class="harbor_position">
-            <div class="card green_card"></div>
-        </div>
-        <div id="harbor_position_3" class="harbor_position">
-            <div class="card blue_card"></div>
-        </div>
-        <div id="harbor_position_4" class="harbor_position">
-            <div class="card purple_card"></div>
-        </div>
-        <div id="harbor_position_5" class="harbor_position">
-            <div class="card red_card"></div>
-        </div>
-        <div id="harbor_position_6" class="harbor_position">
-            <div class="card red_card"></div>
-        </div>
+        <div id="harbor_position_0" class="harbor_position"></div>
+        <div id="harbor_position_1" class="harbor_position"></div>
+        <div id="harbor_position_2" class="harbor_position"></div>
+        <div id="harbor_position_3" class="harbor_position"></div>
+        <div id="harbor_position_4" class="harbor_position"></div>
+        <div id="harbor_position_5" class="harbor_position"></div>
+        <div id="harbor_position_6" class="harbor_position"></div>
     </div>
 
     <br/>
@@ -228,7 +214,7 @@
 <script type="text/javascript">
 
 /****************************** JAVASCRIPT HTML TEMPLATES ******************************/
-var jstpl_card='<div class="card ${color}_card"></div>';
+var jstpl_card='<div id="card_${id}" class="card ${color}_card"></div>';
 
 </script>  
 

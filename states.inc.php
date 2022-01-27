@@ -92,13 +92,15 @@ $machinestates = array(
             "refillHarbor"
          ),
         "transitions" => array( 
-            //"takeAdjacentCard" => 5,
+            "takeAdjacentCard" => 5,
             "discardDownToMaxHandSize" => 6,
             "refillHarbor" => 50
          ),
     ), 
 
-/*
+    // WE USE DIFFERENT ENDPOINTS FOR TAKING THE FIRST AND SECOND CARD
+    //   Once a player takes a card, they cannot place a polyomino
+    //   So we have a distinct state for taking a second card to cut off that option 
     5 => array(
         "name" => "takeAdjacentCard",
         "description" => clienttranslate('${actplayer} must take another card'),
@@ -107,7 +109,7 @@ $machinestates = array(
         "possibleactions" => array( "takeCard" ),
         "transitions" => array(  "takeCard" => 4 )
     ), 
-    */
+    
 
     6 => array(
         "name" => "discardDownToMaxHandSize",
@@ -116,11 +118,11 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must discard a card. You can only have 7 cards in hand.'),
         "type" => "activeplayer",
         "possibleactions" => array( 
-    //        "discardedAndTakeAnother",
+            "discardedAndTakeAnother",
             "discardedAndDone",
          ),
         "transitions" => array(  
-            //"discardedAndTakeAnother" => 5,
+            "discardedAndTakeAnother" => 5,
             "discardedAndDone" => 50, 
         )
     ), 
