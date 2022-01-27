@@ -103,6 +103,7 @@ $machinestates = array(
     //   So we have a distinct state for taking a second card to cut off that option 
     5 => array(
         "name" => "takeAdjacentCard",
+        "args" => "argTakeAdjacentCard",
         "description" => clienttranslate('${actplayer} must take another card'),
         "descriptionmyturn" => clienttranslate('${you} must take another card next to the one you just took.'),
         "type" => "activeplayer",
@@ -113,7 +114,6 @@ $machinestates = array(
 
     6 => array(
         "name" => "discardDownToMaxHandSize",
-        "args" => "argDiscardDownToMaxHandSize",
         "description" => clienttranslate('${actplayer} must discard a card'),
         "descriptionmyturn" => clienttranslate('${you} must discard a card. You can only have 7 cards in hand.'),
         "type" => "activeplayer",

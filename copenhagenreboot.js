@@ -179,10 +179,14 @@ function (dojo, declare) {
             
             this.stateName = stateName;
 
+            //DEBUG
+            console.log( args );
+
             switch( stateName )
             {
 
                 case 'playerTurn':
+                    this.onEnteringPlayerTurn( args );
                     break;
 
                 case 'discardDownToMaxHandSize':
@@ -198,11 +202,24 @@ function (dojo, declare) {
             }
         },
 
+        onEnteringPlayerTurn( args )
+        {
+            if( args.active_player == this.player_id ) 
+            {
+                dojo.query("#harbor_cards .card").addClass("usable");
+            }
+        },
+
+        onLeavingPlayerTurn()
+        {
+            dojo.query(".card.usable").removeClass("usable");
+        },
+
         onEnteringStateDiscardDownToMaxHandSize( args )
         {
 
-            if( args.args.player_id == this.player_id )             // notice there are two levels of args
-            {
+           if( args.active_player == this.player_id )
+           {
                 dojo.addClass("hand","over_max_hand_size");
 
                 var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
@@ -214,7 +231,7 @@ function (dojo, declare) {
                     var discardHandler = dojo.connect( cardsInHand[i], "onclick", this, "onDiscardCardOverMaxHandSize");
                     this.maxHandSizeDiscardHandlers.push( discardHandler ); 
                 }
-            }
+           }
         },
 
         onLeavingStateDiscardDownToMaxHandSize()
@@ -231,12 +248,21 @@ function (dojo, declare) {
 
         onEnteringTakeAdjacentCard( args )
         {
+            if( args.active_player == this.player_id )
+            {
+                dojo.query("#harbor_cards .card").addClass("unusable");
 
+                for( var i = 0; i < args.args.adjacent_card_ids.length; i++)
+                {
+                    dojo.query(`#card_${args.args.adjacent_card_ids[i]}`).removeClass("unusable").addClass("usable");
+                }
+            }
         },
 
-        onLeavingTakeAdjacentCard( args )
+        onLeavingTakeAdjacentCard()
         {
-
+            dojo.query(".card.usable").removeClass("usable");
+            dojo.query(".card.unusable").removeClass("unusable");
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -249,6 +275,10 @@ function (dojo, declare) {
             switch( stateName )
             {
             
+                case 'playerTurn':
+                    this.onLeavingPlayerTurn();
+                     break;
+
                 case 'discardDownToMaxHandSize':
                     this.onLeavingStateDiscardDownToMaxHandSize();
                     break;
@@ -331,30 +361,6 @@ function (dojo, declare) {
                 this.placeOnObject( card, "deck" ); // we use some visual illusion here.  The card starts on its final parent, but we snap it to the deck, then animate its slide back to its actual parent
                 this.slideToObject( card, `harbor_position_${cardData.location_arg}`, 500  ).play();
                 dojo.connect(card, "onclick", this, "onTakeHarborCard");
-        },
-
-        refillHarborCards: function ()
-        {
-            var game = this;
-
-            this.harborCardsToRefill.forEach( function(harborPosition, index)
-            {
-
-                // CREATE A NEW CARD
-                var cardHtml = game.format_block('jstpl_card',{   // make the html in memory
-                    id: 0,
-                    color: "yellow",
-                }); 
-                var card = dojo.place( cardHtml, harborPosition);  // put it in the html dom
-
-                //ANIMATE IT FROM DECK TO CORRECT SPOT
-                game.placeOnObject( card, "deck" ); // we use some visual illusion here.  The card starts on its final parent, but we snap it to the deck, then animate its slide back to its actual parent
-                game.slideToObject( card, harborPosition, 500  ).play();
-
-                dojo.connect(card, "onclick", game, "onTakeHarborCard");
-            });
-
-            this.harborCardsToRefill = [];
         },
 
         // we want to keep cards organized by color in hand
@@ -827,6 +833,8 @@ function (dojo, declare) {
 
             // CLIENT-SIDE VALIDATION
             if( this.hasTooManyCardsInHand()) return; // doesn't work if your hand already has too many cards
+
+            if( dojo.hasClass(event.currentTarget.id, "unusable")) return; // doesn't work if the card isn't usable
 
             // SEND SERVER REQUEST
             if( this.checkAction('takeCard'))

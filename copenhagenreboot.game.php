@@ -17,6 +17,12 @@
   */
 
 
+/*
+ * Debugging Notes to Self:
+ *  self::warn($message) is a way to print to the exception log.  Note that when you click "SQL logs", you then have to click over to "exception logs"
+ *  json_encode($array) is what you want to print out and debug arrays - not implode().  It handles multiple level arrays, and shows you the keys and values.
+ */
+
 require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
 
 
@@ -247,6 +253,25 @@ class CopenhagenReboot extends Table
         return array_values( $empty_harbors ); 
     }
 
+    function getCardIdsAdjacentToEmptyHarbor()
+    {
+        $card_ids = [];
+        $empty_harbors = $this->getEmptyHarbors(); 
+
+        $empty_harbor = $empty_harbors[0]; // for now, assume 1 empty harbor
+
+        if( $empty_harbor - 1 >= 0 )
+        {
+            $card_ids[] = array_key_first($this->cards->getCardsInLocation( "harbor", $empty_harbor - 1));
+        }
+        if( $empty_harbor + 1 < $this->harbor_number )
+        {
+            $card_ids[] = array_key_first($this->cards->getCardsInLocation( "harbor", $empty_harbor + 1));  
+        } 
+
+        return $card_ids;
+    }
+
     function shuffleDiscardIntoDeck()
     {
         $this->cards->moveAllCardsInLocation( "discard", "deck");
@@ -411,8 +436,6 @@ class CopenhagenReboot extends Table
                 "color" => $card["type"]
             )   
         );
-
-        $this->gamestate->nextState( "discardedAndDone");
         
         // NEXT PHASE
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
@@ -432,10 +455,10 @@ class CopenhagenReboot extends Table
         game state.
     */
 
-    function argDiscardDownToMaxHandSize()
+    function argTakeAdjacentCard()
     {
         return array(
-            "player_id" => self::getActivePlayerId(),
+            "adjacent_card_ids" => $this->getCardIdsAdjacentToEmptyHarbor(),
         );
     }
 
