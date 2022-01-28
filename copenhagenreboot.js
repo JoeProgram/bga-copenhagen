@@ -523,7 +523,7 @@ function (dojo, declare) {
 
         isCellEmpty: function( coordinates )
         {
-            return !dojo.hasClass(`#owned_player_area board_cell_${coordinates.x}_${coordinates.y}`,"full");
+            return !dojo.hasClass(`board_cell_${coordinates.x}_${coordinates.y}`,"full");
         },
 
         areCellsEmpty: function( coordinates )
@@ -996,7 +996,7 @@ function (dojo, declare) {
             if( !validity )
             {
                 gridCells.forEach( function(cell, index){
-                    var query = dojo.query(`#board_cell_${cell.x}_${cell.y}`); // the backticks here are for "template literals" - in case I forget javascript has those
+                    var query = dojo.query(`#owned_player_area #board_cell_${cell.x}_${cell.y}`); // the backticks here are for "template literals" - in case I forget javascript has those
                     query.addClass("preview").addClass("invalid");
                 });    
             }
