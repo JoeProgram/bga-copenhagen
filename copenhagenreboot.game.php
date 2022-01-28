@@ -161,6 +161,15 @@ class CopenhagenReboot extends Table
         $sql = substr($sql, 0, -1) . ";"; // remove the last comma, replace with a semicolon
         self::DbQuery( $sql );
 
+
+       $index = 1;
+        foreach( $players as $player_id => $player )
+        {
+            $sql = "UPDATE polyomino SET owner = " . $player_id . " WHERE id = " . $index;
+            self::DbQuery( $sql );
+            $index += 1;
+        }  
+
         // Activate first player
         $this->activeNextPlayer();
 

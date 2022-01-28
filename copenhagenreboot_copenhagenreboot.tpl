@@ -74,7 +74,11 @@
         <div id="cards_in_hand"></div>
     </div>
     <div id="owned_player_area" class="player_area">
-        <div id="owned_playerboard" class="playerboard">
+
+        <!-- BEGIN owned -->
+        <div id="player_{ID}_playerboard" class="playerboard">
+        <!-- END owned -->
+
             <div id="polyomino_preview"></div>
 
             <div class="board_cells">
@@ -98,13 +102,13 @@
 
         <!-- BEGIN opponent_playerboard -->
             <div id="player_area_{ID}" class="player_area">
-                <div class="playerboard playerboard_color_{COLOR}">
+                <div id="player_{ID}_playerboard" class="playerboard playerboard_color_{COLOR}">
                     <div class="board_cells">
 
                         <!-- BEGIN opponent_board_cell -->
                             <div id="player_{PLAYER}_board_cell_{X}_{Y}" class="board_cell board_cell_{X}_{Y}"></div>
                         <!-- END opponent_board_cell -->
-                    
+
                     </div>
                 </div>
                 <div class="ability_tile_area">
@@ -134,7 +138,7 @@
 
 /****************************** JAVASCRIPT HTML TEMPLATES ******************************/
 var jstpl_card='<div id="card_${id}" class="card ${color}_card"></div>';
-var jstpl_polyomino='<div id="${color}-${squares}_${copy}" class="polyomino ${color}_polyomino ${color}-${squares}"></div>';
+var jstpl_polyomino='<div id="${color}-${squares}_${copy}" class="polyomino ${color}_polyomino ${color}-${squares}" style="transform: rotateY(${flip}deg) rotateZ(${rotation}deg)"></div>';
 
 </script>  
 

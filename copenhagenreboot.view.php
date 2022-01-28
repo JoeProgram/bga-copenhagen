@@ -91,6 +91,12 @@
             ));
         }
 
+        // DROP NAME ID
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned");
+        $this->page->insert_block( "owned", array(
+            'ID' => $current_player_id,
+        ));
+
         // BUILDS CELLS OF PLAYERBOARD
         $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "board_cell");
 

@@ -116,7 +116,7 @@ function (dojo, declare) {
                 var player = gamedatas.players[player_id];
                 if( player_id == this.player_id)
                 {
-                    dojo.addClass("owned_playerboard",`playerboard_color_${player.color}`);
+                    dojo.addClass(`player_${player_id}_playerboard`,`playerboard_color_${player.color}`);
                 }
             }
 
@@ -144,9 +144,19 @@ function (dojo, declare) {
                 var polyominoHtml = this.format_block('jstpl_polyomino',{   
                     color: polyomino.color,   
                     squares: polyomino.squares,
-                    copy: polyomino.copy,                
+                    copy: polyomino.copy,  
+                    flip: polyomino.flip,
+                    rotation: polyomino.rotation,              
                 }); 
-                dojo.place( polyominoHtml, `${polyomino.color}-${polyomino.squares}_stack`);
+
+                if( polyomino.owner == null )
+                {
+                    dojo.place( polyominoHtml, `${polyomino.color}-${polyomino.squares}_stack`);
+                }
+                else
+                {
+                    dojo.place( polyominoHtml, `player_${polyomino.owner}_playerboard`);
+                }
             }
 
             
