@@ -102,17 +102,16 @@ class CopenhagenReboot extends Table
 
 
         // SETUP DECK
-
         $cards_per_color = 14;
         if( count($players) == 3 ) $cards_per_color = 12;
 
         $cards = array();
         $cards[] = array( 'type' => "mermaid", 'type_arg' => 0, 'nbr' => 1);
-        $cards[] = array( 'type' => "red", 'type_arg' => 0,  'nbr' => $cards_per_color);
-        $cards[] = array( 'type' => "yellow", 'type_arg' => 0,  'nbr' => $cards_per_color);
-        $cards[] = array( 'type' => "green", 'type_arg' => 0,  'nbr' => $cards_per_color);
-        $cards[] = array( 'type' => "blue", 'type_arg' => 0,  'nbr' => $cards_per_color);
-        $cards[] = array( 'type' => "purple", 'type_arg' => 0,  'nbr' => $cards_per_color);
+        foreach( $this->colors as $color )
+        {    
+            $cards[] = array( 'type' => $color, 'type_arg' => 0,  'nbr' => $cards_per_color);
+        }
+
         $this->cards->createCards( $cards, 'deck' );
 
         // STORE MERMAID CARD ID
@@ -142,6 +141,16 @@ class CopenhagenReboot extends Table
             $cards = $this->cards->pickCards( $number_of_starting_cards, 'deck', $player_id ); 
         }  
 
+        // CREATE POLYOMINOES
+        $sql = "INSERT INTO polyomino(color, squares, copy) VALUES ";
+
+        foreach($this->colors as $color)
+        {
+            $sql .= "('" . $color . "', 2, 1),";
+        }
+        $sql = substr($sql, 0, -1) . ";"; // remove the last comma, replace with a semicolon
+        self::DbQuery( $sql );
+
         // Activate first player
         $this->activeNextPlayer();
 
@@ -167,8 +176,6 @@ class CopenhagenReboot extends Table
         // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
-  
-        // TODO: Gather all information about current game situation (visible by player $current_player_id).
         
         $result['hand'] = $this->cards->getCardsInLocation( 'hand', $current_player_id );
         $result['harbor'] = $this->cards->getCardsInLocation( 'harbor' );
@@ -176,6 +183,7 @@ class CopenhagenReboot extends Table
         $mermaid_card_id = self::getGameStateValue( 'mermaid_card_id' );
         $result['mermaid_card'] = $this->cards->getCard( $mermaid_card_id )["location"];
         $result['cards_in_deck'] = $this->cards->countCardInLocation("deck");
+
         return $result;
     }
 

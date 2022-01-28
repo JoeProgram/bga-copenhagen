@@ -48,9 +48,11 @@ CREATE TABLE IF NOT EXISTS `polyomino` (
   `color` varchar(6) NOT NULL,
   `squares` tinyint(4) unsigned NOT NULL,
   `copy` tinyint(4) unsigned NOT NULL,
-  `owner` int(11),
-  `rotation` smallint(4) NOT NULL,
-  `flip` smallint(4) NOT NULL,
+  `owner` int(11) DEFAULT NULL,
+  `rotation` smallint(4) DEFAULT 0,
+  `flip` smallint(4) DEFAULT 0,
+  `x` tinyint(2) unsigned DEFAULT 0,
+  `y` tinyint(2) unsigned DEFAULT 0,
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
