@@ -143,10 +143,18 @@ class CopenhagenReboot extends Table
 
         // CREATE POLYOMINOES
         $sql = "INSERT INTO polyomino(color, squares, copy) VALUES ";
-
+        $values_format_sql = "('%s', %d, %d),";
         foreach($this->colors as $color)
         {
-            $sql .= "('" . $color . "', 2, 1),";
+            for( $squares = 2; $squares <= 5; $squares ++)
+            {
+                for( $copy = 1; $copy <= 3; $copy ++)
+                {
+                    if( $copy > 1 && $squares == 5) continue; // only one 5 piece of each color
+
+                    $sql .= sprintf( $values_format_sql, $color, $squares, $copy);
+                }
+            }
         }
         $sql = substr($sql, 0, -1) . ";"; // remove the last comma, replace with a semicolon
         self::DbQuery( $sql );
@@ -183,6 +191,9 @@ class CopenhagenReboot extends Table
         $mermaid_card_id = self::getGameStateValue( 'mermaid_card_id' );
         $result['mermaid_card'] = $this->cards->getCard( $mermaid_card_id )["location"];
         $result['cards_in_deck'] = $this->cards->countCardInLocation("deck");
+
+        $sql = "SELECT * FROM polyomino;";
+        $result['polyominoes'] = self::getCollectionFromDb( $sql );
 
         return $result;
     }

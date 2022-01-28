@@ -134,6 +134,21 @@ function (dojo, declare) {
                 this.placeOnObject( card, "hand_bottom_card_target" );
             }
             this.splayCardsInHand();
+
+
+            // POLYOMINOES
+            for( var polyominoId in gamedatas.polyominoes)
+            {
+                var polyomino = gamedatas.polyominoes[ polyominoId ];
+
+                var polyominoHtml = this.format_block('jstpl_polyomino',{   
+                    color: polyomino.color,   
+                    squares: polyomino.squares,
+                    copy: polyomino.copy,                
+                }); 
+                dojo.place( polyominoHtml, `${polyomino.color}-${polyomino.squares}_stack`);
+            }
+
             
             // CONNECT INTERACTIVE ELEMENTS
             dojo.query(".board_cell").connect( 'onclick', this, 'onPlacePolyomino');
