@@ -74,16 +74,13 @@
         <div id="cards_in_hand"></div>
     </div>
     <div id="owned_player_area" class="player_area">
-        <div id="owned_playerboard" class="playerboard blue">
+        <div id="owned_playerboard" class="playerboard">
             <div id="polyomino_preview"></div>
 
-            <div id="board_cells">
+            <div class="board_cells">
                 <!-- BEGIN board_cell -->
-                    <div id="board_cell_{X}_{Y}" class="board_cell"></div>
+                    <div id="board_cell_{X}_{Y}" class="board_cell board_cell_{X}_{Y}"></div>
                 <!-- END board_cell -->
-
-
- 
             </div>
 
             
@@ -101,7 +98,15 @@
 
         <!-- BEGIN opponent_playerboard -->
             <div id="player_area_{ID}" class="player_area">
-                <div class="playerboard playerboard_color_{COLOR}"></div>
+                <div class="playerboard playerboard_color_{COLOR}">
+                    <div class="board_cells">
+
+                        <!-- BEGIN opponent_board_cell -->
+                            <div id="player_{PLAYER}_board_cell_{X}_{Y}" class="board_cell board_cell_{X}_{Y}"></div>
+                        <!-- END opponent_board_cell -->
+                    
+                    </div>
+                </div>
                 <div class="ability_tile_area">
                     <div class="ability_tile any_cards"></div>
                     <div class="ability_tile additional_card"></div>
@@ -109,7 +114,6 @@
                     <div class="ability_tile change_of_colors"></div>
                     <div class="ability_tile both_actions"></div>
                 </div>
-                <div id="board_cell_{X}_{Y}" class="board_cell"></div>
             </div>
         <!-- END opponent_playerboard -->
         

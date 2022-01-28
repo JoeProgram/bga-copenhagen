@@ -63,6 +63,7 @@
         }
 
         // BUILD PLAYERBOARDS
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "opponent_board_cell"); // Nested bock must be declared first
         $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "opponent_playerboard");
         for($i = 1; $i < $players_nbr; $i++ )
         {
@@ -70,7 +71,19 @@
             $player_id = $relative_player_sequence[$i];
             $player = $players[$player_id];
 
-            self::debug( implode(" ",$player) );
+            // RESET THE BOARD CELLS FROM PREVIOUS CALL, THEN BUILD THEM OUT FOR NEW PLAYER
+            $this->page->reset_subblocks( 'opponent_board_cell');
+            for( $x = 0; $x < $this->game->board_width; $x++ )
+            {
+                for( $y = 0; $y < $this->game->board_height ; $y++)
+                {
+                    $this->page->insert_block( "opponent_board_cell", array(
+                        'PLAYER' => $player_id,
+                        'X' => $x,
+                        'Y' => $y,
+                    ));
+                }
+            }
 
             $this->page->insert_block( "opponent_playerboard", array(
                 'ID' => $player_id,
@@ -83,7 +96,7 @@
 
         for( $x = 0; $x < $this->game->board_width; $x++ )
         {
-            for( $y = 0; $y < $this->game->board_width ; $y++)
+            for( $y = 0; $y < $this->game->board_height ; $y++)
             {
                 $this->page->insert_block( "board_cell", array(
                     'X' => $x,

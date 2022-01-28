@@ -151,9 +151,9 @@ function (dojo, declare) {
 
             
             // CONNECT INTERACTIVE ELEMENTS
-            dojo.query(".board_cell").connect( 'onclick', this, 'onPlacePolyomino');
-            dojo.query(".board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
-            dojo.query("#board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
+            dojo.query("#owned_player_area .board_cell").connect( 'onclick', this, 'onPlacePolyomino');
+            dojo.query("#owned_player_area .board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
+            dojo.query("#owned_player_area #board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
             dojo.query("#polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
@@ -177,7 +177,7 @@ function (dojo, declare) {
                 this.board[x] = [];
                 for( var y = 0; y < this.boardHeight; y++ )
                 {
-                    this.board[x][y] = dojo.query(`#board_cell_${x}_${y}`);
+                    this.board[x][y] = dojo.query(`#owned_player_area #board_cell_${x}_${y}`);
                 } 
             }
         },   
@@ -506,10 +506,10 @@ function (dojo, declare) {
 
             gridCells.forEach( function( gridCell )
             {
-                dojo.query( `#board_cell_${gridCell.x}_${gridCell.y}`).addClass("full").addClass(`${color}_cell`);
+                dojo.query( `#owned_player_area #board_cell_${gridCell.x}_${gridCell.y}`).addClass("full").addClass(`${color}_cell`);
             });
 
-            dojo.query(".board_cell.preview").removeClass("preview");
+            dojo.query("#owned_player_area .board_cell.preview").removeClass("preview");
         },
 
         getCoordinatesFromId: function( id )
@@ -523,7 +523,7 @@ function (dojo, declare) {
 
         isCellEmpty: function( coordinates )
         {
-            return !dojo.hasClass(`board_cell_${coordinates.x}_${coordinates.y}`,"full");
+            return !dojo.hasClass(`#owned_player_area board_cell_${coordinates.x}_${coordinates.y}`,"full");
         },
 
         areCellsEmpty: function( coordinates )
@@ -571,7 +571,7 @@ function (dojo, declare) {
 
                 console.log( `Checking ${x},${y} for ${color}`);
 
-                if(dojo.query( `#board_cell_${x}_${y}.${color}_cell`).length > 0) return true;
+                if(dojo.query( `#owned_player_area #board_cell_${x}_${y}.${color}_cell`).length > 0) return true;
             }
 
             return false;
@@ -783,7 +783,7 @@ function (dojo, declare) {
                 if( gridCells[i].y < minY) minY = gridCells[i].y;
             }
 
-            var minCellNode = dojo.query(`#board_cell_${minX}_${minY}`)[0];
+            var minCellNode = dojo.query(`#owned_player_area #board_cell_${minX}_${minY}`)[0];
             var minCellNodePosition = dojo.position(minCellNode);
 
             // POSITION POLYOMINO AT THAT GRID CELL
