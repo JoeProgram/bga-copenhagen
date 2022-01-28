@@ -151,6 +151,8 @@ class CopenhagenReboot extends Table
                 for( $copy = 1; $copy <= 3; $copy ++)
                 {
                     if( $copy > 1 && $squares == 5) continue; // only one 5 piece of each color
+                    else if( count($players) == 2 && $copy == 3) continue; // only 2 pieces per polyomino for 2 player game
+                     else if( count($players) == 3 && $copy == 3 && ($squares == 2 || $squares == 4)) continue; // removing certain pieces for 3 player game
 
                     $sql .= sprintf( $values_format_sql, $color, $squares, $copy);
                 }
