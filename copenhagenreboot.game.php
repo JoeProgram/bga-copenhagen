@@ -165,7 +165,8 @@ class CopenhagenReboot extends Table
        $index = 1;
         foreach( $players as $player_id => $player )
         {
-            $sql = "UPDATE polyomino SET owner = " . $player_id . " WHERE id = " . $index;
+            $sql_format = "UPDATE polyomino SET owner = %s, x = %d, y = %d WHERE id = %d";
+            $sql = sprintf( $sql_format, $player_id, 1,2, $index);
             self::DbQuery( $sql );
             $index += 1;
         }  
