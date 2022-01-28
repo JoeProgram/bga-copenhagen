@@ -71,6 +71,23 @@
         self::ajaxResponse(); 
     }
 
+    public function placePolyomino()
+    {
+        self::setAjaxMode();  
+
+        $color = self::getArg( "color", AT_alphanum, true );
+        $squares = self::getArg( "squares", AT_posint, true );
+        $copy = self::getArg( "copy", AT_posint, true );
+        $x = self::getArg( "x", AT_posint, true );
+        $y = self::getArg( "y", AT_posint, true );
+        $flip = self::getArg( "flip", AT_posint, true );
+        $rotation = self::getArg( "rotation", AT_posint, true );
+
+        $this->game->placePolyomino( $color, $squares, $copy, $x, $y, $flip, $rotation );
+
+        self::ajaxResponse(); 
+    }
+
   }
   
 

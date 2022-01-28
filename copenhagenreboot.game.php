@@ -336,32 +336,6 @@ class CopenhagenReboot extends Table
         (note: each method below must match an input method in copenhagenreboot.action.php)
     */
 
-    /*
-    
-    Example:
-
-    function playCard( $card_id )
-    {
-        // Check that this is the player's turn and that it is a "possible action" at this game state (see states.inc.php)
-        self::checkAction( 'playCard' ); 
-        
-        $player_id = self::getActivePlayerId();
-        
-        // Add your game logic to play a card there 
-        ...
-        
-        // Notify all players about the card played
-        self::notifyAllPlayers( "cardPlayed", clienttranslate( '${player_name} plays ${card_name}' ), array(
-            'player_id' => $player_id,
-            'player_name' => self::getActivePlayerName(),
-            'card_name' => $card_name,
-            'card_id' => $card_id
-        ) );
-          
-    }
-    
-    */
-
     function takeCard( $card_id )
     {
         self::checkAction( 'takeCard' );
@@ -473,6 +447,36 @@ class CopenhagenReboot extends Table
         if( $cards_taken_this_turn == 1 ) $this->gamestate->nextState( "discardedAndTakeAnother");
         else $this->gamestate->nextState( "discardedAndDone");
 
+    }
+
+    function placePolyomino( $color, $squares, $copy, $x, $y, $flip, $rotation )
+    {
+        $player_id = self::getActivePlayerId();
+
+        $sql_format = "UPDATE polyomino SET owner = %s, x = %d, y = %d, flip = %d, rotation = %d WHERE color = '%s' AND squares = %d AND copy = %d";
+        self::DbQuery( sprintf( $sql_format, $player_id, $x, $y, $flip, $rotation, $color, $squares, $copy));
+
+        self::notifyAllPlayers( 
+            "placePolyomino", 
+            clienttranslate('${player_name} placed a facade tile.'),
+            array(
+                "player_name" => self::getActivePlayerName(),
+
+                "player_id" => $player_id,
+                "polyomino" => array(
+                    "owner" => $player_id,
+                    "color" => $color,
+                    "squares" => $squares,
+                    "copy" => $copy,
+                    "x" => $x,
+                    "y" => $y,
+                    "flip" => $flip,
+                    "rotation" => $rotation,
+                )
+            )   
+        );
+
+        $this->gamestate->nextState( "placePolyomino" );
     }
 
     
