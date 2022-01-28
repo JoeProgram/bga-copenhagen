@@ -171,8 +171,6 @@ function (dojo, declare) {
             this.determineTopPolyominoInEveryStack();
             dojo.query("#polyominoes .polyomino.top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
 
-            this.determineUsablePolyominoes();
-
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
@@ -230,15 +228,21 @@ function (dojo, declare) {
 
         onEnteringPlayerTurn( args )
         {
+            // HANDLE CARDS
             if( args.active_player == this.player_id ) 
             {
                 dojo.query("#harbor_cards .card").addClass("usable");
             }
+
+            // HANDLE POLYOMINOES
+            this.determineUsablePolyominoes();
         },
 
         onLeavingPlayerTurn()
         {
             dojo.query(".card.usable").removeClass("usable");
+            dojo.query(".polyomino.usable").removeClass("usable");
+            dojo.query(".polyomino.unusable").removeClass("unusable");
         },
 
         onEnteringStateDiscardDownToMaxHandSize( args )
@@ -268,7 +272,6 @@ function (dojo, declare) {
                 dojo.removeClass("hand","over_max_hand_size");
                 dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
                 this.splayCardsInHand();
-                this.determineUsablePolyominoes();
             }
         },
 
@@ -1087,9 +1090,6 @@ function (dojo, declare) {
             var newTopOfStack = this.determineTopPolyominoInStack( this.selectedPolyomino["name"]);
             dojo.query(`.${this.selectedPolyomino["name"]}.top_of_stack`).connect( 'onclick', this, 'onSelectPolyomino');            
 
-            // recalculate what you can afford
-            this.determineUsablePolyominoes();
-
             this.selectedPolyomino = null;
 
         },
@@ -1142,7 +1142,6 @@ function (dojo, declare) {
                 this.slideToObjectAndDestroy( `card_${notif.args.card_id}`, `overall_player_board_${notif.args.player_id}`)
             }
 
-            //if( !this.hasTooManyCardsInHand()) this.determineUsablePolyominoes();
         },
 
         notif_discardDownToMaxHandSize: function(notif)

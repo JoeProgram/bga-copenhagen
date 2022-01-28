@@ -74,8 +74,8 @@ $machinestates = array(
     
     3 => array(
         "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must take a card'),
-        "descriptionmyturn" => clienttranslate('${you} must take a card'),
+        "description" => clienttranslate('${actplayer} must take a card or place a facade tile'),
+        "descriptionmyturn" => clienttranslate('${you} must take a card or place a facade tile'),
         "type" => "activeplayer",
         "possibleactions" => array( "takeCard" ),
         "transitions" => array(  "takeCard" => 4 )
