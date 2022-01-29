@@ -29,6 +29,33 @@ $this->board_width = 5;
 $this->colors = ["red", "yellow", "green", "blue", "purple"];
 
 
+$this->polyomino_shapes = array(
+    "purple-2" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0)),
+    "purple-3" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0)),
+    "purple-4" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0),array("x" => 3, "y" => 0)),
+    "purple-5" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0),array("x" => 3, "y" => 0),array( "x" =>4,"y" =>0)),
+
+    "green-2" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0)),
+    "green-3" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0)),
+    "green-4" => array( array( "x" => 0, "y" => 0), array( "x" => -1, "y" => 1), array( "x" => 0, "y" => 1),array("x" => 1, "y" => 1)),
+    "green-5" => array( array( "x" => 0, "y" => 0), array( "x" => -1, "y" => 1), array( "x" => 0, "y" => 1),array("x" => 1, "y" => 1),array( "x" =>0,"y" =>2)),
+
+    "red-2" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0)),
+    "red-3" => array( array( "x" => 0, "y" => 0), array( "x" => 0, "y" => 1), array( "x" => 1, "y" => 1)),
+    "red-4" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 0, "y" => 1),array("x" => 1, "y" => 1)),
+    "red-5" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0),array("x" => 1, "y" => 1),array( "x" =>2,"y" =>1)),
+
+    "blue-2" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0)),
+    "blue-3" => array( array( "x" => 0, "y" => 0), array( "x" => 0, "y" => 1), array( "x" => 1, "y" => 1)),
+    "blue-4" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0),array("x" => 2, "y" => 1)),
+    "blue-5" => array( array( "x" => 0, "y" => 0), array( "x" => -2, "y" => 1), array( "x" => -1, "y" => 1),array("x" => 0, "y" => 1),array( "x" =>0,"y" =>2)),
+
+    "yellow-2" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0)),
+    "yellow-3" => array( array( "x" => 0, "y" => 0), array( "x" => 0, "y" => 1), array( "x" => 1, "y" => 1)),
+    "yellow-4" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 1, "y" => 1),array("x" => 2, "y" => 1)),
+    "yellow-5" => array( array( "x" => 0, "y" => 0), array( "x" => -2, "y" => 1), array( "x" => -1, "y" => 1),array("x" => 0, "y" => 1),array( "x" =>-2,"y" =>2)),
+);
+
 
 
 
