@@ -164,7 +164,7 @@ function (dojo, declare) {
             // CONNECT INTERACTIVE ELEMENTS
             dojo.query("#owned_player_area .board_cell").connect( 'onclick', this, 'onPlacePolyomino');
             dojo.query("#owned_player_area .board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
-            dojo.query("#owned_player_area #board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
+            dojo.query("#owned_player_area .board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
             dojo.query("#polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
@@ -454,7 +454,12 @@ function (dojo, declare) {
 
         determineTopPolyominoInStack: function( polyominoClass )
         {
-            return dojo.query( `.${polyominoClass}:last-child` ).addClass("top_of_stack");
+            var query = dojo.query( `.${polyominoClass}:last-child` );
+            if( query.length == 0 ) return; // no more polyominoes in this stack
+
+            var topOfStackNode = query[0];
+            dojo.addClass( topOfStackNode, "top_of_stack");
+            return topOfStackNode;
         },
 
         determineUsablePolyominoes: function()
@@ -752,7 +757,8 @@ function (dojo, declare) {
             this.slideToObjectPos( polyominoNodeId, boardCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ).play();
 
             // handle the new top of stack
-            var newTopOfStack = this.determineTopPolyominoInStack( `${polyominoData.color}-${polyominoData.squares}`);           
+            var newTopOfStack = this.determineTopPolyominoInStack( `${polyominoData.color}-${polyominoData.squares}`);  
+            dojo.connect( newTopOfStack, 'onclick', this, 'onSelectPolyomino');         
 
         },
 
@@ -1214,8 +1220,6 @@ function (dojo, declare) {
         notif_placePolyomino: function(notif)
         { 
 
-            if( this.player_id == notif.args.player_id) this.fadeOutShadowBox();
-
             var polyominoData = notif.args.polyomino;
             dojo.style(
                 `${polyominoData.color}-${polyominoData.squares}_${polyominoData.copy}`, 
@@ -1224,6 +1228,10 @@ function (dojo, declare) {
             );
 
             this.placePolyomino( polyominoData );
+
+            if( this.player_id == notif.args.player_id) this.fadeOutShadowBox(); // NOTE: this needs to come after polyomino placement, or it messes up where the polyomino ends up
+
+            this.selectedPolyomino = null;
             
         },
 
