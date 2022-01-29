@@ -141,6 +141,22 @@ class CopenhagenReboot extends Table
             $cards = $this->cards->pickCards( $number_of_starting_cards, 'deck', $player_id ); 
         }  
 
+        // CREATE PLAYERBOARDS
+        $sql = "INSERT INTO board_cell(owner, x, y) VALUES ";
+        $values_format_sql = "(%d,%d,%d),";
+        foreach( $players as $player_id => $player )
+        {
+            for( $x = 0; $x < $this->board_width; $x++)
+            {
+                for( $y = 0; $y < $this->board_height; $y++)
+                {
+                    $sql .= sprintf( $values_format_sql, $player_id, $x, $y);
+                }
+            }
+        }  
+        $sql = substr($sql, 0, -1) . ";"; // remove the last comma, replace with a semicolon
+        self::DbQuery( $sql );
+
         // CREATE POLYOMINOES
         $sql = "INSERT INTO polyomino(color, squares, copy) VALUES ";
         $values_format_sql = "('%s', %d, %d),";
@@ -203,6 +219,8 @@ class CopenhagenReboot extends Table
         $mermaid_card_id = self::getGameStateValue( 'mermaid_card_id' );
         $result['mermaid_card'] = $this->cards->getCard( $mermaid_card_id )["location"];
         $result['cards_in_deck'] = $this->cards->countCardInLocation("deck");
+
+        $result['playerboards'] = $this->getPlayerboards();
 
         $sql = "SELECT * FROM polyomino;";
         $result['polyominoes'] = self::getCollectionFromDb( $sql );
@@ -323,6 +341,35 @@ class CopenhagenReboot extends Table
         {
             $this->cards->insertCardOnExtremePosition( $card["id"], "deck", false);
         }
+    }
+
+    function getPlayerboards()
+    {
+        $players = self::loadPlayersBasicInfos();
+
+        $playerboards = array();
+        foreach( $players as $player_id => $player )
+        {
+            $playerboards[$player_id] = $this->getPlayerboard( $player_id);
+        } 
+
+        return $playerboards;
+    }
+
+    function getPlayerboard( $player_id )
+    {
+        $sql = "SELECT * from board_cell WHERE owner = " . $player_id . " ORDER BY x, y";
+        $rows = self::getObjectListFromDB( $sql );
+
+        // turn rows into 2d array
+        $playerboard = array();
+        foreach( $rows as $row )
+        {
+            if( !array_key_exists($row["x"], $playerboard) ) $playerboard["x"] = array();
+            $playerboard[$row["x"]][$row["y"]] = $row;
+        }
+
+        return $playerboard;
     }
 
 
