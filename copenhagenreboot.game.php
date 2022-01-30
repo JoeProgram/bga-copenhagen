@@ -43,6 +43,8 @@ class CopenhagenReboot extends Table
             // GLOBAL VARIABLES 
             "cards_taken_this_turn" => 10,  // keep track of how many cards have been taken this turn.  10 is not the value to track - just an internal ID
             "mermaid_card_id" => 11,
+            "total_drawable_cards" => 12,
+            "drawn_cards" => 13,
             
             // VARIANTS
             //    "my_first_game_variant" => 100,
@@ -94,6 +96,7 @@ class CopenhagenReboot extends Table
 
         // INITIALIZE GLOBAL VALUES
         self::setGameStateValue( 'cards_taken_this_turn', 0 );
+        self::setGameStateValue( 'drawn_cards', 0 );
 
         // INITIALIZE GAME STATISTICS
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -107,18 +110,19 @@ class CopenhagenReboot extends Table
 
         $cards = array();
         $cards[] = array( 'type' => "mermaid", 'type_arg' => 0, 'nbr' => 1);
-        
-        // TESTING CODE
-        //  All red cards for faster polyomino placement
-        //$cards[] = array( 'type' => "red", 'type_arg' => 0,  'nbr' => 50);
 
-        // PRODUCTION CODE
         foreach( $this->colors as $color )
         {    
             $cards[] = array( 'type' => $color, 'type_arg' => 0,  'nbr' => $cards_per_color);
         }
 
         $this->cards->createCards( $cards, 'deck' );
+
+        // CARD COUNTING FOR PROGRESSION SYSTEM - PART 1
+        $total_playable_cards = $cards_per_color * count($this->colors);
+        if( count($players) > 2 ) $total_playable_cards *= 2;
+        $drawable_cards = $total_playable_cards - $this->harbor_number;
+
 
         // STORE MERMAID CARD ID
         $sql = "SELECT card_id FROM card WHERE card_type = 'mermaid';";  // remember SQL uses one equals sign, not two
@@ -145,7 +149,11 @@ class CopenhagenReboot extends Table
         {
             $number_of_starting_cards = $this->getStartingCardsForPlayerNumber( $player["player_no"], count($players) );
             $cards = $this->cards->pickCards( $number_of_starting_cards, 'deck', $player_id ); 
+            $drawable_cards -= $number_of_starting_cards;
         }  
+
+        // CARD COUNTING FOR PROGRESSION SYSTEM - PART 2
+        self::setGameStateValue( 'total_drawable_cards', $drawable_cards );
 
         // CREATE PLAYERBOARDS
         $sql = "INSERT INTO board_cell(owner, x, y) VALUES ";
@@ -221,6 +229,20 @@ class CopenhagenReboot extends Table
         $sql = "SELECT * FROM polyomino;";
         $result['polyominoes'] = self::getCollectionFromDb( $sql );
 
+        /*
+        // GET THE TOTAL NUMBER OF CARDS THAT WILL APPEAR THIS GAME
+        $number_of_playable_cards = self::DbQuery( "SELECT COUNT(card_id) FROM card WHERE color != 'mermaid'");
+        $total_playable_cards = $number_of_playable_cards;
+        if( $this->getPlayersNumber() > 2 ) $total_playable_cards *= 2;
+
+        // GET THE NUMBER OF CARDS REMAINING
+        $cards_remaining = $this->cards->countCardInLocation( "deck "); 
+
+        $mermaid_card_id = self::getGameStateValue( "mermaid_card_id" );
+        if( $this->card->getCard( $mermaid_card_id )["location"] ) $cards_remaining += $number_of_playable_cards;
+
+        $percentage = ($cards_remaining * 100.0)/ $total_playable_cards;*/
+
         return $result;
     }
 
@@ -236,9 +258,12 @@ class CopenhagenReboot extends Table
     */
     function getGameProgression()
     {
-        // TODO: compute and return the game progression
 
-        return 0;
+        $drawn_cards = self::getGameStateValue( "drawn_cards" );
+        $total_drawable_cards = self::getGameStateValue( "total_drawable_cards" );
+
+        return ($drawn_cards * 100.0)/ $total_drawable_cards;
+        
     }
 
 
@@ -589,6 +614,9 @@ class CopenhagenReboot extends Table
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
         self::setGameStateValue( 'cards_taken_this_turn', $cards_taken_this_turn + 1 );
 
+        $drawn_cards = self::getGameStateValue( "drawn_cards" );
+        self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );        
+
         self::notifyAllPlayers( 
             "takeCard", 
             clienttranslate('${player_name} takes a ${color} card.'),
@@ -632,6 +660,9 @@ class CopenhagenReboot extends Table
 
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
         self::setGameStateValue( 'cards_taken_this_turn', $cards_taken_this_turn + 1 );
+
+        $drawn_cards = self::getGameStateValue( "drawn_cards" );
+        self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );   
 
         self::notifyAllPlayers( 
             "takeCard", 
