@@ -561,7 +561,7 @@
 
 .ability_tile
 {
-    background-image: url('img/tiles.png');
+    /*background-image: url('img/tiles.png'); temp taken out*/
     width: 43px;
     height: 43px;
     display: inline-block;
