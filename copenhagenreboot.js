@@ -755,7 +755,7 @@ function (dojo, declare) {
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
             var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCell( polyominoNode, boardCellNode );
 
-            this.attachToNewParent(  polyominoNodeId, `player_${polyominoData.owner}_playerboard`);
+            this.attachToNewParent( polyominoNodeId, `player_${polyominoData.owner}_playerboard`);
             this.slideToObjectPos( polyominoNodeId, boardCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ).play();
 
             // handle the new top of stack

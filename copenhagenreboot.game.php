@@ -107,10 +107,15 @@ class CopenhagenReboot extends Table
 
         $cards = array();
         $cards[] = array( 'type' => "mermaid", 'type_arg' => 0, 'nbr' => 1);
-        foreach( $this->colors as $color )
+        
+        // TESTING CODE
+        $cards[] = array( 'type' => "red", 'type_arg' => 0,  'nbr' => 50);
+
+        // PRODUCTION CODE
+        /*foreach( $this->colors as $color )
         {    
             $cards[] = array( 'type' => $color, 'type_arg' => 0,  'nbr' => $cards_per_color);
-        }
+        }*/
 
         $this->cards->createCards( $cards, 'deck' );
 
@@ -176,16 +181,6 @@ class CopenhagenReboot extends Table
         }
         $sql = substr($sql, 0, -1) . ";"; // remove the last comma, replace with a semicolon
         self::DbQuery( $sql );
-
-
-       $index = 1;
-        foreach( $players as $player_id => $player )
-        {
-            $sql_format = "UPDATE polyomino SET owner = %s, rotation = 90, x = %d, y = %d WHERE id = %d";
-            $sql = sprintf( $sql_format, $player_id, 1,2, $index);
-            self::DbQuery( $sql );
-            $index += 1;
-        }  
 
         // Activate first player
         $this->activeNextPlayer();
@@ -432,6 +427,20 @@ class CopenhagenReboot extends Table
         return $polyominoShape;
     }
 
+    function getMinGridCell( $grid_cells )
+    {
+
+        $min_grid_cell = $grid_cells[0];
+
+        foreach( $grid_cells as $grid_cell )
+        {
+            if( $grid_cell["x"] < $min_grid_cell["x"]) $min_grid_cell["x"] = $grid_cell["x"];
+            if( $grid_cell["y"] < $min_grid_cell["y"]) $min_grid_cell["y"] = $grid_cell["y"];
+        }
+
+        return $min_grid_cell;
+    }
+
     function getGridCellsForPolyominoAtCoordinates( $shape, $x, $y )
     {
 
@@ -450,11 +459,13 @@ class CopenhagenReboot extends Table
 
     function isGroundedPosition( $grid_cells, $playerboard )
     {
-        for( $i = 0; i < count($grid_cells); $i++)
+        for( $i = 0; $i < count($grid_cells); $i++)
         {
             if( $grid_cells[$i]["y"] == 0 ) return true;
 
-            $cell_below = $playerboard[$grid_cells[$i]["x"]][$grid_cells[$i]["y"]];
+            $cell_below = $playerboard[$grid_cells[$i]["x"]][$grid_cells[$i]["y"] - 1];
+
+            self::warn( "Cell Below Fill is " . json_encode($cell_below) . "   ");
             if( $cell_below["fill"] != NULL ) return true;
         }
 
@@ -642,8 +653,23 @@ class CopenhagenReboot extends Table
 
 
         // PLACE POLYOMINO
-        $sql_format = "UPDATE polyomino SET owner = %s, x = %d, y = %d, flip = %d, rotation = %d WHERE color = '%s' AND squares = %d AND copy = %d";
-        self::DbQuery( sprintf( $sql_format, $player_id, $x, $y, $flip, $rotation, $color, $squares, $copy));
+        //  Up till now, we've been using the "origin" of the polyomino
+        //  But for placement display, we switch to the min bounds point
+        $min_grid_cell = $this->getMinGridCell( $grid_cells );
+        $min_grid_cell_x = $min_grid_cell["x"];
+        $min_grid_cell_y = $min_grid_cell["y"];
+
+
+        $sql = "UPDATE polyomino SET owner = $player_id, x = $min_grid_cell_x, y = $min_grid_cell_y, flip = $flip, rotation = $rotation WHERE color = '$color' AND squares = $squares AND copy = $copy";
+        self::DbQuery(  $sql );
+
+        // UPDATE BOARD CELLS
+        foreach( $grid_cells as $grid_cell ) 
+        {
+            $sql = "UPDATE board_cell SET color = '$color', fill = 'window' WHERE owner = $player_id AND x = $grid_cell[x] AND y = $grid_cell[y] ;";
+            self::DbQuery(  $sql );
+        }
+
 
         // DISCARD CARDS
 
@@ -661,12 +687,12 @@ class CopenhagenReboot extends Table
                     "color" => $color,
                     "squares" => $squares,
                     "copy" => $copy,
-                    "x" => $x,
-                    "y" => $y,
+                    "x" => $min_grid_cell_x,
+                    "y" => $min_grid_cell_y,
                     "flip" => $flip,
                     "rotation" => $rotation,
                 ),
-                "playerboard" => $playerboard,
+                "playerboard" => $this->getPlayerboard( $player_id), // get refreshed playerboard after update
             )   
         );
 
