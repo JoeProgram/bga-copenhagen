@@ -388,7 +388,7 @@ function (dojo, declare) {
         {
             if( numberCardsInDeck == 0 ) dojo.style("deck","display","none");
             else dojo.style("deck","display","block");
-            this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in deck"));
+            this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in deck"), "");
         },
 
         makeHarborCard: function( cardData )
