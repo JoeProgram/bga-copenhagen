@@ -372,6 +372,94 @@ class CopenhagenReboot extends Table
         return $playerboard;
     }
 
+    function getTransformedShape( $color, $squares, $flip, $rotation )
+    {
+        // NOTE: In PHP, array assignment creates a copy of the array, so it's not going to corrupt the original
+        $shape = $this->polyomino_shapes[sprintf("%s-%d",$color, $squares)];
+
+        while( $rotation > 0)
+        {
+            $shape = $this->rotatePolyominoShape( $shape );
+            $rotation -= 90;
+        }
+        if( $flip == 180) $shape = $this->flipPolyominoShape( $shape );
+
+        return $shape;
+    }
+
+    function rotatePolyominoShape( $polyominoShape )
+    {
+        for( $i = 0; $i < count($polyominoShape); $i++)
+        {
+            $polyominoShape[$i] = array( "x" => $polyominoShape[$i]["y"], "y" => -$polyominoShape[$i]["x"]);  
+        } 
+
+        return $this->setNewShapeOrigin( $polyominoShape ); 
+    }
+
+    function flipPolyominoShape( $polyominoShape )
+    {
+        for( $i = 0; $i < count($polyominoShape); $i++)
+        {
+            $polyominoShape[$i] = array( "x" => -$polyominoShape[$i]["x"], "y" => $polyominoShape[$i]["y"]);  
+        } 
+
+        return $this->setNewShapeOrigin( $polyominoShape ); 
+    }
+
+    function setNewShapeOrigin( $polyominoShape )
+    {
+        $newOrigin = $polyominoShape[0];
+
+        // find the lowest, left-most square
+        for( $i = 1; $i < count($polyominoShape); $i++)
+        {
+            if( 
+                $polyominoShape[$i]["y"] < $newOrigin["y"] 
+                || ($polyominoShape[$i]["y"] == $newOrigin["y"] && $polyominoShape[$i]["x"] < $newOrigin["x"])
+            )
+            {
+                $newOrigin = $polyominoShape[$i];
+            }
+        }
+
+        // offset the other cells by so the lowest, left-most square is the origin
+        for( $i = 0; $i < count($polyominoShape); $i++) 
+        {
+            $polyominoShape[$i] = array( "x" => $polyominoShape[$i]["x"] - $newOrigin["x"], "y" => $polyominoShape[$i]["y"] - $newOrigin["y"]);
+        }
+
+        return $polyominoShape;
+    }
+
+    function getGridCellsForPolyominoAtCoordinates( $shape, $x, $y )
+    {
+
+        $results = array();
+
+        foreach($shape as $grid_cell )
+        {
+            $results[] = array(
+                "x" => $grid_cell["x"] + $x,
+                "y" => $grid_cell["y"] + $y,
+            );
+        }
+
+        return $results;
+    }
+
+    function isGroundedPosition( $grid_cells, $playerboard )
+    {
+        for( $i = 0; i < count($grid_cells); $i++)
+        {
+            if( $grid_cells[$i]["y"] == 0 ) return true;
+
+            $cell_below = $playerboard[$grid_cells[$i]["x"]][$grid_cells[$i]["y"]];
+            if( $cell_below["fill"] != NULL ) return true;
+        }
+
+        return false;
+    }
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -500,8 +588,66 @@ class CopenhagenReboot extends Table
     {
         $player_id = self::getActivePlayerId();
 
+        $transformed_shape = $this->getTransformedShape( $color, $squares, $flip, $rotation);
+
+        $playerboard = $this->getPlayerboard( $player_id );
+        $grid_cells = $this->getGridCellsForPolyominoAtCoordinates( $transformed_shape, $x, $y );
+
+        // PHP NOTE: In double-quoted strings, you can reference variable names directly in the string.  Neat!
+        $sql = "SELECT * FROM polyomino WHERE color = '$color' AND squares = $squares AND copy = $copy;"; 
+        $polyomino = self::getObjectFromDB( $sql );
+
+        // SERVER VALIDATION
+
+        // BASIC INPUT VALIDATION
+        if( !in_array($color, $this->colors, true)) throw new feException( self::_("The provided color isn't valid."));
+        if( $squares < 2 || $squares > 5 ) throw new feException( self::_("The provided shape isn't valid."));
+        if( $copy < 1 || $copy > 3 ) throw new feException( self::_("The provided copy name isn't valid."));
+        if( $x < 0 || $x > $this->board_width ) throw new feException( self::_("The provided position isn't valid."));
+        if( $y < 0 || $y > $this->board_height ) throw new feException( self::_("The provided position isn't valid."));
+        if( $flip != 0 && $flip != 180 ) throw new feException( self::_("The provided flip isn't valid."));
+        if( $rotation != 0 && $rotation != 90 && $rotation != 180 && $rotation != 270) throw new feException( self::_("The provided rotation isn't valid."));
+
+        // CHECK THAT POLYOMINO IS UNOWNED
+        if( $polyomino["owner"] != NULL ) throw new feException( self::_("This facade tile is already owned."));
+
+        // CHECK THAT POLYOMINO PLACEMENT IS FULLY ON BOARD
+        foreach( $grid_cells as $grid_cell ) 
+        {
+            if( 
+                $grid_cell["x"] < 0 
+                || $grid_cell["x"] >= $this->board_width 
+                ||  $grid_cell["y"] < 0 
+                || $grid_cell["y"] >= $this->board_height
+            )
+            {
+                throw new feException( self::_("That placement would put the facade tile off your board."));
+            }
+        }
+
+        // CHECK THAT POLYOMINO IS ON EMPTY SPACE
+        foreach( $grid_cells as $grid_cell ) 
+        {
+            if( $playerboard[$grid_cell["x"]][$grid_cell["y"]]["fill"] != NULL )
+            {
+                throw new feException( self::_("That placement would overlap one of your other facade tiles."));
+            }
+        }
+
+        // CHECK THAT POLYOMINO IS GROUNDED
+        if( !$this->isGroundedPosition($grid_cells, $playerboard)) throw new feException( self::_("The polyomino must sit on the bottom of the facade, or on another facade tile."));
+
+        // CHECK PLAYER CAN AFFORD POLYOMINO
+
+
+
+        // PLACE POLYOMINO
         $sql_format = "UPDATE polyomino SET owner = %s, x = %d, y = %d, flip = %d, rotation = %d WHERE color = '%s' AND squares = %d AND copy = %d";
         self::DbQuery( sprintf( $sql_format, $player_id, $x, $y, $flip, $rotation, $color, $squares, $copy));
+
+        // DISCARD CARDS
+
+        // SEE IF PLAYER GETS ADJACENT COST REDUCTION
 
         self::notifyAllPlayers( 
             "placePolyomino", 
@@ -519,7 +665,8 @@ class CopenhagenReboot extends Table
                     "y" => $y,
                     "flip" => $flip,
                     "rotation" => $rotation,
-                )
+                ),
+                "playerboard" => $playerboard,
             )   
         );
 

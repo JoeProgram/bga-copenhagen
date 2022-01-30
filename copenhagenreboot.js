@@ -33,6 +33,7 @@ function (dojo, declare) {
 
             this.boardWidth = 5;
             this.boardHeight = 9;
+            this.playerboard = [];
 
             this.cardWidth = 66;
             this.cardSplayDistance = 20;
@@ -92,8 +93,6 @@ function (dojo, declare) {
         setup: function( gamedatas )
         {
             console.log( "Starting game setup" );
-            
-            this.setupBoard();
 
             // DEBUG - see all game data in console
             console.log( gamedatas);
@@ -109,6 +108,9 @@ function (dojo, declare) {
             {
                 this.makeHarborCard( gamedatas.harbor[card_id] );
             }
+
+            // PLAYERBOARD DATA OBJECT
+            this.playerboard = gamedatas.playerboards[this.player_id];
 
             // PLAYER BOARDS 
             for( var player_id in gamedatas.players )
@@ -177,6 +179,8 @@ function (dojo, declare) {
             console.log( "Ending game setup" );
         },    
 
+        /*
+        ** TO BE REMOVED
         setupBoard: function()
         {
             // logic for setting up data of playboard
@@ -190,6 +194,7 @@ function (dojo, declare) {
                 } 
             }
         },   
+        */
 
         ///////////////////////////////////////////////////
         //// Game & client states
@@ -524,19 +529,6 @@ function (dojo, declare) {
             dojo.destroy( card );
         },
 
-        updateBoardCells: function( polyomino, gridCells, board )
-        {
-
-            var color = this.getPolyominoColorFromId( polyomino.id );
-
-            gridCells.forEach( function( gridCell )
-            {
-                dojo.query( `#owned_player_area #board_cell_${gridCell.x}_${gridCell.y}`).addClass("full").addClass(`${color}_cell`);
-            });
-
-            dojo.query("#owned_player_area .board_cell.preview").removeClass("preview");
-        },
-
         getCoordinatesFromId: function( id )
         {
             var coordinates = id.split('_');
@@ -548,7 +540,7 @@ function (dojo, declare) {
 
         isCellEmpty: function( coordinates )
         {
-            return !dojo.hasClass(`board_cell_${coordinates.x}_${coordinates.y}`,"full");
+            return this.playerboard[coordinates.x][coordinates.y].fill == null;
         },
 
         areCellsEmpty: function( coordinates )
@@ -602,7 +594,7 @@ function (dojo, declare) {
 
         isValidPlacementPosition: function( coordinates )
         {
-            
+
             // CHECK EASY CONDITIONS FIRST
             if( !this.areCellsEmpty( coordinates ) || !this.isGroundedPosition( coordinates )) return false; 
 
@@ -617,22 +609,36 @@ function (dojo, declare) {
             return cardsOfColor >= cost;
         },
 
-        getGridCellsForPolyominoAtCoordinates: function( polyominoShape, coordinates )
+        // There's a few different systems we're using to identify polyomino placement
+        //   THE CLICKED BOARD CELL - this is the square the user clicked on
+        //   THE POLYOMINO ORIGIN - this is the lowest, left-most square of the shape.  May not be the actual square the user clicked on.
+        //   THE BOUNDS MIN - this is the x of the left-most square, and the y of the bottom-most square.  May not be an actual square on the polyomino
+        //
+        //   This function adjusts to clicked board cell to the polyomino origin, since the bounds of the playerboard might scootch the polyomino left, right, or down 
+        getAdjustedCoordinates: function( polyominoShape, coordinates )
         {
 
-            results = [];
+            var x = coordinates.x;
+            var y = coordinates.y;
 
-            // storing variables for use in anonymous function
             var boardWidth = this.boardWidth;
             var boardHeight = this.boardHeight;
 
             // ADJUST PLACEMENT TO BE ON BOARD
             var bounds = this.getPolyominoBounds( polyominoShape );
             
-            if( coordinates.x + bounds.min.x < 0 ) coordinates.x = -bounds.min.x; //scootch it to the right
-            else if(coordinates.x + bounds.max.x >= boardWidth) coordinates.x = boardWidth - 1 - bounds.max.x; // scootch it to the left
+            if( coordinates.x + bounds.min.x < 0 ) x = -bounds.min.x; //scootch it to the right
+            else if(coordinates.x + bounds.max.x >= boardWidth) x = boardWidth - 1 - bounds.max.x; // scootch it to the left
 
-            if( coordinates.y + bounds.max.y >= boardHeight) coordinates.y = boardHeight - 1 - bounds.max.y; // scootch it down
+            if( coordinates.y + bounds.max.y >= boardHeight) y = boardHeight - 1 - bounds.max.y; // scootch it down
+
+            return {x:x, y:y};
+        },
+
+        getGridCellsForPolyominoAtCoordinates: function( polyominoShape, coordinates )
+        {
+
+            results = [];
 
             polyominoShape.forEach( function( polyCoord, index)
             {
@@ -642,7 +648,6 @@ function (dojo, declare) {
                     y: coordinates.y + polyCoord.y,
                 };
 
-                // IT'S VALID - ADD IT
                 results.push(newCoord);
  
             });
@@ -745,10 +750,7 @@ function (dojo, declare) {
             var polyominoNode = dojo.query(`#${polyominoNodeId}`)[0];
             dojo.removeClass(polyominoNode, "top_of_stack");
 
-            var boardCellNode = dojo.query(`#player_${polyominoData.owner}_playerboard .board_cell_${polyominoData.x}_${polyominoData.y}`)[0]
-
-            // UPDATE BOARD DATA
-            //this.updateBoardCells(polyominoNode, gridCells, this.board);
+            var boardCellNode = dojo.query(`#player_${polyominoData.owner}_playerboard .board_cell_${polyominoData.x}_${polyominoData.y}`)[0];
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
             var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCell( polyominoNode, boardCellNode );
@@ -867,40 +869,6 @@ function (dojo, declare) {
             _ make a call to the game server
         
         */
-        
-        /* Example:
-        
-        onMyMethodToCall1: function( evt )
-        {
-            console.log( 'onMyMethodToCall1' );
-            
-            // Preventing default browser reaction
-            dojo.stopEvent( evt );
-
-            // Check that this action is possible (see "possibleactions" in states.inc.php)
-            if( ! this.checkAction( 'myAction' ) )
-            {   return; }
-
-            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/myAction.html", { 
-                                                                    lock: true, 
-                                                                    myArgument1: arg1, 
-                                                                    myArgument2: arg2,
-                                                                    ...
-                                                                 }, 
-                         this, function( result ) {
-                            
-                            // What to do after the server call if it succeeded
-                            // (most of the time: nothing)
-                            
-                         }, function( is_error) {
-
-                            // What to do after the server call in anyway (success or failure)
-                            // (most of the time: nothing)
-
-                         } );        
-        },        
-        
-        */
 
         onTakeHarborCard: function( event )
         {
@@ -1001,7 +969,10 @@ function (dojo, declare) {
             });
             animation.play();
 
+            // NOTE: we mod the rotation by 360 here to keep the value between 0 and 360 for simplicity's sake
+            //  however, we don't do that in the animation, as animating from 270 -> 0 animates differently than 270 -> 360
             this.selectedPolyomino["rotation"] = (this.selectedPolyomino["rotation"] + rotationDegrees) % 360;
+            if( this.selectedPolyomino["rotation"] < 0 ) this.selectedPolyomino["rotation"] += 360;
 
             this.rotatePolyominoShape( this.selectedPolyomino["shape"] );
 
@@ -1021,11 +992,13 @@ function (dojo, declare) {
 
             // CODE SNIPPET FROM: https://forum.boardgamearena.com/viewtopic.php?t=15158
 
+            var endingFlipValue = (this.selectedPolyomino["flip"] + 180) % 360;
+
             var animation = dojo.animateProperty({
                 node: polyominoNode,
                 duration: 500,
                 properties: {
-                    propertyTransform: {start: this.selectedPolyomino["flip"], end: this.selectedPolyomino["flip"]+180 }
+                    propertyTransform: {start: this.selectedPolyomino["flip"], end: endingFlipValue }
                 },
                 onAnimate: function (values) {
                     dojo.style(this.node, 'transform', 'rotateY(' + parseFloat(values.propertyTransform.replace("px", "")) + 'deg) rotateZ(' + rotation + 'deg)');
@@ -1033,7 +1006,7 @@ function (dojo, declare) {
             });
             animation.play();
 
-            this.selectedPolyomino["flip"] = (this.selectedPolyomino["flip"] + 180) % 360;
+            this.selectedPolyomino["flip"] = endingFlipValue;
 
             this.flipPolyominoShape( this.selectedPolyomino["shape"] );
 
@@ -1050,7 +1023,8 @@ function (dojo, declare) {
             if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
 
             var coordinates = this.getCoordinatesFromId( event.currentTarget.id);
-            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , coordinates );
+            var adjustedCoordinates = this.getAdjustedCoordinates( this.selectedPolyomino["shape"], coordinates);
+            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , adjustedCoordinates );
             var validity = this.isValidPlacementPosition( gridCells );
 
             // SHOW IF INVALID
@@ -1089,10 +1063,11 @@ function (dojo, declare) {
             if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
  
             var coordinates = this.getCoordinatesFromId( event.currentTarget.id);
-            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , coordinates );
-            var minGridCell = this.getMinGridCell( gridCells );
+            var adjustedCoordinates = this.getAdjustedCoordinates( this.selectedPolyomino["shape"], coordinates);
+            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , adjustedCoordinates );
+            
+            // CLIENT VALIDATION - CHECK FOR A VALID POSITION
             var validity = this.isValidPlacementPosition( gridCells );
-
             if( !validity ) return; // can't place polyomino if space isn't valid
 
             // SEND SERVER REQUEST
@@ -1104,38 +1079,13 @@ function (dojo, declare) {
                     color: this.getPolyominoColorFromId( this.selectedPolyomino.id) ,
                     squares: this.getPolyominoSquaresFromId( this.selectedPolyomino.id),
                     copy:this.getPolyominoCopyFromId( this.selectedPolyomino.id),
-                    x:minGridCell.x,
-                    y:minGridCell.y,
+                    x:adjustedCoordinates.x,
+                    y:adjustedCoordinates.y,
                     flip:this.selectedPolyomino["flip"],
                     rotation:this.selectedPolyomino["rotation"],
                     card_id:event.currentTarget.id.split("_")[1],
                 }, this, function( result ){} ); 
             }
-
-            // PAY THE COST
-            //   do this first, so that the polyomino doesn't count itself when determining if adjacent to a similar color.
-            //this.payPolyominoCost( this.selectedPolyomino.id, gridCells );
-
-            // UPDATE BOARD DATA
-            //var polyominoNode = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
-            //this.updateBoardCells(polyominoNode, gridCells, this.board);
-           
-            //dojo.removeClass(polyominoNode, "top_of_stack");
-
-            // DETERMINE HTML PLACEMENT FOR POLYOMINO
-            //var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCells( polyominoNode, gridCells );
-
-            //this.attachToNewParent(  this.selectedPolyomino["id"], "owned_playerboard");
-            //this.slideToObjectPos( this.selectedPolyomino["id"],htmlPlacement.minCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ).play();
-
-            //this.fadeOutShadowBox();
-
-            // handle the new top of stack
-            //var newTopOfStack = this.determineTopPolyominoInStack( this.selectedPolyomino["name"]);
-            //dojo.query(`.${this.selectedPolyomino["name"]}.top_of_stack`).connect( 'onclick', this, 'onSelectPolyomino');            
-
-            //this.selectedPolyomino = null;
-
         },
 
 
@@ -1229,7 +1179,11 @@ function (dojo, declare) {
 
             this.placePolyomino( polyominoData );
 
-            if( this.player_id == notif.args.player_id) this.fadeOutShadowBox(); // NOTE: this needs to come after polyomino placement, or it messes up where the polyomino ends up
+            if( this.player_id == notif.args.player_id)
+            {
+              this.fadeOutShadowBox(); // NOTE: this needs to come after polyomino placement, or it messes up where the polyomino ends up
+              this.playerboard = notif.args.playerboard;  
+            } 
 
             this.selectedPolyomino = null;
             
