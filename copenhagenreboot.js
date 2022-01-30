@@ -499,7 +499,7 @@ function (dojo, declare) {
         {
             for( var x = 0; x < this.boardWidth; x++)
             {
-                for( var y = 0; y < this.boardWidth; y++)
+                for( var y = 0; y < this.boardHeight; y++)
                 {
                     if(this.playerboard[x][y].color == color ) return true;
                 }
@@ -1138,6 +1138,9 @@ function (dojo, declare) {
 
             dojo.subscribe( 'placePolyomino', this, 'notif_placePolyomino' );
             this.notifqueue.setSynchronous( 'placePolyomino', 500 );
+
+            dojo.subscribe( 'updateScore', this, 'notif_updateScore' );
+            this.notifqueue.setSynchronous( 'updateScore', 500 );
         },  
         
         // TODO: from this point and below, you can write your game notifications handling methods
@@ -1216,6 +1219,10 @@ function (dojo, declare) {
             
         },
 
+        notif_updateScore: function(notif)
+        {
+            this.scoreCtrl[ notif.args.player_id ].toValue( notif.args.score );
+        }
 
    });             
 });

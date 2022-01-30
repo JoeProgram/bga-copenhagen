@@ -497,6 +497,33 @@ class CopenhagenReboot extends Table
         return false;
     }
 
+    function getRowPoints( $y, $playerboard)
+    {
+        $windows_only = true;
+
+        for( $x = 0; $x < $this->board_width; $x++ )
+        {
+            if( $playerboard[$x][$y]["fill"] == NULL ) return 0;
+            else if( $playerboard[$x][$y]["fill"] == "brickwork") $windows_only = false;
+        }
+
+        return $windows_only ? 2 : 1;
+    }
+
+    function getColumnPoints( $x, $playerboard)
+    {
+
+        $windows_only = true;
+
+        for( $y = 0; $y < $this->board_height; $y++ )
+        {
+            if( $playerboard[$x][$y]["fill"] == NULL ) return 0;
+            else if( $playerboard[$x][$y]["fill"] == "brickwork") $windows_only = false;
+        }
+
+        return $windows_only ? 4 : 2;
+    }
+
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Player actions
@@ -827,6 +854,32 @@ class CopenhagenReboot extends Table
 
         if( $this->cards->getCard($mermaid_card_id)["location"] == "harbor") $this->gamestate->nextState("endGame"); // end game if we draw mermaid card
         else $this->gamestate->nextState("nextPlayer");
+    }
+
+    function stCalculateScore()
+    {
+        $points = 0;
+
+        $player_id = self::getActivePlayerId();
+
+        $playerboard = $this->getPlayerboard( $player_id );
+
+        for( $x = 0; $x < $this->board_width; $x++) $points += ( $this->getColumnPoints($x, $playerboard));
+        for( $y = 0; $y < $this->board_width; $y++) $points += ( $this->getRowPoints($y, $playerboard));
+
+        self::DbQuery( "UPDATE player SET player_score=$points WHERE player_id=$player_id;" );
+
+        self::notifyAllPlayers( 
+            "updateScore", 
+            "",
+            array(
+                "score" => $points,
+                "player_id" => $player_id,
+            )   
+        );
+
+        $this->gamestate->nextState("nextPlayer");
+        // $this->gamestate->nextState("endGame"); 
     }
 
 //////////////////////////////////////////////////////////////////////////////

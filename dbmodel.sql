@@ -46,7 +46,7 @@ CREATE TABLE IF NOT EXISTS `board_cell` (
   `x` tinyint(2) unsigned NOT NULL,
   `y` tinyint(2) unsigned NOT NULL,
   `color` varchar(6) DEFAULT NULL,
-  `fill` varchar(6) DEFAULT NULL,
+  `fill` varchar(9) DEFAULT NULL,
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ; 

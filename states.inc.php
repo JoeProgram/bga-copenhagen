@@ -78,7 +78,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must take a card or place a facade tile'),
         "type" => "activeplayer",
         "possibleactions" => array( "takeCard", "placePolyomino" ),
-        "transitions" => array(  "takeCard" => 4, "placePolyomino" => 2 )
+        "transitions" => array(  "takeCard" => 4, "placePolyomino" => 7 )
     ), 
 
     4 => array(
@@ -125,6 +125,15 @@ $machinestates = array(
             "discardedAndTakeAnother" => 5,
             "discardedAndDone" => 50, 
         )
+    ), 
+
+    7 => array(
+        "name" => "calculateScore",
+        "description" => "",
+        "type" => "game",
+        "action" => "stCalculateScore",
+        "possibleactions" => array( "nextPlayer", "endGame" ),
+        "transitions" => array(  "nextPlayer" => 2, "endGame" => 99 )
     ), 
 
     50 => array(
