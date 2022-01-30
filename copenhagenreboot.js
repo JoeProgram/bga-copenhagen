@@ -177,6 +177,9 @@ function (dojo, declare) {
             this.setupNotifications();
 
             console.log( "Ending game setup" );
+
+            // DEBUGGING
+            // dojo.query("#deck").connect('onclick',this,`onDebugStuff`);
         },    
 
         /*
@@ -1099,7 +1102,14 @@ function (dojo, declare) {
             }
         },
 
-
+        ///// DEBUGGING
+        onDebugStuff: function( event )
+        {
+            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/discardDownToMaxHandSize.html",
+                {
+                    card_id:2000,
+                }, this, function( result ){} ); 
+        },
 
         
         ///////////////////////////////////////////////////

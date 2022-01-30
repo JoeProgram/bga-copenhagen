@@ -466,7 +466,6 @@ class CopenhagenReboot extends Table
 
             $cell_below = $playerboard[$grid_cells[$i]["x"]][$grid_cells[$i]["y"] - 1];
 
-            self::warn( "Cell Below Fill is " . json_encode($cell_below) . "   ");
             if( $cell_below["fill"] != NULL ) return true;
         }
 
@@ -520,7 +519,6 @@ class CopenhagenReboot extends Table
 
         // MAKE SURE CARD IS IN HARBOR
         $card = $this->cards->getCard( $card_id ); 
-        self::warn( "Attempt to take card " . $card_id . " which is in location " . $card["location"]);
         if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
 
         $this->cards->moveCard( $card_id, "hand", $player_id );
@@ -590,6 +588,8 @@ class CopenhagenReboot extends Table
 
         $player_id = self::getActivePlayerId();
         $card = $this->cards->getCard( $card_id ); 
+
+        if($card == NULL ) throw new feException( self::_("That card does not exist."));
 
         // MAKE SURE CARD IS IN PLAYER'S HAND
         if( $card['location'] != 'hand' && $card['location_arg'] == $player_id) throw new feException( self::_("That card is not in your hand."));
