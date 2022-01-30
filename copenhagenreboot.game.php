@@ -109,13 +109,14 @@ class CopenhagenReboot extends Table
         $cards[] = array( 'type' => "mermaid", 'type_arg' => 0, 'nbr' => 1);
         
         // TESTING CODE
-        $cards[] = array( 'type' => "red", 'type_arg' => 0,  'nbr' => 50);
+        //  All red cards for faster polyomino placement
+        //$cards[] = array( 'type' => "red", 'type_arg' => 0,  'nbr' => 50);
 
         // PRODUCTION CODE
-        /*foreach( $this->colors as $color )
+        foreach( $this->colors as $color )
         {    
             $cards[] = array( 'type' => $color, 'type_arg' => 0,  'nbr' => $cards_per_color);
-        }*/
+        }
 
         $this->cards->createCards( $cards, 'deck' );
 
@@ -472,6 +473,31 @@ class CopenhagenReboot extends Table
         return false;
     }
 
+    function isAdjacentToSameColor( $grid_cells, $playerboard, $color )
+    {
+        for( $i = 0; $i < count($grid_cells); $i++)
+        {
+            if( $this->isCellAdjacentToSameColor( $grid_cells[$i], $playerboard, $color )) return true;
+        }
+        return false;
+    }
+
+    function isCellAdjacentToSameColor( $grid_cell, $playerboard, $color )
+    {
+        foreach( $this->adjacent_offsets as $offset)
+        {
+            $x = $grid_cell["x"] + $offset["x"];
+            $y = $grid_cell["y"] + $offset["y"];
+
+            // make sure the cell is valid before checking
+            if( $x < 0 || $x >= $this->board_width || $y < 0 || $y >= $this->board_height) continue;
+
+            if( $playerboard[$x][$y]["color"] == $color ) return true;
+        }
+
+        return false;
+    }
+
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Player actions
@@ -614,8 +640,8 @@ class CopenhagenReboot extends Table
         if( !in_array($color, $this->colors, true)) throw new feException( self::_("The provided color isn't valid."));
         if( $squares < 2 || $squares > 5 ) throw new feException( self::_("The provided shape isn't valid."));
         if( $copy < 1 || $copy > 3 ) throw new feException( self::_("The provided copy name isn't valid."));
-        if( $x < 0 || $x > $this->board_width ) throw new feException( self::_("The provided position isn't valid."));
-        if( $y < 0 || $y > $this->board_height ) throw new feException( self::_("The provided position isn't valid."));
+        if( $x < 0 || $x >= $this->board_width ) throw new feException( self::_("The provided position isn't valid."));
+        if( $y < 0 || $y >= $this->board_height ) throw new feException( self::_("The provided position isn't valid."));
         if( $flip != 0 && $flip != 180 ) throw new feException( self::_("The provided flip isn't valid."));
         if( $rotation != 0 && $rotation != 90 && $rotation != 180 && $rotation != 270) throw new feException( self::_("The provided rotation isn't valid."));
 
@@ -649,8 +675,11 @@ class CopenhagenReboot extends Table
         if( !$this->isGroundedPosition($grid_cells, $playerboard)) throw new feException( self::_("The polyomino must sit on the bottom of the facade, or on another facade tile."));
 
         // CHECK PLAYER CAN AFFORD POLYOMINO
+        $cost = $squares;
+        if( $this->isAdjacentToSameColor($grid_cells, $playerboard, $color)) $cost -= 1;
 
-
+        $valid_cards = self::getCollectionFromDb("SELECT card_id FROM card WHERE card_type = '$color' AND card_location = 'hand' AND card_location_arg = $player_id");
+        if( count($valid_cards) < $cost )  throw new feException( self::_("You don't have enough cards to place that facade tile in that spot."));
 
         // PLACE POLYOMINO
         //  Up till now, we've been using the "origin" of the polyomino
@@ -670,8 +699,11 @@ class CopenhagenReboot extends Table
             self::DbQuery(  $sql );
         }
 
-
         // DISCARD CARDS
+        $discard_ids = array_keys( $valid_cards );
+        $discard_ids = array_slice($discard_ids, 0, $cost);
+        
+        $this->cards->moveCards( $discard_ids, "discard");
 
         // SEE IF PLAYER GETS ADJACENT COST REDUCTION
 
@@ -693,6 +725,7 @@ class CopenhagenReboot extends Table
                     "rotation" => $rotation,
                 ),
                 "playerboard" => $this->getPlayerboard( $player_id), // get refreshed playerboard after update
+                "discards" => $discard_ids,
             )   
         );
 

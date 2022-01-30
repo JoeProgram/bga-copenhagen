@@ -494,7 +494,15 @@ function (dojo, declare) {
 
         hasPolyominoOfColorOnBoard: function( color )
         {
-            return dojo.query(`#owned_playerboard .${color}_polyomino`).length >= 1;
+            for( var x = 0; x < this.boardWidth; x++)
+            {
+                for( var y = 0; y < this.boardWidth; y++)
+                {
+                    if(this.playerboard[x][y].color == color ) return true;
+                }
+            }
+
+            return false;
         },
 
         getPolyominoColorFromId: function( polyominoId )
@@ -586,7 +594,10 @@ function (dojo, declare) {
                 var x = coordinate.x + this.adjacentOffsets[i].x;
                 var y = coordinate.y + this.adjacentOffsets[i].y;
 
-                if(dojo.query( `#owned_player_area #board_cell_${x}_${y}.${color}_cell`).length > 0) return true;
+                // make sure its a valid square
+                if( x < 0 || x >= this.boardWidth || y < 0 || y >= this.boardHeight) continue;
+
+                if( this.playerboard[x][y].color == color ) return true;
             }
 
             return false;
@@ -1186,6 +1197,12 @@ function (dojo, declare) {
             } 
 
             this.selectedPolyomino = null;
+
+            // HANDLE DISCARDS
+            notif.args.discards.forEach( function( card_id ){
+                dojo.destroy( `card_${card_id}` );
+            });
+            this.splayCardsInHand();
             
         },
 
