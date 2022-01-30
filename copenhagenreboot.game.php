@@ -517,8 +517,11 @@ class CopenhagenReboot extends Table
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
         if ($cards_taken_this_turn != 0 ) throw new feException( self::_("You've already taken your first card this turn."));
 
+        // MAKE SURE CARD EXISTS
+        $card = $this->cards->getCard( $card_id );
+        if($card == NULL ) throw new feException( self::_("That card does not exist.")); 
+
         // MAKE SURE CARD IS IN HARBOR
-        $card = $this->cards->getCard( $card_id ); 
         if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
 
         $this->cards->moveCard( $card_id, "hand", $player_id );
@@ -550,8 +553,11 @@ class CopenhagenReboot extends Table
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
         if ($cards_taken_this_turn != 1 ) throw new feException( self::_("You're trying to take your second card before your first."));
 
+        // MAKE SURE CARD EXISTS
+        $card = $this->cards->getCard( $card_id );
+        if($card == NULL ) throw new feException( self::_("That card does not exist.")); 
+
         // MAKE SURE CARD IS IN HARBOR
-        $card = $this->cards->getCard( $card_id ); 
         if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
 
         // MAKE SURE WE ONLY HAVE 1 EMPTY HARBOR
