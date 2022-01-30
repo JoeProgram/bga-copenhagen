@@ -1128,7 +1128,6 @@ function (dojo, declare) {
         {
                      
             dojo.subscribe( 'takeCard', this, 'notif_takeCard' );
-            this.notifqueue.setSynchronous( 'takeCard', 500 ); // this forces a wait time for this action so players can process what's happening on screen
 
             dojo.subscribe( 'discardDownToMaxHandSize', this, 'notif_discardDownToMaxHandSize' );
             this.notifqueue.setSynchronous( 'discardDownToMaxHandSize', 500 );

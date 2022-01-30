@@ -26,6 +26,8 @@ $this->max_hand_size = 7;
 $this->board_height = 9;
 $this->board_width = 5;
 
+$this->end_of_game_points = 12;
+
 $this->colors = array("red", "yellow", "green", "blue", "purple");
 
 

@@ -878,8 +878,8 @@ class CopenhagenReboot extends Table
             )   
         );
 
-        $this->gamestate->nextState("nextPlayer");
-        // $this->gamestate->nextState("endGame"); 
+        if( $points < $this->end_of_game_points ) $this->gamestate->nextState("nextPlayer");
+        else $this->gamestate->nextState("endGame"); 
     }
 
 //////////////////////////////////////////////////////////////////////////////
