@@ -429,6 +429,8 @@ function (dojo, declare) {
             var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
             var cardsInHand = this.getChildElementNodes( cardsInHandNode );
 
+            if( cardsInHand == 0 ) return; // do nothing if we don't have any cards in hand
+
             var lastCard = cardsInHand[ cardsInHand.length - 1];
             var lastCardTop = dojo.position( lastCard ).y;
             this.slideToObject(lastCard, "hand_bottom_card_target").play();

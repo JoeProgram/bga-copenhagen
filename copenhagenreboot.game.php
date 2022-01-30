@@ -371,7 +371,10 @@ class CopenhagenReboot extends Table
     function getTransformedShape( $color, $squares, $flip, $rotation )
     {
         // NOTE: In PHP, array assignment creates a copy of the array, so it's not going to corrupt the original
-        $shape = $this->polyomino_shapes[sprintf("%s-%d",$color, $squares)];
+        $shape = $this->polyomino_shapes["$color-$squares"];
+
+        self::warn("getTransformedShape - input");
+        self::warn( json_encode($shape));
 
         while( $rotation > 0)
         {
@@ -380,6 +383,9 @@ class CopenhagenReboot extends Table
         }
         if( $flip == 180) $shape = $this->flipPolyominoShape( $shape );
 
+        self::warn("getTransformedShape - output");
+        self::warn( json_encode($shape));
+
         return $shape;
     }
 
@@ -387,7 +393,15 @@ class CopenhagenReboot extends Table
     {
         for( $i = 0; $i < count($polyominoShape); $i++)
         {
-            $polyominoShape[$i] = array( "x" => $polyominoShape[$i]["y"], "y" => -$polyominoShape[$i]["x"]);  
+
+            self::warn("rotatePolyominoShape");
+            self::warn( json_encode($polyominoShape[$i]));
+
+            $polyominoShape[$i] = array( 
+                "x" => $polyominoShape[$i]["y"], 
+                "y" => -$polyominoShape[$i]["x"],
+                "fill" => $polyominoShape[$i]["fill"],
+            );  
         } 
 
         return $this->setNewShapeOrigin( $polyominoShape ); 
@@ -397,7 +411,15 @@ class CopenhagenReboot extends Table
     {
         for( $i = 0; $i < count($polyominoShape); $i++)
         {
-            $polyominoShape[$i] = array( "x" => -$polyominoShape[$i]["x"], "y" => $polyominoShape[$i]["y"]);  
+
+            self::warn("flipPolyominoShape");
+            self::warn( json_encode($polyominoShape[$i]));
+
+            $polyominoShape[$i] = array( 
+                "x" => -$polyominoShape[$i]["x"], 
+                "y" => $polyominoShape[$i]["y"],
+                "fill" => $polyominoShape[$i]["fill"],
+            );  
         } 
 
         return $this->setNewShapeOrigin( $polyominoShape ); 
@@ -422,7 +444,11 @@ class CopenhagenReboot extends Table
         // offset the other cells by so the lowest, left-most square is the origin
         for( $i = 0; $i < count($polyominoShape); $i++) 
         {
-            $polyominoShape[$i] = array( "x" => $polyominoShape[$i]["x"] - $newOrigin["x"], "y" => $polyominoShape[$i]["y"] - $newOrigin["y"]);
+            $polyominoShape[$i] = array( 
+                "x" => $polyominoShape[$i]["x"] - $newOrigin["x"], 
+                "y" => $polyominoShape[$i]["y"] - $newOrigin["y"],
+                "fill" => $polyominoShape[$i]["fill"]
+            );
         }
 
         return $polyominoShape;
@@ -442,6 +468,8 @@ class CopenhagenReboot extends Table
         return $min_grid_cell;
     }
 
+    // Apply the shape - which has local coordinates
+    // To "boardspace" - and get the list of coordinates the polyomino will be placed on
     function getGridCellsForPolyominoAtCoordinates( $shape, $x, $y )
     {
 
@@ -449,9 +477,14 @@ class CopenhagenReboot extends Table
 
         foreach($shape as $grid_cell )
         {
+
+            self::warn("getGridCellsForPolyominoAtCoordinates");
+            self::warn( json_encode($shape));
+
             $results[] = array(
                 "x" => $grid_cell["x"] + $x,
                 "y" => $grid_cell["y"] + $y,
+                "fill" => $grid_cell["fill"],
             );
         }
 
@@ -660,6 +693,9 @@ class CopenhagenReboot extends Table
 
         $transformed_shape = $this->getTransformedShape( $color, $squares, $flip, $rotation);
 
+        self::warn("transformed_shape");
+        self::warn( json_encode($transformed_shape));
+
         $playerboard = $this->getPlayerboard( $player_id );
         $grid_cells = $this->getGridCellsForPolyominoAtCoordinates( $transformed_shape, $x, $y );
 
@@ -728,7 +764,8 @@ class CopenhagenReboot extends Table
         // UPDATE BOARD CELLS
         foreach( $grid_cells as $grid_cell ) 
         {
-            $sql = "UPDATE board_cell SET color = '$color', fill = 'window' WHERE owner = $player_id AND x = $grid_cell[x] AND y = $grid_cell[y] ;";
+            $fill = $grid_cell["fill"];
+            $sql = "UPDATE board_cell SET color = '$color', fill = '$fill' WHERE owner = $player_id AND x = $grid_cell[x] AND y = $grid_cell[y] ;";
             self::DbQuery(  $sql );
         }
 

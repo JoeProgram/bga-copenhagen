@@ -32,30 +32,30 @@ $this->colors = array("red", "yellow", "green", "blue", "purple");
 
 
 $this->polyomino_shapes = array(
-    "purple-2" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0)),
-    "purple-3" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0)),
-    "purple-4" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0),array("x" => 3, "y" => 0)),
-    "purple-5" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0),array("x" => 3, "y" => 0),array( "x" =>4,"y" =>0)),
+    "purple-2" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window"), ),
+    "purple-3" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window"), array( "x" => 2, "y" => 0, "fill" => "window")),
+    "purple-4" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window"), array( "x" => 2, "y" => 0, "fill" => "window"),array("x" => 3, "y" => 0, "fill" => "window")),
+    "purple-5" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window"), array( "x" => 2, "y" => 0, "fill" => "window"),array("x" => 3, "y" => 0, "fill" => "window"),array( "x" =>4,"y" =>0, "fill" => "window")),
 
-    "green-2" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0)),
-    "green-3" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0)),
-    "green-4" => array( array( "x" => 0, "y" => 0), array( "x" => -1, "y" => 1), array( "x" => 0, "y" => 1),array("x" => 1, "y" => 1)),
-    "green-5" => array( array( "x" => 0, "y" => 0), array( "x" => -1, "y" => 1), array( "x" => 0, "y" => 1),array("x" => 1, "y" => 1),array( "x" =>0,"y" =>2)),
+    "green-2" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window")),
+    "green-3" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window"), array( "x" => 2, "y" => 0, "fill" => "window")),
+    "green-4" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => -1, "y" => 1, "fill" => "window"), array( "x" => 0, "y" => 1, "fill" => "window"),array("x" => 1, "y" => 1, "fill" => "window")),
+    "green-5" => array( array( "x" => 0, "y" => 0, "fill" => "window"), array( "x" => -1, "y" => 1,  "fill" => "brickwork"), array( "x" => 0, "y" => 1, "fill" => "window"),array("x" => 1, "y" => 1, "fill" => "window"),array( "x" =>0,"y" =>2, "fill" => "window")),
 
-    "red-2" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0)),
-    "red-3" => array( array( "x" => 0, "y" => 0), array( "x" => 0, "y" => 1), array( "x" => 1, "y" => 1)),
-    "red-4" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 0, "y" => 1),array("x" => 1, "y" => 1)),
-    "red-5" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0),array("x" => 1, "y" => 1),array( "x" =>2,"y" =>1)),
+    "red-2" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window")),
+    "red-3" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 0, "y" => 1, "fill" => "window"), array( "x" => 1, "y" => 1, "fill" => "window")),
+    "red-4" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window"), array( "x" => 0, "y" => 1, "fill" => "window"),array("x" => 1, "y" => 1, "fill" => "window")),
+    "red-5" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window"), array( "x" => 2, "y" => 0, "fill" => "window"),array("x" => 1, "y" => 1, "fill" => "window"),array( "x" =>2,"y" =>1, "fill" => "window")),
 
-    "blue-2" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0)),
-    "blue-3" => array( array( "x" => 0, "y" => 0), array( "x" => 0, "y" => 1), array( "x" => 1, "y" => 1)),
-    "blue-4" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 2, "y" => 0),array("x" => 2, "y" => 1)),
-    "blue-5" => array( array( "x" => 0, "y" => 0), array( "x" => -2, "y" => 1), array( "x" => -1, "y" => 1),array("x" => 0, "y" => 1),array( "x" =>0,"y" =>2)),
+    "blue-2" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window")),
+    "blue-3" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 0, "y" => 1, "fill" => "window"), array( "x" => 1, "y" => 1, "fill" => "window")),
+    "blue-4" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window"), array( "x" => 2, "y" => 0, "fill" => "window"),array("x" => 2, "y" => 1, "fill" => "window")),
+    "blue-5" => array( array( "x" => 0, "y" => 0, "fill" => "window"), array( "x" => -2, "y" => 1, "fill" => "brickwork"), array( "x" => -1, "y" => 1, "fill" => "window"),array("x" => 0, "y" => 1, "fill" => "window"),array( "x" =>0,"y" =>2, "fill" => "window")),
 
-    "yellow-2" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0)),
-    "yellow-3" => array( array( "x" => 0, "y" => 0), array( "x" => 0, "y" => 1), array( "x" => 1, "y" => 1)),
-    "yellow-4" => array( array( "x" => 0, "y" => 0), array( "x" => 1, "y" => 0), array( "x" => 1, "y" => 1),array("x" => 2, "y" => 1)),
-    "yellow-5" => array( array( "x" => 0, "y" => 0), array( "x" => -2, "y" => 1), array( "x" => -1, "y" => 1),array("x" => 0, "y" => 1),array( "x" =>-2,"y" =>2)),
+    "yellow-2" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window")),
+    "yellow-3" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 0, "y" => 1, "fill" => "window"), array( "x" => 1, "y" => 1, "fill" => "window")),
+    "yellow-4" => array( array( "x" => 0, "y" => 0, "fill" => "window"), array( "x" => 1, "y" => 0, "fill" => "window"), array( "x" => 1, "y" => 1, "fill" => "brickwork"),array("x" => 2, "y" => 1, "fill" => "window")),
+    "yellow-5" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => -2, "y" => 1, "fill" => "window"), array( "x" => -1, "y" => 1, "fill" => "window"),array("x" => 0, "y" => 1, "fill" => "window"),array( "x" =>-2,"y" =>2, "fill" => "window")),
 );
 
 $this->adjacent_offsets = array(
