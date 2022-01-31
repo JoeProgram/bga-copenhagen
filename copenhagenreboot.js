@@ -116,11 +116,11 @@ function (dojo, declare) {
                 var player = gamedatas.players[player_id];
                          
                 // Setting up players boards if needed
-                var player_board_div = $('player_board_'+player_id);
+                var player_score_div = dojo.query(`#player_board_${player_id} .player_score`)[0];
                 dojo.place( this.format_block(
                     'jstpl_player_board', 
                     {hand_size: gamedatas.hand_sizes[player_id], player_id: player_id}
-                ), player_board_div );
+                ), player_score_div, "after" );
             }
 
             // PLAYERBOARD DATA OBJECT

@@ -10,117 +10,121 @@
 -------
 -->
 
-<div id="playspace">
+<div id="copen_playspace">
 
-    <div id="harbors">
-        <div class="harbor"></div>
-        <div class="harbor"></div>
-        <div class="harbor"></div>
-        <div class="harbor"></div>
-        <div class="harbor"></div>
-        <div class="harbor"></div>
-        <div class="harbor"></div>
-    </div>
+    <div id="top_chunk">
+        <div id="harbors">
+            <div class="harbor"></div>
+            <div class="harbor"></div>
+            <div class="harbor"></div>
+            <div class="harbor"></div>
+            <div class="harbor"></div>
+            <div class="harbor"></div>
+            <div class="harbor"></div>
+        </div>
 
-    <br/>
+        <br/>
 
-    <div id="deck_cards">
-        <div id="deck"></div>
-        <div id="small_mermaid_card"></div>
-    </div>
+        <div id="deck_cards">
+            <div id="deck"></div>
+            <div id="small_mermaid_card"></div>
+        </div>
 
-    <div id="harbor_cards">
-        <div id="harbor_position_0" class="harbor_position"></div>
-        <div id="harbor_position_1" class="harbor_position"></div>
-        <div id="harbor_position_2" class="harbor_position"></div>
-        <div id="harbor_position_3" class="harbor_position"></div>
-        <div id="harbor_position_4" class="harbor_position"></div>
-        <div id="harbor_position_5" class="harbor_position"></div>
-        <div id="harbor_position_6" class="harbor_position"></div>
-    </div>
+        <div id="harbor_cards">
+            <div id="harbor_position_0" class="harbor_position"></div>
+            <div id="harbor_position_1" class="harbor_position"></div>
+            <div id="harbor_position_2" class="harbor_position"></div>
+            <div id="harbor_position_3" class="harbor_position"></div>
+            <div id="harbor_position_4" class="harbor_position"></div>
+            <div id="harbor_position_5" class="harbor_position"></div>
+            <div id="harbor_position_6" class="harbor_position"></div>
+        </div>
 
-    <br/>
+        <br/>
 
-    <div id="polyominoes">
+        <div id="polyominoes">
 
-        <div id="purple-2_stack"></div>        
-        <div id="purple-3_stack"></div>
-        <div id="purple-4_stack"></div>
-        <div id="purple-5_stack"></div>
+            <div id="purple-2_stack"></div>        
+            <div id="purple-3_stack"></div>
+            <div id="purple-4_stack"></div>
+            <div id="purple-5_stack"></div>
 
-        <div id="green-2_stack"></div>
-        <div id="green-3_stack"></div>
-        <div id="green-4_stack"></div>
-        <div id="green-5_stack"></div>
+            <div id="green-2_stack"></div>
+            <div id="green-3_stack"></div>
+            <div id="green-4_stack"></div>
+            <div id="green-5_stack"></div>
 
-        <div id="red-2_stack"></div>
-        <div id="red-3_stack"></div>
-        <div id="red-4_stack"></div>
-        <div id="red-5_stack"> </div>
+            <div id="red-2_stack"></div>
+            <div id="red-3_stack"></div>
+            <div id="red-4_stack"></div>
+            <div id="red-5_stack"> </div>
 
-        <div id="blue-2_stack"></div>
-        <div id="blue-3_stack"></div>        
-        <div id="blue-4_stack"></div>
-        <div id="blue-5_stack"></div>
+            <div id="blue-2_stack"></div>
+            <div id="blue-3_stack"></div>        
+            <div id="blue-4_stack"></div>
+            <div id="blue-5_stack"></div>
 
-        <div id="yellow-2_stack"></div>
-        <div id="yellow-3_stack"></div>
-        <div id="yellow-4_stack"></div>
-        <div id="yellow-5_stack"></div>
-    </div>
+            <div id="yellow-2_stack"></div>
+            <div id="yellow-3_stack"></div>
+            <div id="yellow-4_stack"></div>
+            <div id="yellow-5_stack"></div>
+        </div>
 
-    <div id="hand">
-        <div id="hand_bottom_card_target"></div>
-        <div id="cards_in_hand"></div>
-    </div>
-    <div id="owned_player_area" class="player_area">
+        <div id="hand">
+            <div id="hand_bottom_card_target"></div>
+            <div id="cards_in_hand"></div>
+        </div>
+        <div id="owned_player_area" class="player_area">
 
-        <!-- BEGIN owned -->
-        <div id="player_{ID}_playerboard" class="playerboard">
-        <!-- END owned -->
+            <!-- BEGIN owned -->
+            <div id="player_{ID}_playerboard" class="playerboard">
+            <!-- END owned -->
 
-            <div id="polyomino_preview"></div>
+                <div id="polyomino_preview"></div>
 
-            <div class="board_cells">
-                <!-- BEGIN board_cell -->
-                    <div id="board_cell_{X}_{Y}" class="board_cell board_cell_{X}_{Y}"></div>
-                <!-- END board_cell -->
+                <div class="board_cells">
+                    <!-- BEGIN board_cell -->
+                        <div id="board_cell_{X}_{Y}" class="board_cell board_cell_{X}_{Y}"></div>
+                    <!-- END board_cell -->
+                </div>
+
+                
             </div>
-
-            
-        </div>
-        <div class="ability_tile_area">
-            <div class="ability_tile any_cards"></div>
-            <div class="ability_tile additional_card"></div>
-            <div class="ability_tile construction_discount"></div>
-            <div class="ability_tile change_of_colors"></div>
-            <div class="ability_tile both_actions"></div>
+            <div class="ability_tile_area">
+                <div class="ability_tile any_cards"></div>
+                <div class="ability_tile additional_card"></div>
+                <div class="ability_tile construction_discount"></div>
+                <div class="ability_tile change_of_colors"></div>
+                <div class="ability_tile both_actions"></div>
+            </div>
         </div>
     </div>
+ 
+    <div id="bottom_chunk">
+        <div id="opponent_playerboards">
 
-    <div id="opponent_playerboards">
+            <!-- BEGIN opponent_playerboard -->
+                <div id="player_area_{ID}" class="player_area">
+                    <div id="player_{ID}_playerboard" class="playerboard playerboard_color_{COLOR}">
+                        <div class="board_cells">
 
-        <!-- BEGIN opponent_playerboard -->
-            <div id="player_area_{ID}" class="player_area">
-                <div id="player_{ID}_playerboard" class="playerboard playerboard_color_{COLOR}">
-                    <div class="board_cells">
+                            <!-- BEGIN opponent_board_cell -->
+                                <div id="player_{PLAYER}_board_cell_{X}_{Y}" class="board_cell board_cell_{X}_{Y}"></div>
+                            <!-- END opponent_board_cell -->
 
-                        <!-- BEGIN opponent_board_cell -->
-                            <div id="player_{PLAYER}_board_cell_{X}_{Y}" class="board_cell board_cell_{X}_{Y}"></div>
-                        <!-- END opponent_board_cell -->
-
+                        </div>
+                    </div>
+                    <div class="ability_tile_area">
+                        <div class="ability_tile any_cards"></div>
+                        <div class="ability_tile additional_card"></div>
+                        <div class="ability_tile construction_discount"></div>
+                        <div class="ability_tile change_of_colors"></div>
+                        <div class="ability_tile both_actions"></div>
                     </div>
                 </div>
-                <div class="ability_tile_area">
-                    <div class="ability_tile any_cards"></div>
-                    <div class="ability_tile additional_card"></div>
-                    <div class="ability_tile construction_discount"></div>
-                    <div class="ability_tile change_of_colors"></div>
-                    <div class="ability_tile both_actions"></div>
-                </div>
-            </div>
-        <!-- END opponent_playerboard -->
-        
+            <!-- END opponent_playerboard -->
+            
+        </div>
     </div>
 
     <div id="shadow_box"></div>

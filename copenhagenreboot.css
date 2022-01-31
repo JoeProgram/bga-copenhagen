@@ -22,10 +22,28 @@
 /* Note: you must not use any @import directive */
 
 
-#playspace
+#copen_playspace
 {
+    position: relative;
+    min-height: 500px;
+}
+
+#top_chunk
+{
+    float: left;
+    display: inline-block;
+    position: relative;
     width: 730px;
-    height: 1000px;
+    min-height: 500px;
+}
+
+#bottom_chunk
+{
+    float: left;
+    display: inline-block;
+    position: relative;
+    min-height: 500px;
+    min-width: 250px;
 }
 
 #harbors
@@ -42,6 +60,7 @@
 .harbor
 {
     display: inline-block;
+    position: relative;
     width: 66px;
     height: 6px;
     background-image:  url('img/harbor.png');
@@ -528,9 +547,9 @@
 
 #opponent_playerboards
 {
-    position:  absolute;
-    top: 500px;
-    width: 730px;
+    position:  relative;
+    /*width: 730px;*/
+    min-width: 250px;
 }
 
 #opponent_playerboards .playerboard
