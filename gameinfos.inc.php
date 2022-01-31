@@ -132,6 +132,8 @@ $gameinfos = array(
     'max' => null
 ),
 
+'enable_3d' => false,
+
 // Game presentation
 // Short game presentation text that will appear on the game description page, structured as an array of paragraphs.
 // Each paragraph must be wrapped with totranslate() for translation and should not contain html (plain text without formatting).
