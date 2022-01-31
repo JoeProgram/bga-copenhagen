@@ -109,6 +109,17 @@ function (dojo, declare) {
                 this.makeHarborCard( gamedatas.harbor[card_id] );
             }
 
+            // UI PLAYERBOARDS
+            //   the bga boxes containing the score - not the buildings
+            for( var player_id in gamedatas.players )
+            {
+                var player = gamedatas.players[player_id];
+                         
+                // Setting up players boards if needed
+                var player_board_div = $('player_board_'+player_id);
+                dojo.place( this.format_block('jstpl_player_board', player ), player_board_div );
+            }
+
             // PLAYERBOARD DATA OBJECT
             this.playerboard = gamedatas.playerboards[this.player_id];
 

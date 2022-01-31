@@ -670,4 +670,28 @@
     background-position: -55px -57px
 }
 
+/* UI Playerboards */
+
+.player_board_content .copen_hand_size_wrapper
+{
+    margin-left: 44px;
+}
+
+.player_board_content .copen_hand_size_card
+{
+    background-image: url('img/polyomino_buttons.png'); 
+    width: 28px;
+    height: 41px;  
+    background-image: url('img/tiny_cards.png');
+    background-position: 0px 0px;
+}
+
+.player_board_content .copen_hand_size_number
+{
+    text-align: center;
+    color:  white;
+    font-style: bold;
+    padding-top: 10px;
+}
+
 
