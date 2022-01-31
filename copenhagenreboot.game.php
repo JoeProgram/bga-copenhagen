@@ -217,6 +217,12 @@ class CopenhagenReboot extends Table
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
         
+        $result['hand_sizes'] = array();
+        foreach( $result['players'] as $player_id => $player )
+        {
+            $result['hand_sizes'][$player_id] = $this->cards->countCardInLocation( 'hand', $player_id );
+        }
+
         $result['hand'] = $this->cards->getCardsInLocation( 'hand', $current_player_id );
         $result['harbor'] = $this->cards->getCardsInLocation( 'harbor' );
 
@@ -225,6 +231,8 @@ class CopenhagenReboot extends Table
         $result['cards_in_deck'] = $this->cards->countCardInLocation("deck");
 
         $result['playerboards'] = $this->getPlayerboards();
+
+
 
         $sql = "SELECT * FROM polyomino;";
         $result['polyominoes'] = self::getCollectionFromDb( $sql );
@@ -624,7 +632,8 @@ class CopenhagenReboot extends Table
                 "card_id" => $card_id,
                 "player_id" => $player_id,
                 "player_name" => self::getActivePlayerName(),
-                "color" => $card["type"]
+                "color" => $card["type"],
+                "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
             )   
         );
 
@@ -671,7 +680,8 @@ class CopenhagenReboot extends Table
                 "card_id" => $card_id,
                 "player_id" => $player_id,
                 "player_name" => self::getActivePlayerName(),
-                "color" => $card["type"]
+                "color" => $card["type"],
+                "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
             )   
         );
 
@@ -707,7 +717,8 @@ class CopenhagenReboot extends Table
                 "player_id" => $player_id,
                 "player_name" => self::getActivePlayerName(),
                 "card_id" => $card_id,
-                "color" => $card["type"]
+                "color" => $card["type"],
+                "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
             )   
         );
         
@@ -827,6 +838,7 @@ class CopenhagenReboot extends Table
                 ),
                 "playerboard" => $this->getPlayerboard( $player_id), // get refreshed playerboard after update
                 "discards" => $discard_ids,
+                "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
             )   
         );
 

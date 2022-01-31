@@ -140,15 +140,13 @@
 var jstpl_card='<div id="card_${id}" class="card ${color}_card"></div>';
 var jstpl_polyomino='<div id="${color}-${squares}_${copy}" class="polyomino ${color}_polyomino ${color}-${squares}" style="transform: rotateY(${flip}deg) rotateZ(${rotation}deg)"></div>';
 
-var jstpl_player_board = `
-        <div class="copen_hand_size_wrapper">
-            <div class="copen_hand_size_card">
-                <div class="copen_hand_size_number">
-                    4
-                </div>
-            </div>
-        </div>
-`;
+var jstpl_player_board = '<div class="copen_hand_size_wrapper">' +
+                            '<div class="copen_hand_size_card">' +
+                                '<div id="player_hand_size_${player_id}" class="copen_hand_size_number">' +
+                                    '${hand_size}' +
+                                '</div>' +
+                            '</div>' + 
+                        '</div>';
 
 </script>  
 

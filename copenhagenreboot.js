@@ -117,7 +117,10 @@ function (dojo, declare) {
                          
                 // Setting up players boards if needed
                 var player_board_div = $('player_board_'+player_id);
-                dojo.place( this.format_block('jstpl_player_board', player ), player_board_div );
+                dojo.place( this.format_block(
+                    'jstpl_player_board', 
+                    {hand_size: gamedatas.hand_sizes[player_id], player_id: player_id}
+                ), player_board_div );
             }
 
             // PLAYERBOARD DATA OBJECT
@@ -192,23 +195,6 @@ function (dojo, declare) {
             // DEBUGGING
             // dojo.query("#deck").connect('onclick',this,`onDebugStuff`);
         },    
-
-        /*
-        ** TO BE REMOVED
-        setupBoard: function()
-        {
-            // logic for setting up data of playboard
-            this.board = [];
-            for( var x = 0; x < this.boardWidth; x++)
-            {
-                this.board[x] = [];
-                for( var y = 0; y < this.boardHeight; y++ )
-                {
-                    this.board[x][y] = dojo.query(`#owned_player_area #board_cell_${x}_${y}`);
-                } 
-            }
-        },   
-        */
 
         ///////////////////////////////////////////////////
         //// Game & client states
@@ -1182,8 +1168,12 @@ function (dojo, declare) {
             // IF ITS AN OPPONENTS CARD
             else
             {
-                this.slideToObjectAndDestroy( `card_${notif.args.card_id}`, `overall_player_board_${notif.args.player_id}`)
+                this.slideToObjectAndDestroy( `card_${notif.args.card_id}`, `player_hand_size_${notif.args.player_id}`)
             }
+
+            // UPDATE CARD AMOUNT UI
+            dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
+
 
         },
 
@@ -1195,6 +1185,9 @@ function (dojo, declare) {
                 dojo.destroy( `card_${notif.args.card_id}` );
                 this.splayCardsInHand();
             }
+
+            // UPDATE CARD AMOUNT UI
+            dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
         },
 
         notif_refillHarbor: function(notif)
@@ -1242,6 +1235,9 @@ function (dojo, declare) {
                 dojo.destroy( `card_${card_id}` );
             });
             this.splayCardsInHand();
+
+            // UPDATE CARD AMOUNT UI
+            dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
             
         },
 
