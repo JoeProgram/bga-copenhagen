@@ -10,9 +10,11 @@
 -------
 -->
 
-<div id="copen_playspace">
+<div id="copen_wrapper">
 
     <div id="top_chunk">
+
+
         <div id="harbors">
             <div id="harbor_0" class="harbor"></div>
             <div id="harbor_1" class="harbor"></div>
@@ -22,8 +24,6 @@
             <div id="harbor_5" class="harbor"></div>
             <div id="harbor_6" class="harbor"></div>
         </div>
-
-        <br/>
 
         <div id="deck_cards">
             <div id="deck"></div>
@@ -39,8 +39,6 @@
             <div id="harbor_position_5" class="harbor_position"></div>
             <div id="harbor_position_6" class="harbor_position"></div>
         </div>
-
-        <br/>
 
         <div id="polyominoes">
 
@@ -127,6 +125,8 @@
         </div>
     </div>
 
+    <div class="copen_clearfloat"></div>
+
     <div id="shadow_box"></div>
     <div id="polyomino_placement">
         <div id="polyomino_placement_target"></div>
@@ -136,7 +136,9 @@
         </div>
     </div>
 
+
 </div>
+
 
 <script type="text/javascript">
 

@@ -22,20 +22,15 @@
 /* Note: you must not use any @import directive */
 
 
-#copen_playspace
+#copen_wrapper
 {
-    position: relative;
-    min-height: 500px;
-}
-
-#copen_playspace_inner_wrapper
-{
-
+    width: 100%;
+    text-align: center;
 }
 
 #top_chunk
 {
-    float: left;
+    
     display: inline-block;
     position: relative;
     width: 730px;
@@ -44,17 +39,22 @@
 
 #bottom_chunk
 {
-    float: left;
+    
     display: inline-block;
     position: relative;
     min-height: 500px;
     min-width: 250px;
 }
 
+.copen_clear_float
+{
+    float: clear;
+}
+
 #harbors
 {
-    position: relative;
-    display:  inline-block;
+    position: absolute;
+    display:  block;
     left: 31px;
     height: 7px;
     width: 462px;
@@ -85,7 +85,7 @@
 {
     position: absolute;
     width: 28px;
-    display: inline-block;
+    display: block;
 }
 
 #deck
