@@ -14,13 +14,13 @@
 
     <div id="top_chunk">
         <div id="harbors">
-            <div class="harbor"></div>
-            <div class="harbor"></div>
-            <div class="harbor"></div>
-            <div class="harbor"></div>
-            <div class="harbor"></div>
-            <div class="harbor"></div>
-            <div class="harbor"></div>
+            <div id="harbor_0" class="harbor"></div>
+            <div id="harbor_1" class="harbor"></div>
+            <div id="harbor_2" class="harbor"></div>
+            <div id="harbor_3" class="harbor"></div>
+            <div id="harbor_4" class="harbor"></div>
+            <div id="harbor_5" class="harbor"></div>
+            <div id="harbor_6" class="harbor"></div>
         </div>
 
         <br/>

@@ -28,6 +28,11 @@
     min-height: 500px;
 }
 
+#copen_playspace_inner_wrapper
+{
+
+}
+
 #top_chunk
 {
     float: left;
@@ -60,7 +65,7 @@
 .harbor
 {
     display: inline-block;
-    position: relative;
+    position: absolute;
     width: 66px;
     height: 6px;
     background-image:  url('img/harbor.png');
@@ -68,9 +73,17 @@
 
 }
 
+#harbor_0{ left:0px; }
+#harbor_1{ left:66px; }
+#harbor_2{ left:132px; }
+#harbor_3{ left:198px; }
+#harbor_4{ left:264px; }
+#harbor_5{ left:330px; }
+#harbor_6{ left:396px; }
+
 #deck_cards
 {
-    position: relative;
+    position: absolute;
     width: 28px;
     display: inline-block;
 }
