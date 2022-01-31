@@ -459,7 +459,7 @@ function (dojo, declare) {
         determineTopPolyominoInStack: function( polyominoClass )
         {
             var query = dojo.query( `.${polyominoClass}:last-child` );
-            if( query.length == 0 ) return; // no more polyominoes in this stack
+            if( query.length == 0 ) return null; // no more polyominoes in this stack
 
             var topOfStackNode = query[0];
             dojo.addClass( topOfStackNode, "top_of_stack");
@@ -768,10 +768,6 @@ function (dojo, declare) {
             this.attachToNewParent( polyominoNodeId, `player_${polyominoData.owner}_playerboard`);
             this.slideToObjectPos( polyominoNodeId, boardCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ).play();
 
-            // handle the new top of stack
-            var newTopOfStack = this.determineTopPolyominoInStack( `${polyominoData.color}-${polyominoData.squares}`);  
-            dojo.connect( newTopOfStack, 'onclick', this, 'onSelectPolyomino');         
-
         },
 
         // get a copy of the shape,
@@ -944,8 +940,8 @@ function (dojo, declare) {
 
             this.fadeInShadowBox(); // have to fade in the shadow box first - or the display:none css style won't allow the polyomino to slide to the target correctly
 
-            this.attachToNewParent( event.currentTarget, "polyomino_placement");
-            this.slideToObject( this.selectedPolyomino["id"], "polyomino_placement_target", 500 ).play();
+            this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
+            this.slideToObject( this.selectedPolyomino.id, "polyomino_placement_target", 500 ).play();
 
             dojo.style("cancel_polyomino_placement","display","inline-block");
 
@@ -1090,11 +1086,6 @@ function (dojo, declare) {
             dojo.style("cancel_polyomino_placement","display","none");
         },
 
-        testtest: function( event )
-        {
-            console.log("testtest");
-        },
-
         onClearPreviewPolyomino: function( event )
         {
             this.clearPreview();
@@ -1222,6 +1213,10 @@ function (dojo, declare) {
             );
 
             this.placePolyomino( polyominoData );
+
+            // handle the new top of stack
+            var newTopOfStack = this.determineTopPolyominoInStack( `${polyominoData.color}-${polyominoData.squares}`);         
+            if( newTopOfStack != null ) dojo.connect( newTopOfStack, "onclick", this, "onSelectPolyomino" );
 
             if( this.player_id == notif.args.player_id)
             {
