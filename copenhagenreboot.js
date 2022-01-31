@@ -346,18 +346,12 @@ function (dojo, declare) {
             {            
                 switch( stateName )
                 {
-/*               
-                 Example:
- 
-                 case 'myGameState':
-                    
-                    // Add 3 action buttons in the action status bar:
-                    
-                    this.addActionButton( 'button_1_id', _('Button 1 label'), 'onMyMethodToCall1' ); 
-                    this.addActionButton( 'button_2_id', _('Button 2 label'), 'onMyMethodToCall2' ); 
-                    this.addActionButton( 'button_3_id', _('Button 3 label'), 'onMyMethodToCall3' ); 
+
+                case 'playerTurn':
+                    this.addActionButton( 'cancel_polyomino_placement', _("Cancel"), "onCancelPolyominoPlacement", null, false, "red");
+                    dojo.style("cancel_polyomino_placement","display","none");
                     break;
-*/
+
                 }
             }
         },        
@@ -946,11 +940,15 @@ function (dojo, declare) {
             this.selectedPolyomino["shape"] = this.getCopyOfShape(this.selectedPolyomino["name"]);
             this.selectedPolyomino["rotation"] = 0;
             this.selectedPolyomino["flip"] = 0;
+            this.selectedPolyomino.originalPosition = dojo.getMarginBox( event.currentTarget); // getMarginBox includes 'l' and 't' - the values for "left" and "top"
 
             this.fadeInShadowBox(); // have to fade in the shadow box first - or the display:none css style won't allow the polyomino to slide to the target correctly
 
             this.attachToNewParent( event.currentTarget, "polyomino_placement");
             this.slideToObject( this.selectedPolyomino["id"], "polyomino_placement_target", 500 ).play();
+
+            dojo.style("cancel_polyomino_placement","display","inline-block");
+
 
             // prepare polyomino preview for use
             var polyomino = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
@@ -1067,6 +1065,36 @@ function (dojo, declare) {
 
         },
 
+        onCancelPolyominoPlacement: function( event )
+        {
+            if( this.selectedPolyomino == null ) return; 
+
+            var color = this.getPolyominoColorFromId( this.selectedPolyomino.id);
+            var squares = this.getPolyominoSquaresFromId( this.selectedPolyomino.id);
+
+            var stackId = `${color}-${squares}_stack`; 
+
+            dojo.style(this.selectedPolyomino.id, "transform", "rotateY(0deg) rotateZ(0deg)");
+
+            this.attachToNewParent( this.selectedPolyomino["id"], stackId);
+            this.slideToObjectPos( this.selectedPolyomino["id"], stackId, this.selectedPolyomino.originalPosition.l, this.selectedPolyomino.originalPosition.t, 500 ).play();
+
+            // RECONNECT THE CLICK
+            //   I tried connecting with dojo.connect() directly, but couldn't get it to work.             
+            dojo.query( `#${this.selectedPolyomino.id}`).connect("onclick",this,"onSelectPolyomino");
+
+            this.selectedPolyomino = null;
+            this.fadeOutShadowBox();
+            this.clearPreview();
+
+            dojo.style("cancel_polyomino_placement","display","none");
+        },
+
+        testtest: function( event )
+        {
+            console.log("testtest");
+        },
+
         onClearPreviewPolyomino: function( event )
         {
             this.clearPreview();
@@ -1102,15 +1130,6 @@ function (dojo, declare) {
                     card_id:event.currentTarget.id.split("_")[1],
                 }, this, function( result ){} ); 
             }
-        },
-
-        ///// DEBUGGING
-        onDebugStuff: function( event )
-        {
-            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/discardDownToMaxHandSize.html",
-                {
-                    card_id:2000,
-                }, this, function( result ){} ); 
         },
 
         
