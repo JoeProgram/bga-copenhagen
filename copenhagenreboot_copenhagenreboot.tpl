@@ -70,28 +70,6 @@
             <div id="yellow-3_stack"></div>
             <div id="yellow-4_stack"></div>
             <div id="yellow-5_stack"></div>
-
-            <div id="white-1_stack_1"> 
-                <div id="white-1_1" class="polyomino white_polyomino white-1"></div>
-                <div id="white-1_2" class="polyomino white_polyomino white-1"></div>
-                <div id="white-1_3" class="polyomino white_polyomino white-1"></div>
-            </div>
-            <div id="white-1_stack_2">
-                <div id="white-1_4" class="polyomino white_polyomino white-1"></div>
-                <div id="white-1_5" class="polyomino white_polyomino white-1"></div>
-                <div id="white-1_6" class="polyomino white_polyomino white-1"></div>
-            </div>
-            <div id="white-1_stack_3">
-                <div id="white-1_7" class="polyomino white_polyomino white-1"></div>
-                <div id="white-1_8" class="polyomino white_polyomino white-1"></div>
-                <div id="white-1_9" class="polyomino white_polyomino white-1"></div>
-            </div>
-            <div id="white-1_stack_4">
-                <div id="white-1_10" class="polyomino white_polyomino white-1"></div>
-                <div id="white-1_11" class="polyomino white_polyomino white-1"></div>
-                <div id="white-1_12" class="polyomino white_polyomino white-1"></div>
-            </div>
-
         </div>
 
         <div id="hand">

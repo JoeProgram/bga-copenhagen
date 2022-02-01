@@ -71,8 +71,6 @@ function (dojo, declare) {
                 "yellow-3":[{x:0,y:0},{x:0,y:1},{x:1,y:1}],
                 "yellow-4":[{x:0,y:0},{x:1,y:0},{x:1,y:1},{x:2,y:1}],
                 "yellow-5":[{x:0,y:0},{x:-2,y:1},{x:-1,y:1},{x:0,y:1},{x:-2,y:2}],
-
-                "white-1":[{x:0,y:0}],
             };
 
             this.selectedPolyomino = null;
