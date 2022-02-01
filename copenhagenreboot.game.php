@@ -174,6 +174,8 @@ class CopenhagenReboot extends Table
         // CREATE POLYOMINOES
         $sql = "INSERT INTO polyomino(color, squares, copy) VALUES ";
         $values_format_sql = "('%s', %d, %d),";
+
+        // CREATE NORMAL COLOR POLYOMINOES
         foreach($this->colors as $color)
         {
             for( $squares = 2; $squares <= 5; $squares ++)
@@ -188,6 +190,13 @@ class CopenhagenReboot extends Table
                 }
             }
         }
+
+        // CREATE SPECIAL WHITE POLYOMINOES
+        for( $i = 1; $i <= $this->white_polyomino_copies; $i++)
+        {
+            $sql .= "('white', 1, $i),";
+        }
+        
         $sql = substr($sql, 0, -1) . ";"; // remove the last comma, replace with a semicolon
         self::DbQuery( $sql );
 
@@ -733,31 +742,30 @@ class CopenhagenReboot extends Table
     {
         $player_id = self::getActivePlayerId();
 
-        $transformed_shape = $this->getTransformedShape( $color, $squares, $flip, $rotation);
-
-        self::warn("transformed_shape");
-        self::warn( json_encode($transformed_shape));
-
-        $playerboard = $this->getPlayerboard( $player_id );
-        $grid_cells = $this->getGridCellsForPolyominoAtCoordinates( $transformed_shape, $x, $y );
-
-        // PHP NOTE: In double-quoted strings, you can reference variable names directly in the string.  Neat!
-        $sql = "SELECT * FROM polyomino WHERE color = '$color' AND squares = $squares AND copy = $copy;"; 
-        $polyomino = self::getObjectFromDB( $sql );
-
-        // SERVER VALIDATION
-
         // BASIC INPUT VALIDATION
-        if( !in_array($color, $this->colors, true)) throw new feException( self::_("The provided color isn't valid."));
-        if( $squares < 2 || $squares > 5 ) throw new feException( self::_("The provided shape isn't valid."));
-        if( $copy < 1 || $copy > 3 ) throw new feException( self::_("The provided copy name isn't valid."));
+        if( !in_array($color, $this->polyomino_colors, true)) throw new feException( self::_("The provided color isn't valid."));
+        if( $squares < 1 || $squares > 5 ) throw new feException( self::_("The provided shape isn't valid."));
+        if( $copy < 1 || $copy > 12 ) throw new feException( self::_("The provided copy name isn't valid."));
         if( $x < 0 || $x >= $this->board_width ) throw new feException( self::_("The provided position isn't valid."));
         if( $y < 0 || $y >= $this->board_height ) throw new feException( self::_("The provided position isn't valid."));
         if( $flip != 0 && $flip != 180 ) throw new feException( self::_("The provided flip isn't valid."));
         if( $rotation != 0 && $rotation != 90 && $rotation != 180 && $rotation != 270) throw new feException( self::_("The provided rotation isn't valid."));
 
+        // GET THE POLYOMINO
+        $sql = "SELECT * FROM polyomino WHERE color = '$color' AND squares = $squares AND copy = $copy;"; 
+        $polyomino = self::getObjectFromDB( $sql );
+
+        // CHECK THAT IT EXISTS
+        if( $polyomino == NULL ) throw new feException( self::_("This facade tile does not exist."));
+
         // CHECK THAT POLYOMINO IS UNOWNED
         if( $polyomino["owner"] != NULL ) throw new feException( self::_("This facade tile is already owned."));
+
+        $transformed_shape = $this->getTransformedShape( $color, $squares, $flip, $rotation);
+
+        $playerboard = $this->getPlayerboard( $player_id );
+        $grid_cells = $this->getGridCellsForPolyominoAtCoordinates( $transformed_shape, $x, $y );
+
 
         // CHECK THAT POLYOMINO PLACEMENT IS FULLY ON BOARD
         foreach( $grid_cells as $grid_cell ) 
@@ -786,11 +794,21 @@ class CopenhagenReboot extends Table
         if( !$this->isGroundedPosition($grid_cells, $playerboard)) throw new feException( self::_("The polyomino must sit on the bottom of the facade, or on another facade tile."));
 
         // CHECK PLAYER CAN AFFORD POLYOMINO
-        $cost = $squares;
-        if( $this->isAdjacentToSameColor($grid_cells, $playerboard, $color)) $cost -= 1;
 
-        $valid_cards = self::getCollectionFromDb("SELECT card_id FROM card WHERE card_type = '$color' AND card_location = 'hand' AND card_location_arg = $player_id");
-        if( count($valid_cards) < $cost )  throw new feException( self::_("You don't have enough cards to place that facade tile in that spot."));
+        if( $color == "white")
+        {
+            if($this->gamestate->state()["name"] != "coatOfArms") throw new feException( self::_("You can only play special facade tiles from a coat of arms action"));
+        }
+        else
+        {
+            $cost = $squares;
+            if( $this->isAdjacentToSameColor($grid_cells, $playerboard, $color)) $cost -= 1;
+
+            $valid_cards = self::getCollectionFromDb("SELECT card_id FROM card WHERE card_type = '$color' AND card_location = 'hand' AND card_location_arg = $player_id");
+            if( count($valid_cards) < $cost )  throw new feException( self::_("You don't have enough cards to place that facade tile in that spot."));
+        }
+
+
 
         // PLACE POLYOMINO
         //  Up till now, we've been using the "origin" of the polyomino
@@ -817,8 +835,7 @@ class CopenhagenReboot extends Table
         
         $this->cards->moveCards( $discard_ids, "discard");
 
-        // SEE IF PLAYER GETS ADJACENT COST REDUCTION
-
+        // NOTIFY CLIENTS
         self::notifyAllPlayers( 
             "placePolyomino", 
             clienttranslate('${player_name} placed a facade tile.'),
@@ -842,7 +859,9 @@ class CopenhagenReboot extends Table
             )   
         );
 
-        $this->gamestate->nextState( "placePolyomino" );
+        // TESTING
+        //$this->gamestate->nextState( "placePolyomino" );
+        $this->gamestate->nextState( "coatOfArms" );
     }
 
     
