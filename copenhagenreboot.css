@@ -24,31 +24,26 @@
 
 #copen_wrapper
 {
-    width: 100%;
     text-align: center;
+    position:  relative;
 }
 
 #top_chunk
 {
-    
+    vertical-align: text-top;
     display: inline-block;
     position: relative;
     width: 730px;
-    min-height: 500px;
+    height: 500px;
 }
 
 #bottom_chunk
 {
-    
+    vertical-align: text-top;
     display: inline-block;
-    position: relative;
-    min-height: 500px;
+    position:  relative;
+    height: 500px;
     min-width: 250px;
-}
-
-.copen_clear_float
-{
-    float: clear;
 }
 
 #harbors
@@ -453,7 +448,6 @@
     width: 230px;
     height: 425px;
     background-image:  url('img/playerboards.png');
-    position: relative;
 }
 
 .playerboard_color_3785bd{ background-position: 0px 0px; }     /* blue */
@@ -561,30 +555,12 @@
 #opponent_playerboards
 {
     position:  relative;
-    /*width: 730px;*/
-    min-width: 250px;
 }
 
 #opponent_playerboards .playerboard
 {
     display: inline-block;
 }
-
-#opponent1_playerboard
-{
-   position: relative; 
-}
-
-#opponent2_playerboard
-{
-   position: relative; 
-}
-
-#opponent3_playerboard
-{
-   position: relative; 
-}
-
 
 .ability_tile_area
 {

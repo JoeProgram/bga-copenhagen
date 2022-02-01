@@ -14,7 +14,7 @@
 
     <div id="top_chunk">
 
-
+        
         <div id="harbors">
             <div id="harbor_0" class="harbor"></div>
             <div id="harbor_1" class="harbor"></div>
@@ -24,6 +24,8 @@
             <div id="harbor_5" class="harbor"></div>
             <div id="harbor_6" class="harbor"></div>
         </div>
+
+
 
         <div id="deck_cards">
             <div id="deck"></div>
@@ -39,6 +41,8 @@
             <div id="harbor_position_5" class="harbor_position"></div>
             <div id="harbor_position_6" class="harbor_position"></div>
         </div>
+
+
 
         <div id="polyominoes">
 
@@ -96,13 +100,18 @@
                 <div class="ability_tile both_actions"></div>
             </div>
         </div>
+
+              
     </div>
  
     <div id="bottom_chunk">
-        <div id="opponent_playerboards">
 
+
+        <div id="opponent_playerboards">
+   
             <!-- BEGIN opponent_playerboard -->
                 <div id="player_area_{ID}" class="player_area">
+
                     <div id="player_{ID}_playerboard" class="playerboard playerboard_color_{COLOR}">
                         <div class="board_cells">
 
@@ -112,6 +121,7 @@
 
                         </div>
                     </div>
+
                     <div class="ability_tile_area">
                         <div class="ability_tile any_cards"></div>
                         <div class="ability_tile additional_card"></div>
@@ -121,11 +131,10 @@
                     </div>
                 </div>
             <!-- END opponent_playerboard -->
-            
+                  
         </div>
-    </div>
 
-    <div class="copen_clearfloat"></div>
+    </div>
 
     <div id="shadow_box"></div>
     <div id="polyomino_placement">
