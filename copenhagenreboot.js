@@ -45,7 +45,6 @@ function (dojo, declare) {
             this.cardColorOrder = ["red_card", "yellow_card", "green_card", "blue_card", "purple_card"];
             this.adjacentOffsets = [{x:1,y:0}, {x:0,y:-1}, {x:-1,y:0}, {x:0,y:1}];
 
-            this.whitePolyominosPerStack = 3;
 
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
@@ -228,10 +227,6 @@ function (dojo, declare) {
                 case 'takeAdjacentCard':
                     this.onEnteringTakeAdjacentCard( args );
                     break;
-
-                case 'coatOfArms':
-                    this.onEnteringCoatOfArms( args );
-                    break;
            
                 case 'dummmy':
                     break;
@@ -310,22 +305,6 @@ function (dojo, declare) {
             dojo.query(".card.unusable").removeClass("unusable");
         },
 
-        onEnteringCoatOfArms( args )
-        {
-
-            if( args.active_player != this.player_id ) return;
-
-            dojo.query(".white_polyomino.top_of_stack").forEach(function(polyomino)
-            {
-                dojo.addClass( polyomino, "usable");
-            });
-        },
-
-        onLeavingCoatOfArms()
-        {
-            dojo.query(".polyomino.usable").removeClass("usable");
-        },
-
         // onLeavingState: this method is called each time we are leaving a game state.
         //                 You can use this method to perform some user interface changes at this moment.
         //
@@ -371,12 +350,6 @@ function (dojo, declare) {
                     this.addActionButton( 'cancel_polyomino_placement', _("Cancel"), "onCancelPolyominoPlacement", null, false, "red");
                     dojo.style("cancel_polyomino_placement","display","none");
                     break;
-
-                case 'coatOfArms':
-                    this.addActionButton( 'cancel_polyomino_placement', _("Cancel"), "onCancelPolyominoPlacement", null, false, "red");
-                    dojo.style("cancel_polyomino_placement","display","none");
-                    break;
-
 
                 }
             }
@@ -480,34 +453,6 @@ function (dojo, declare) {
             {
                 this.determineTopPolyominoInStack( key );
             }
-        },
-
-        getStackIdFromPolyominoId: function( polyominoId )
-        {
-            var color = this.getPolyominoColorFromId( polyominoId );
-
-            // SPECIAL RULES FOR WHITE TILES
-            if( color == "white")
-            {
-                var stack_number = this.getStackNumberFromWhitePolyominoId( polyominoId );
-                return `${color}-1_stack_${stack_number}`;
-            }
-
-            // HANDLE ALL OTHER TILES
-            else
-            {
-                var squares = this.getPolyominoSquaresFromId( polyominoId );
-                return `${color}-${squares}_stack`;
-            }
-        },
-
-        // WHITE POLYOMINOS HAVE SPECIAL STACK RULES
-        //   white tiles didn't look good in one giant stack
-        //   so we're letting them live in multiple stacks so that it looks nice
-        getStackNumberFromWhitePolyominoId: function( polyominoId )
-        {
-            var copy = parseInt(this.getPolyominoCopyFromId( polyominoId ));
-            return Math.ceil((copy * 1.0) / this.whitePolyominosPerStack);
         },
 
         determineTopPolyominoInStack: function( polyominoClass )
@@ -664,11 +609,6 @@ function (dojo, declare) {
 
             // CHECK IF WE CAN AFFORD IT
             var color = this.getPolyominoColorFromId( this.selectedPolyomino.id);
-
-            // SPECIAL RULES FOR WHITE POLYOMINOES
-            if( color == "white")  return this.stateName == "coatOfArms";
-            
-            // STANDARD RULES FOR OTHER COLORS
             var cardsOfColor = this.countColoredCardsInHand( color );
             var squares = this.getPolyominoSquaresFromId( this.selectedPolyomino.id);
 
@@ -1126,11 +1066,10 @@ function (dojo, declare) {
 
             var color = this.getPolyominoColorFromId( this.selectedPolyomino.id);
             var squares = this.getPolyominoSquaresFromId( this.selectedPolyomino.id);
-            var stackId = this.getStackIdFromPolyominoId( this.selectedPolyomino.id ); 
+
+            var stackId = `${color}-${squares}_stack`; 
 
             dojo.style(this.selectedPolyomino.id, "transform", "rotateY(0deg) rotateZ(0deg)");
-
-            console.log( `stack Id is ${stackId}`);
 
             this.attachToNewParent( this.selectedPolyomino["id"], stackId);
             this.slideToObjectPos( this.selectedPolyomino["id"], stackId, this.selectedPolyomino.originalPosition.l, this.selectedPolyomino.originalPosition.t, 500 ).play();

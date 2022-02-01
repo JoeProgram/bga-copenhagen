@@ -77,8 +77,8 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} must take a card or place a facade tile'),
         "descriptionmyturn" => clienttranslate('${you} must take a card or place a facade tile'),
         "type" => "activeplayer",
-        "possibleactions" => array( "takeCard", "placePolyomino", "coatOfArms" ),
-        "transitions" => array(  "takeCard" => 4, "placePolyomino" => 7, "coatOfArms" => 8 )
+        "possibleactions" => array( "takeCard", "placePolyomino" ),
+        "transitions" => array(  "takeCard" => 4, "placePolyomino" => 7 )
     ), 
 
     4 => array(
@@ -134,15 +134,6 @@ $machinestates = array(
         "action" => "stCalculateScore",
         "possibleactions" => array( "nextPlayer", "endGame" ),
         "transitions" => array(  "nextPlayer" => 2, "endGame" => 99 )
-    ), 
-
-    8 => array(
-        "name" => "coatOfArms",
-        "description" => clienttranslate('${actplayer} must place a special facade tile'),
-        "descriptionmyturn" => clienttranslate('${you} must place a special facade tile'),
-        "type" => "activeplayer",
-        "possibleactions" => array( "placePolyomino", "coatOfArms" ),
-        "transitions" => array( "placePolyomino" => 7, "coatOfArms" => 8 ),
     ), 
 
     50 => array(
