@@ -877,6 +877,8 @@ class CopenhagenReboot extends Table
 
         $player_id = self::activeNextPlayer(); // this sets the turn to the next player
 
+        $this->giveExtraTime($player_id);
+
         // NEXT PLAYER'S TURN
         self::setGameStateValue( 'cards_taken_this_turn', 0 );
 
