@@ -56,6 +56,8 @@ $this->polyomino_shapes = array(
     "yellow-3" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 0, "y" => 1, "fill" => "window"), array( "x" => 1, "y" => 1, "fill" => "window")),
     "yellow-4" => array( array( "x" => 0, "y" => 0, "fill" => "window"), array( "x" => 1, "y" => 0, "fill" => "window"), array( "x" => 1, "y" => 1, "fill" => "brickwork"),array("x" => 2, "y" => 1, "fill" => "window")),
     "yellow-5" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => -2, "y" => 1, "fill" => "window"), array( "x" => -1, "y" => 1, "fill" => "window"),array("x" => 0, "y" => 1, "fill" => "window"),array( "x" =>-2,"y" =>2, "fill" => "window")),
+
+    "white-1" => array( array( "x" => 0, "y" => 0, "fill" => "window")),
 );
 
 $this->adjacent_offsets = array(

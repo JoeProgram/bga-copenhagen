@@ -34,7 +34,7 @@
     display: inline-block;
     position: relative;
     width: 730px;
-    height: 500px;
+    height: 550px;
 }
 
 #bottom_chunk
@@ -402,6 +402,27 @@
     left: 293px;
     top:  279px;
 }
+
+.polyomino.white-1
+{
+    background-position: -416px -106px;
+    width: 34px;
+    height: 34px;  
+}
+
+#white-1_1{ left: 258px; top: 400px; z-index: 1;}
+#white-1_2{ left: 260px; top: 398px; z-index: 2;}
+#white-1_3{ left: 262px; top: 396px; z-index: 3;}
+#white-1_4{ left: 292px; top: 400px; z-index: 1;}
+#white-1_5{ left: 294px; top: 398px; z-index: 2;}
+#white-1_6{ left: 296px; top: 396px; z-index: 3;}
+#white-1_7{ left: 326px; top: 400px; z-index: 1;}
+#white-1_8{ left: 329px; top: 398px; z-index: 2;}
+#white-1_9{ left: 330px; top: 396px; z-index: 3;}
+#white-1_10{ left: 361px; top: 400px; z-index: 1;}
+#white-1_11{ left: 363px; top: 398px; z-index: 2;}
+#white-1_12{ left: 365px; top: 396px; z-index: 3;}
+
 
 .player_area
 {
