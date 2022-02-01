@@ -118,6 +118,11 @@
     top: 0px;
 }
 
+#harbor_cards .card:hover
+{
+    z-index: 10; 
+}
+
 .card
 {
     display: block;
