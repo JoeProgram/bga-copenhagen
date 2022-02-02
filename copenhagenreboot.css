@@ -514,7 +514,7 @@
     top: 61px;
 }
 
-.copen_board_cell.preview.invalid
+.copen_board_cell.copen_preview.copen_invalid
 {
     background-color:  red;
     opacity: 0.25;
@@ -630,7 +630,7 @@
     z-index: -1;
 }
 
-.behind_shadow_box{
+.copen_behind_shadow_box{
     z-index: -2;
 }
 

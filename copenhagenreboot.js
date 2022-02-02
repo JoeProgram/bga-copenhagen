@@ -188,7 +188,7 @@ function (dojo, declare) {
             dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
             this.determineTopPolyominoInEveryStack();
-            dojo.query("#polyominoes .copen_polyomino.top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
+            dojo.query("#polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -315,7 +315,7 @@ function (dojo, declare) {
 
             if( args.active_player != this.player_id ) return;
 
-            dojo.query(".white_polyomino.top_of_stack").forEach(function(polyomino)
+            dojo.query(".white_polyomino.copen_top_of_stack").forEach(function(polyomino)
             {
                 dojo.addClass( polyomino, "copen_usable");
             });
@@ -523,7 +523,7 @@ function (dojo, declare) {
             if( query.length == 0 ) return null; // no more polyominoes in this stack
 
             var topOfStackNode = query[0];
-            dojo.addClass( topOfStackNode, "top_of_stack");
+            dojo.addClass( topOfStackNode, "copen_top_of_stack");
             return topOfStackNode;
         },
 
@@ -532,7 +532,7 @@ function (dojo, declare) {
 
             var game = this;
 
-            dojo.query(".copen_polyomino.top_of_stack").forEach(function(polyomino)
+            dojo.query(".copen_polyomino.copen_top_of_stack").forEach(function(polyomino)
             {
                 // clear previously let classes
                 dojo.removeClass(polyomino, "copen_usable");
@@ -765,11 +765,11 @@ function (dojo, declare) {
             dojo.style("shadow_box", "opacity","0"); // note - don't use the (#) pound symbol for this function
             
             // set elements behind the shadow box
-            dojo.query("#harbors").addClass("behind_shadow_box");
-            dojo.query("#deck_cards").addClass("behind_shadow_box");
-            dojo.query("#harbor_cards").addClass("behind_shadow_box");
-            dojo.query("#polyominoes").addClass("behind_shadow_box");  
-            dojo.query("#opponent_playerboards").addClass("behind_shadow_box");  
+            dojo.query("#harbors").addClass("copen_behind_shadow_box");
+            dojo.query("#deck_cards").addClass("copen_behind_shadow_box");
+            dojo.query("#harbor_cards").addClass("copen_behind_shadow_box");
+            dojo.query("#polyominoes").addClass("copen_behind_shadow_box");  
+            dojo.query("#opponent_playerboards").addClass("copen_behind_shadow_box");  
 
             dojo.query("#polyomino_placement").style("display","block");
 
@@ -787,11 +787,7 @@ function (dojo, declare) {
 
         fadeOutShadowBox: function()
         {
-            dojo.query("#harbors").removeClass("behind_shadow_box");
-            dojo.query("#deck_cards").removeClass("behind_shadow_box");
-            dojo.query("#harbor_cards").removeClass("behind_shadow_box");
-            dojo.query("#polyominoes").removeClass("behind_shadow_box");  
-            dojo.query("#opponent_playerboards").removeClass("behind_shadow_box"); 
+            dojo.query(".copen_behind_shadow_box").removeClass("copen_behind_shadow_box");
 
             dojo.query("#polyomino_placement").style("display","none");
 
@@ -810,7 +806,7 @@ function (dojo, declare) {
 
             var polyominoNodeId = `${polyominoData.color}-${polyominoData.squares}_${polyominoData.copy}`;
             var polyominoNode = dojo.query(`#${polyominoNodeId}`)[0];
-            dojo.removeClass(polyominoNode, "top_of_stack");
+            dojo.removeClass(polyominoNode, "copen_top_of_stack");
 
             var boardCellNode = dojo.query(`#player_${polyominoData.owner}_playerboard .copen_board_cell_${polyominoData.x}_${polyominoData.y}`)[0];
 
@@ -1094,7 +1090,7 @@ function (dojo, declare) {
             {
                 gridCells.forEach( function(cell, index){
                     var query = dojo.query(`#owned_player_area #board_cell_${cell.x}_${cell.y}`); // the backticks here are for "template literals" - in case I forget javascript has those
-                    query.addClass("preview").addClass("invalid");
+                    query.addClass("copen_preview").addClass("copen_invalid");
                 });    
             }
             // SHOW IF VALID
