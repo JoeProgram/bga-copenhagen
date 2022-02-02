@@ -135,7 +135,7 @@ function (dojo, declare) {
                 var player = gamedatas.players[player_id];
                 if( player_id == this.player_id)
                 {
-                    dojo.addClass(`player_${player_id}_playerboard`,`playerboard_color_${player.color}`);
+                    dojo.addClass(`player_${player_id}_playerboard`,`copen_playerboard_color_${player.color}`);
                 }
             }
 

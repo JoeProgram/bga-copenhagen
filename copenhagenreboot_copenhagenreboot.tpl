@@ -85,7 +85,7 @@
         <div id="owned_player_area" class="copen_player_area">
 
             <!-- BEGIN owned -->
-            <div id="player_{ID}_playerboard" class="playerboard">
+            <div id="player_{ID}_playerboard" class="copen_playerboard">
             <!-- END owned -->
 
                 <div id="polyomino_preview"></div>
@@ -118,7 +118,7 @@
             <!-- BEGIN opponent_playerboard -->
                 <div id="player_area_{ID}" class="copen_player_area">
 
-                    <div id="player_{ID}_playerboard" class="playerboard playerboard_color_{COLOR}">
+                    <div id="player_{ID}_playerboard" class="copen_playerboard copen_playerboard_color_{COLOR}">
                         <div class="board_cells">
 
                             <!-- BEGIN opponent_board_cell -->

@@ -469,19 +469,19 @@
     height: 101px;
 }
 
-.playerboard
+.copen_playerboard
 {
     width: 230px;
     height: 425px;
     background-image:  url('img/playerboards.png');
 }
 
-.playerboard_color_3785bd{ background-position: 0px 0px; }     /* blue */
-.playerboard_color_fbcc3c{ background-position: -230px 0px; }  /* yellow */
-.playerboard_color_3da045{ background-position: -460px 0px; }  /* green */
-.playerboard_color_e2474a{ background-position: -690px 0px; }  /* red */
+.copen_playerboard_color_3785bd{ background-position: 0px 0px; }     /* blue */
+.copen_playerboard_color_fbcc3c{ background-position: -230px 0px; }  /* yellow */
+.copen_playerboard_color_3da045{ background-position: -460px 0px; }  /* green */
+.copen_playerboard_color_e2474a{ background-position: -690px 0px; }  /* red */
 
-.playerboard .copen_polyomino
+.copen_playerboard .copen_polyomino
 {
     z-index: 1; /* Make sure the clickable cells are always in front of place polyominoes */
 }
@@ -583,7 +583,7 @@
     position:  relative;
 }
 
-#opponent_playerboards .playerboard
+#opponent_playerboards .copen_playerboard
 {
     display: inline-block;
 }
