@@ -830,10 +830,14 @@ class CopenhagenReboot extends Table
         }
 
         // DISCARD CARDS
-        $discard_ids = array_keys( $valid_cards );
-        $discard_ids = array_slice($discard_ids, 0, $cost);
-        
-        $this->cards->moveCards( $discard_ids, "discard");
+        $discard_ids = array();
+        if( $color != "white")
+        {
+            $discard_ids = array_keys( $valid_cards );
+            $discard_ids = array_slice($discard_ids, 0, $cost);
+            
+            $this->cards->moveCards( $discard_ids, "discard");
+        }
 
         // NOTIFY CLIENTS
         self::notifyAllPlayers( 

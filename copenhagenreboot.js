@@ -170,7 +170,7 @@ function (dojo, declare) {
 
                 if( polyomino.owner == null )
                 {
-                    dojo.place( polyominoHtml, `${polyomino.color}-${polyomino.squares}_stack`);
+                    dojo.place( polyominoHtml, this.getStackIdFromPolyominoId( `${polyomino.color}-${polyomino.squares}_${polyomino.copy}`));
                 }
                 else
                 {
@@ -565,6 +565,8 @@ function (dojo, declare) {
 
         getPolyominoSquaresFromId: function( polyominoId )
         {
+            console.log("getPolyominoSquaresFromId");
+            console.log( polyominoId);
             return polyominoId.split('-')[1].split('_')[0];
         },
 
