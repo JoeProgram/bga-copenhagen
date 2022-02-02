@@ -16,13 +16,13 @@
 
         
         <div id="harbors">
-            <div id="harbor_0" class="harbor"></div>
-            <div id="harbor_1" class="harbor"></div>
-            <div id="harbor_2" class="harbor"></div>
-            <div id="harbor_3" class="harbor"></div>
-            <div id="harbor_4" class="harbor"></div>
-            <div id="harbor_5" class="harbor"></div>
-            <div id="harbor_6" class="harbor"></div>
+            <div id="harbor_0" class="copen_harbor"></div>
+            <div id="harbor_1" class="copen_harbor"></div>
+            <div id="harbor_2" class="copen_harbor"></div>
+            <div id="harbor_3" class="copen_harbor"></div>
+            <div id="harbor_4" class="copen_harbor"></div>
+            <div id="harbor_5" class="copen_harbor"></div>
+            <div id="harbor_6" class="copen_harbor"></div>
         </div>
 
 
@@ -33,13 +33,13 @@
         </div>
 
         <div id="harbor_cards">
-            <div id="harbor_position_0" class="harbor_position"></div>
-            <div id="harbor_position_1" class="harbor_position"></div>
-            <div id="harbor_position_2" class="harbor_position"></div>
-            <div id="harbor_position_3" class="harbor_position"></div>
-            <div id="harbor_position_4" class="harbor_position"></div>
-            <div id="harbor_position_5" class="harbor_position"></div>
-            <div id="harbor_position_6" class="harbor_position"></div>
+            <div id="harbor_position_0" class="copen_harbor_position"></div>
+            <div id="harbor_position_1" class="copen_harbor_position"></div>
+            <div id="harbor_position_2" class="copen_harbor_position"></div>
+            <div id="harbor_position_3" class="copen_harbor_position"></div>
+            <div id="harbor_position_4" class="copen_harbor_position"></div>
+            <div id="harbor_position_5" class="copen_harbor_position"></div>
+            <div id="harbor_position_6" class="copen_harbor_position"></div>
         </div>
 
 

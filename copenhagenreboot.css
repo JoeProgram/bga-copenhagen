@@ -57,7 +57,7 @@
 
 }
 
-.harbor
+.copen_harbor
 {
     display: inline-block;
     position: absolute;
@@ -139,7 +139,7 @@
 .card.purple_card { background-position: -280px 0px; }
 .card.mermaid_card {  background-position: -350px 0px; }
 
-.harbor_position
+.copen_harbor_position
 {
     display: block;
     position: absolute;
