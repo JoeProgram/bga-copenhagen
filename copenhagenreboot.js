@@ -188,7 +188,7 @@ function (dojo, declare) {
             dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
             this.determineTopPolyominoInEveryStack();
-            dojo.query("#polyominoes .polyomino.top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
+            dojo.query("#polyominoes .copen_polyomino.top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -256,8 +256,8 @@ function (dojo, declare) {
         onLeavingPlayerTurn()
         {
             dojo.query(".copen_card.copen_usable").removeClass("copen_usable");
-            dojo.query(".polyomino.copen_usable").removeClass("copen_usable");
-            dojo.query(".polyomino.copen_unusable").removeClass("copen_unusable");
+            dojo.query(".copen_polyomino.copen_usable").removeClass("copen_usable");
+            dojo.query(".copen_polyomino.copen_unusable").removeClass("copen_unusable");
         },
 
         onEnteringStateDiscardDownToMaxHandSize( args )
@@ -323,7 +323,7 @@ function (dojo, declare) {
 
         onLeavingCoatOfArms()
         {
-            dojo.query(".polyomino.copen_usable").removeClass("copen_usable");
+            dojo.query(".copen_polyomino.copen_usable").removeClass("copen_usable");
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -532,7 +532,7 @@ function (dojo, declare) {
 
             var game = this;
 
-            dojo.query(".polyomino.top_of_stack").forEach(function(polyomino)
+            dojo.query(".copen_polyomino.top_of_stack").forEach(function(polyomino)
             {
                 // clear previously let classes
                 dojo.removeClass(polyomino, "copen_usable");
