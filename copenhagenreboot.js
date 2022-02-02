@@ -246,7 +246,7 @@ function (dojo, declare) {
             // HANDLE CARDS
             if( args.active_player == this.player_id ) 
             {
-                dojo.query("#harbor_cards .copen_card").addClass("usable");
+                dojo.query("#harbor_cards .copen_card").addClass("copen_usable");
             }
 
             // HANDLE POLYOMINOES
@@ -255,9 +255,9 @@ function (dojo, declare) {
 
         onLeavingPlayerTurn()
         {
-            dojo.query(".copen_card.usable").removeClass("usable");
-            dojo.query(".polyomino.usable").removeClass("usable");
-            dojo.query(".polyomino.unusable").removeClass("unusable");
+            dojo.query(".copen_card.copen_usable").removeClass("copen_usable");
+            dojo.query(".polyomino.copen_usable").removeClass("copen_usable");
+            dojo.query(".polyomino.copen_unusable").removeClass("copen_unusable");
         },
 
         onEnteringStateDiscardDownToMaxHandSize( args )
@@ -295,19 +295,19 @@ function (dojo, declare) {
         {
             if( args.active_player == this.player_id )
             {
-                dojo.query("#harbor_cards .copen_card").addClass("unusable");
+                dojo.query("#harbor_cards .copen_card").addClass("copen_unusable");
 
                 for( var i = 0; i < args.args.adjacent_card_ids.length; i++)
                 {
-                    dojo.query(`#card_${args.args.adjacent_card_ids[i]}`).removeClass("unusable").addClass("usable");
+                    dojo.query(`#card_${args.args.adjacent_card_ids[i]}`).removeClass("copen_unusable").addClass("copen_usable");
                 }
             }
         },
 
         onLeavingTakeAdjacentCard()
         {
-            dojo.query(".copen_card.usable").removeClass("usable");
-            dojo.query(".copen_card.unusable").removeClass("unusable");
+            dojo.query(".copen_card.copen_usable").removeClass("copen_usable");
+            dojo.query(".copen_card.copen_unusable").removeClass("copen_unusable");
         },
 
         onEnteringCoatOfArms( args )
@@ -317,13 +317,13 @@ function (dojo, declare) {
 
             dojo.query(".white_polyomino.top_of_stack").forEach(function(polyomino)
             {
-                dojo.addClass( polyomino, "usable");
+                dojo.addClass( polyomino, "copen_usable");
             });
         },
 
         onLeavingCoatOfArms()
         {
-            dojo.query(".polyomino.usable").removeClass("usable");
+            dojo.query(".polyomino.copen_usable").removeClass("copen_usable");
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -535,8 +535,8 @@ function (dojo, declare) {
             dojo.query(".polyomino.top_of_stack").forEach(function(polyomino)
             {
                 // clear previously let classes
-                dojo.removeClass(polyomino, "usable");
-                dojo.removeClass(polyomino, "unusable");
+                dojo.removeClass(polyomino, "copen_usable");
+                dojo.removeClass(polyomino, "copen_unusable");
 
                 // gather the information
                 var color = game.getPolyominoColorFromId( polyomino.id );
@@ -547,8 +547,8 @@ function (dojo, declare) {
                 if( color != "white" && game.hasPolyominoOfColorOnBoard( color ) ) cost -= 1; // reduce cost by 1 if there's any matching polyominoes on board
 
                 // see if player can afford polyomino
-                if( cardsOfColor >= cost ) dojo.addClass( polyomino, "usable");
-                else dojo.addClass(polyomino, "unusable");
+                if( cardsOfColor >= cost ) dojo.addClass( polyomino, "copen_usable");
+                else dojo.addClass(polyomino, "copen_unusable");
             });
         },
 
@@ -936,7 +936,7 @@ function (dojo, declare) {
             // CLIENT-SIDE VALIDATION
             if( this.hasTooManyCardsInHand()) return; // doesn't work if your hand already has too many cards
 
-            if( dojo.hasClass(event.currentTarget.id, "unusable")) return; // doesn't work if the card isn't usable
+            if( dojo.hasClass(event.currentTarget.id, "copen_unusable")) return; // doesn't work if the card isn't usable
 
             // SEND SERVER REQUEST
             if( this.checkAction('takeCard'))
@@ -979,7 +979,7 @@ function (dojo, declare) {
         onSelectPolyomino: function( event )
         {
 
-            if( !dojo.hasClass(event.currentTarget, "usable")) return; // make sure we can afford this polyomino before selecting it
+            if( !dojo.hasClass(event.currentTarget, "copen_usable")) return; // make sure we can afford this polyomino before selecting it
 
             this.selectedPolyomino = {};
 

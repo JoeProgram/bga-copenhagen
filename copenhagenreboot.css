@@ -174,13 +174,13 @@
     perspective: 1000px;
 }
 
-.usable:hover
+.copen_usable:hover
 {
     filter:  drop-shadow(0px 0px 5px white);
     cursor:  pointer;
 }
 
-.unusable:hover
+.copen_unusable:hover
 {
     filter:  drop-shadow(0px 0px 5px red);
 }
