@@ -42,7 +42,7 @@ function (dojo, declare) {
 
             this.stateName = "";
 
-            this.cardColorOrder = ["red_card", "yellow_card", "green_card", "blue_card", "purple_card"];
+            this.cardColorOrder = ["copen_red_card", "copen_yellow_card", "copen_green_card", "copen_blue_card", "copen_purple_card"];
             this.adjacentOffsets = [{x:1,y:0}, {x:0,y:-1}, {x:-1,y:0}, {x:0,y:1}];
 
             this.whitePolyominosPerStack = 3;
@@ -468,7 +468,7 @@ function (dojo, declare) {
 
         countColoredCardsInHand: function( color )
         {
-            return dojo.query(`#cards_in_hand .copen_card.${color}_card`).length;
+            return dojo.query(`#cards_in_hand .copen_card.copen_${color}_card`).length;
         },
 
         hasTooManyCardsInHand: function()

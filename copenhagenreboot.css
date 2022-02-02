@@ -132,12 +132,12 @@
     background-image:  url('img/cards.png');
 }
 
-.copen_card.red_card { background-position: 0px 0px; }
-.copen_card.yellow_card { background-position: -70px 0px; }
-.copen_card.green_card { background-position: -140px 0px; }
-.copen_card.blue_card { background-position: -210px 0px; }
-.copen_card.purple_card { background-position: -280px 0px; }
-.copen_card.mermaid_card {  background-position: -350px 0px; }
+.copen_card.copen_red_card { background-position: 0px 0px; }
+.copen_card.copen_yellow_card { background-position: -70px 0px; }
+.copen_card.copen_green_card { background-position: -140px 0px; }
+.copen_card.copen_blue_card { background-position: -210px 0px; }
+.copen_card.copen_purple_card { background-position: -280px 0px; }
+.copen_card.copen_mermaid_card {  background-position: -350px 0px; }
 
 .copen_harbor_position
 {
