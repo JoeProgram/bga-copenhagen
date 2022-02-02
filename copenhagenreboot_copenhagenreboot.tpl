@@ -90,9 +90,9 @@
 
                 <div id="polyomino_preview"></div>
 
-                <div class="board_cells">
+                <div class="copen_board_cells">
                     <!-- BEGIN board_cell -->
-                        <div id="board_cell_{X}_{Y}" class="board_cell board_cell_{X}_{Y}"></div>
+                        <div id="board_cell_{X}_{Y}" class="copen_board_cell copen_board_cell_{X}_{Y}"></div>
                     <!-- END board_cell -->
                 </div>
 
@@ -119,10 +119,10 @@
                 <div id="player_area_{ID}" class="copen_player_area">
 
                     <div id="player_{ID}_playerboard" class="copen_playerboard copen_playerboard_color_{COLOR}">
-                        <div class="board_cells">
+                        <div class="copen_board_cells">
 
                             <!-- BEGIN opponent_board_cell -->
-                                <div id="player_{PLAYER}_board_cell_{X}_{Y}" class="board_cell board_cell_{X}_{Y}"></div>
+                                <div id="player_{PLAYER}_board_cell_{X}_{Y}" class="copen_board_cell copen_board_cell_{X}_{Y}"></div>
                             <!-- END opponent_board_cell -->
 
                         </div>

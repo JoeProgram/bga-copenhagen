@@ -181,9 +181,9 @@ function (dojo, declare) {
 
             
             // CONNECT INTERACTIVE ELEMENTS
-            dojo.query("#owned_player_area .board_cell").connect( 'onclick', this, 'onPlacePolyomino');
-            dojo.query("#owned_player_area .board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
-            dojo.query("#owned_player_area .board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
+            dojo.query("#owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPlacePolyomino');
+            dojo.query("#owned_player_area .copen_board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
+            dojo.query("#owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
             dojo.query("#polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
@@ -812,7 +812,7 @@ function (dojo, declare) {
             var polyominoNode = dojo.query(`#${polyominoNodeId}`)[0];
             dojo.removeClass(polyominoNode, "top_of_stack");
 
-            var boardCellNode = dojo.query(`#player_${polyominoData.owner}_playerboard .board_cell_${polyominoData.x}_${polyominoData.y}`)[0];
+            var boardCellNode = dojo.query(`#player_${polyominoData.owner}_playerboard .copen_board_cell_${polyominoData.x}_${polyominoData.y}`)[0];
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
             var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCell( polyominoNode, boardCellNode );

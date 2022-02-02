@@ -486,7 +486,7 @@
     z-index: 1; /* Make sure the clickable cells are always in front of place polyominoes */
 }
 
-.board_cell
+.copen_board_cell
 {
     display:  inline-block;
     position: absolute;
@@ -504,7 +504,7 @@
     display: block;
 }
 
-.board_cells
+.copen_board_cells
 {
     display: block;
     position: absolute;
@@ -514,61 +514,61 @@
     top: 61px;
 }
 
-.board_cell.preview.invalid
+.copen_board_cell.preview.invalid
 {
     background-color:  red;
     opacity: 0.25;
 }
 
-.board_cell_0_8{ top: 0px;  left:  0px; }
-.board_cell_0_7{ top: 34px; left:  0px; }
-.board_cell_0_6{ top: 68px; left: 0px; }
-.board_cell_0_5{ top: 102px; left: 0px; }
-.board_cell_0_4{ top: 136px; left: 0px; }
-.board_cell_0_3{ top: 170px; left: 0px; }
-.board_cell_0_2{ top: 204px; left: 0px; }
-.board_cell_0_1{ top: 238px; left: 0px; }
-.board_cell_0_0{ top: 272px; left: 0px; }
+.copen_board_cell_0_8{ top: 0px;  left:  0px; }
+.copen_board_cell_0_7{ top: 34px; left:  0px; }
+.copen_board_cell_0_6{ top: 68px; left: 0px; }
+.copen_board_cell_0_5{ top: 102px; left: 0px; }
+.copen_board_cell_0_4{ top: 136px; left: 0px; }
+.copen_board_cell_0_3{ top: 170px; left: 0px; }
+.copen_board_cell_0_2{ top: 204px; left: 0px; }
+.copen_board_cell_0_1{ top: 238px; left: 0px; }
+.copen_board_cell_0_0{ top: 272px; left: 0px; }
 
-.board_cell_1_8{ top: 0px;  left:  34px; }
-.board_cell_1_7{ top: 34px; left:  34px; }
-.board_cell_1_6{ top: 68px;  left: 34px; }
-.board_cell_1_5{ top: 102px; left: 34px; }
-.board_cell_1_4{ top: 136px; left: 34px; }
-.board_cell_1_3{ top: 170px; left: 34px; }
-.board_cell_1_2{ top: 204px; left: 34px; }
-.board_cell_1_1{ top: 238px; left: 34px; }
-.board_cell_1_0{ top: 272px; left: 34px; }
+.copen_board_cell_1_8{ top: 0px;  left:  34px; }
+.copen_board_cell_1_7{ top: 34px; left:  34px; }
+.copen_board_cell_1_6{ top: 68px;  left: 34px; }
+.copen_board_cell_1_5{ top: 102px; left: 34px; }
+.copen_board_cell_1_4{ top: 136px; left: 34px; }
+.copen_board_cell_1_3{ top: 170px; left: 34px; }
+.copen_board_cell_1_2{ top: 204px; left: 34px; }
+.copen_board_cell_1_1{ top: 238px; left: 34px; }
+.copen_board_cell_1_0{ top: 272px; left: 34px; }
 
-.board_cell_2_8{ top: 0px;  left:  68px; }
-.board_cell_2_7{ top: 34px; left:  68px; }
-.board_cell_2_6{ top: 68px;  left: 68px; }
-.board_cell_2_5{ top: 102px; left: 68px; }
-.board_cell_2_4{ top: 136px; left: 68px; }
-.board_cell_2_3{ top: 170px; left: 68px; }
-.board_cell_2_2{ top: 204px; left: 68px; }
-.board_cell_2_1{ top: 238px; left: 68px; }
-.board_cell_2_0{ top: 272px; left: 68px; }
+.copen_board_cell_2_8{ top: 0px;  left:  68px; }
+.copen_board_cell_2_7{ top: 34px; left:  68px; }
+.copen_board_cell_2_6{ top: 68px;  left: 68px; }
+.copen_board_cell_2_5{ top: 102px; left: 68px; }
+.copen_board_cell_2_4{ top: 136px; left: 68px; }
+.copen_board_cell_2_3{ top: 170px; left: 68px; }
+.copen_board_cell_2_2{ top: 204px; left: 68px; }
+.copen_board_cell_2_1{ top: 238px; left: 68px; }
+.copen_board_cell_2_0{ top: 272px; left: 68px; }
 
-.board_cell_3_8{ top: 0px;  left:  102px; }
-.board_cell_3_7{ top: 34px; left:  102px; }
-.board_cell_3_6{ top: 68px;  left: 102px; }
-.board_cell_3_5{ top: 102px; left: 102px; }
-.board_cell_3_4{ top: 136px; left: 102px; }
-.board_cell_3_3{ top: 170px; left: 102px; }
-.board_cell_3_2{ top: 204px; left: 102px; }
-.board_cell_3_1{ top: 238px; left: 102px; }
-.board_cell_3_0{ top: 272px; left: 102px; }
+.copen_board_cell_3_8{ top: 0px;  left:  102px; }
+.copen_board_cell_3_7{ top: 34px; left:  102px; }
+.copen_board_cell_3_6{ top: 68px;  left: 102px; }
+.copen_board_cell_3_5{ top: 102px; left: 102px; }
+.copen_board_cell_3_4{ top: 136px; left: 102px; }
+.copen_board_cell_3_3{ top: 170px; left: 102px; }
+.copen_board_cell_3_2{ top: 204px; left: 102px; }
+.copen_board_cell_3_1{ top: 238px; left: 102px; }
+.copen_board_cell_3_0{ top: 272px; left: 102px; }
 
-.board_cell_4_8{ top: 0px;  left:  136px; }
-.board_cell_4_7{ top: 34px; left:  136px; }
-.board_cell_4_6{ top: 68px;  left: 136px; }
-.board_cell_4_5{ top: 102px; left: 136px; }
-.board_cell_4_4{ top: 136px; left: 136px; }
-.board_cell_4_3{ top: 170px; left: 136px; }
-.board_cell_4_2{ top: 204px; left: 136px; }
-.board_cell_4_1{ top: 238px; left: 136px; }
-.board_cell_4_0{ top: 272px; left: 136px; }
+.copen_board_cell_4_8{ top: 0px;  left:  136px; }
+.copen_board_cell_4_7{ top: 34px; left:  136px; }
+.copen_board_cell_4_6{ top: 68px;  left: 136px; }
+.copen_board_cell_4_5{ top: 102px; left: 136px; }
+.copen_board_cell_4_4{ top: 136px; left: 136px; }
+.copen_board_cell_4_3{ top: 170px; left: 136px; }
+.copen_board_cell_4_2{ top: 204px; left: 136px; }
+.copen_board_cell_4_1{ top: 238px; left: 136px; }
+.copen_board_cell_4_0{ top: 272px; left: 136px; }
 
 
 #owned_player_area
