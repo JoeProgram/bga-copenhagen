@@ -315,7 +315,7 @@ function (dojo, declare) {
 
             if( args.active_player != this.player_id ) return;
 
-            dojo.query(".white_polyomino.copen_top_of_stack").forEach(function(polyomino)
+            dojo.query(".copen_white_polyomino.copen_top_of_stack").forEach(function(polyomino)
             {
                 dojo.addClass( polyomino, "copen_usable");
             });
@@ -442,7 +442,7 @@ function (dojo, declare) {
                 var color = this.cardColorOrder[i];
 
                 if( dojo.hasClass( card, color)) return position;
-                position += dojo.query(`#cards_in_hand .${color}`).length;
+                position += dojo.query(`#cards_in_hand .${color}`).length; // the copen_ prefix is already in the variable here 
             }
 
             return -1; // something went wrong - the card didn't have a color class
@@ -755,7 +755,7 @@ function (dojo, declare) {
 
         clearPreview: function()
         {
-            dojo.query(".preview").removeClass("invalid").removeClass("preview");
+            dojo.query(".copen_preview").removeClass("copen_invalid").removeClass("copen_preview");
             dojo.query("#polyomino_preview").style("display","none");
         },
 
