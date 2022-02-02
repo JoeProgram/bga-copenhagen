@@ -601,20 +601,20 @@
     display: inline-block;
 }
 
-.copen_ability_tile.any_cards{
+.copen_ability_tile.copen_any_cards{
     background-position: -194px 0px;
 }
 
-.copen_ability_tile.additional_card{
+.copen_ability_tile.copen_additional_card{
         background-position: -145.5px 0px;
 }
-.copen_ability_tile.construction_discount{
+.copen_ability_tile.copen_construction_discount{
         background-position: -97px 0px;
 }
-.copen_ability_tile.change_of_colors{
+.copen_ability_tile.copen_change_of_colors{
         background-position: -48.5px 0px;
 }
-.copen_ability_tile.both_actions{
+.copen_ability_tile.copen_both_actions{
         background-position: 0px 0px;
 }
 

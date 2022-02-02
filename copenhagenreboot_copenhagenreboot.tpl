@@ -99,11 +99,11 @@
                 
             </div>
             <div class="copen_ability_tile_area">
-                <div class="copen_ability_tile any_cards"></div>
-                <div class="copen_ability_tile additional_card"></div>
-                <div class="copen_ability_tile construction_discount"></div>
-                <div class="copen_ability_tile change_of_colors"></div>
-                <div class="copen_ability_tile both_actions"></div>
+                <div class="copen_ability_tile copen_any_cards"></div>
+                <div class="copen_ability_tile copen_additional_card"></div>
+                <div class="copen_ability_tile copen_construction_discount"></div>
+                <div class="copen_ability_tile copen_change_of_colors"></div>
+                <div class="copen_ability_tile copen_both_actions"></div>
             </div>
         </div>
 
@@ -129,11 +129,11 @@
                     </div>
 
                     <div class="copen_ability_tile_area">
-                        <div class="copen_ability_tile any_cards"></div>
-                        <div class="copen_ability_tile additional_card"></div>
-                        <div class="copen_ability_tile construction_discount"></div>
-                        <div class="copen_ability_tile change_of_colors"></div>
-                        <div class="copen_ability_tile both_actions"></div>
+                        <div class="copen_ability_tile copen_any_cards"></div>
+                        <div class="copen_ability_tile copen_additional_card"></div>
+                        <div class="copen_ability_tile copen_construction_discount"></div>
+                        <div class="copen_ability_tile copen_change_of_colors"></div>
+                        <div class="copen_ability_tile copen_both_actions"></div>
                     </div>
                 </div>
             <!-- END opponent_playerboard -->
