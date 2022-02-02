@@ -586,6 +586,12 @@ class CopenhagenReboot extends Table
         return $windows_only ? 2 : 1;
     }
 
+    function isRowComplete( $y, $playerboard )
+    {
+        for( $x = 0; $x < $this->board_width; $x++ ) if( $playerboard[$x][$y]["fill"] == NULL ) return false;
+        return true;
+    }
+
     function getColumnPoints( $x, $playerboard)
     {
 
@@ -830,16 +836,35 @@ class CopenhagenReboot extends Table
             self::DbQuery(  $sql );
         }
 
+
+        // GET NEW, UPDATED COPY OF PLAYERBOARD
+        $playerboard = $this->getPlayerboard( $player_id );
+
         // COAT OF ARMS
         $coat_of_arms_earned = self::getGameStateValue( 'coat_of_arms_earned' );
 
-        // ADD COAT OF ARMS FOR EACH COVERED CELL
+        // ADD COAT OF ARMS FOR EACH COVERED COAT OF ARMS CELL 
         foreach( $grid_cells as $grid_cell)
         {
             $x = $grid_cell["x"];
             $y = $grid_cell["y"];
             if( in_array( "$x-$y", $this->coat_of_arms_board_cells )) $coat_of_arms_earned += 1;
         }
+
+        // ADD COAT OF ARMS FOR EACH COMPLETED COAT OF ARMS ROW
+        $rows = array();
+        foreach( $grid_cells as $grid_cell) if( !in_array( $grid_cell["y"],$rows)) $rows[] = $grid_cell["y"];
+        foreach( $rows as $row )
+        {
+            if( 
+                in_array( $row, $this->coat_of_arms_board_rows )
+                && $this->isRowComplete($row, $playerboard)
+            ) 
+            {
+                $coat_of_arms_earned += 1;
+            }
+            
+        } 
 
         // REMOVE COAT OF ARMS POINT IF PLACING WHITE TILE
         if( $color == "white" ) $coat_of_arms_earned -= 1;
@@ -874,7 +899,7 @@ class CopenhagenReboot extends Table
                     "flip" => $flip,
                     "rotation" => $rotation,
                 ),
-                "playerboard" => $this->getPlayerboard( $player_id), // get refreshed playerboard after update
+                "playerboard" => $playerboard, // get refreshed playerboard after update
                 "discards" => $discard_ids,
                 "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
             )   

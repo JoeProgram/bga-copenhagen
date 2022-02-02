@@ -71,6 +71,6 @@ $this->adjacent_offsets = array(
 );
 
 $this->coat_of_arms_board_cells = array("2-2","4-4","1-6","3-8");
-$this->coat_of_arms_board_rows = array("1","3","5");
+$this->coat_of_arms_board_rows = array(1,3,5);
 
 
