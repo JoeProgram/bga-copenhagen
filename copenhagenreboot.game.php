@@ -159,14 +159,13 @@ class CopenhagenReboot extends Table
 
         // CREATE PLAYERBOARDS
         $sql = "INSERT INTO board_cell(owner, x, y) VALUES ";
-        $values_format_sql = "(%d,%d,%d),";
         foreach( $players as $player_id => $player )
         {
             for( $x = 0; $x < $this->board_width; $x++)
             {
                 for( $y = 0; $y < $this->board_height; $y++)
                 {
-                    $sql .= sprintf( $values_format_sql, $player_id, $x, $y);
+                    $sql .= "($player_id, $x, $y),";
                 }
             }
         }  
@@ -831,6 +830,22 @@ class CopenhagenReboot extends Table
             self::DbQuery(  $sql );
         }
 
+        // COAT OF ARMS
+        $coat_of_arms_earned = self::getGameStateValue( 'coat_of_arms_earned' );
+
+        // ADD COAT OF ARMS FOR EACH COVERED CELL
+        foreach( $grid_cells as $grid_cell)
+        {
+            $x = $grid_cell["x"];
+            $y = $grid_cell["y"];
+            if( in_array( "$x-$y", $this->coat_of_arms_board_cells )) $coat_of_arms_earned += 1;
+        }
+
+        // REMOVE COAT OF ARMS POINT IF PLACING WHITE TILE
+        if( $color == "white" ) $coat_of_arms_earned -= 1;
+        
+        self::setGameStateValue( 'coat_of_arms_earned', $coat_of_arms_earned );
+
         // DISCARD CARDS
         $discard_ids = array();
         if( $color != "white")
@@ -865,11 +880,7 @@ class CopenhagenReboot extends Table
             )   
         );
 
-        // TESTING
-        $coat_of_arms_earned = self::getGameStateValue( 'coat_of_arms_earned' );
-        if( $color != "white" ) $coat_of_arms_earned = +2;
-        else $coat_of_arms_earned -= 1;
-        self::setGameStateValue( 'coat_of_arms_earned', $coat_of_arms_earned );
+
 
         if( $coat_of_arms_earned > 0 ) $this->gamestate->nextState( "coatOfArms" );
         else $this->gamestate->nextState( "placePolyomino" );
