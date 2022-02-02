@@ -246,7 +246,7 @@ function (dojo, declare) {
             // HANDLE CARDS
             if( args.active_player == this.player_id ) 
             {
-                dojo.query("#harbor_cards .card").addClass("usable");
+                dojo.query("#harbor_cards .copen_card").addClass("usable");
             }
 
             // HANDLE POLYOMINOES
@@ -255,7 +255,7 @@ function (dojo, declare) {
 
         onLeavingPlayerTurn()
         {
-            dojo.query(".card.usable").removeClass("usable");
+            dojo.query(".copen_card.usable").removeClass("usable");
             dojo.query(".polyomino.usable").removeClass("usable");
             dojo.query(".polyomino.unusable").removeClass("unusable");
         },
@@ -295,7 +295,7 @@ function (dojo, declare) {
         {
             if( args.active_player == this.player_id )
             {
-                dojo.query("#harbor_cards .card").addClass("unusable");
+                dojo.query("#harbor_cards .copen_card").addClass("unusable");
 
                 for( var i = 0; i < args.args.adjacent_card_ids.length; i++)
                 {
@@ -306,8 +306,8 @@ function (dojo, declare) {
 
         onLeavingTakeAdjacentCard()
         {
-            dojo.query(".card.usable").removeClass("usable");
-            dojo.query(".card.unusable").removeClass("unusable");
+            dojo.query(".copen_card.usable").removeClass("usable");
+            dojo.query(".copen_card.unusable").removeClass("unusable");
         },
 
         onEnteringCoatOfArms( args )
@@ -468,12 +468,12 @@ function (dojo, declare) {
 
         countColoredCardsInHand: function( color )
         {
-            return dojo.query(`#cards_in_hand .card.${color}_card`).length;
+            return dojo.query(`#cards_in_hand .copen_card.${color}_card`).length;
         },
 
         hasTooManyCardsInHand: function()
         {
-            return dojo.query("#cards_in_hand .card").length > this.maxHandSize;
+            return dojo.query("#cards_in_hand .copen_card").length > this.maxHandSize;
         },
 
 
@@ -581,23 +581,6 @@ function (dojo, declare) {
        getPolyominoCopyFromId: function( polyominoId )
         {
             return polyominoId.split('_')[1];
-        },
-
-        payPolyominoCost: function( polyominoId, gridCells )
-        {
-            var color = this.getPolyominoColorFromId( polyominoId );
-            var squares = this.getPolyominoSquaresFromId( polyominoId );
-
-            var cost = squares;
-            if( this.isAdjacentToSameColor( gridCells, color)) cost -= 1;
-
-            for( var i = 0; i < cost; i++ ) this.discardCardOfColor( color );
-        },
-
-        discardCardOfColor: function( color )
-        {
-            var card = dojo.query(`#hand .card.${color}_card`)[0];
-            dojo.destroy( card );
         },
 
         getCoordinatesFromId: function( id )

@@ -113,17 +113,17 @@
     left: 31px;
 }
 
-#harbor_cards .card
+#harbor_cards .copen_card
 {
     top: 0px;
 }
 
-#harbor_cards .card:hover
+#harbor_cards .copen_card:hover
 {
     z-index: 10; 
 }
 
-.card
+.copen_card
 {
     display: block;
     position:  absolute;
@@ -132,12 +132,12 @@
     background-image:  url('img/cards.png');
 }
 
-.card.red_card { background-position: 0px 0px; }
-.card.yellow_card { background-position: -70px 0px; }
-.card.green_card { background-position: -140px 0px; }
-.card.blue_card { background-position: -210px 0px; }
-.card.purple_card { background-position: -280px 0px; }
-.card.mermaid_card {  background-position: -350px 0px; }
+.copen_card.red_card { background-position: 0px 0px; }
+.copen_card.yellow_card { background-position: -70px 0px; }
+.copen_card.green_card { background-position: -140px 0px; }
+.copen_card.blue_card { background-position: -210px 0px; }
+.copen_card.purple_card { background-position: -280px 0px; }
+.copen_card.mermaid_card {  background-position: -350px 0px; }
 
 .copen_harbor_position
 {
