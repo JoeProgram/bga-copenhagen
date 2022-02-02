@@ -347,6 +347,10 @@ function (dojo, declare) {
                 case 'takeAdjacentCard':
                     this.onLeavingTakeAdjacentCard();
                     break;
+
+                case 'coatOfArms':
+                    this.onLeavingCoatOfArms();
+                    break;
                
                 case 'dummmy':
                     break;
@@ -476,10 +480,10 @@ function (dojo, declare) {
         determineTopPolyominoInEveryStack: function()
         {
 
-            for( const [key, value] of Object.entries(this.polyominoShapes))
-            {
-                this.determineTopPolyominoInStack( key );
-            }
+            var game = this;
+            dojo.query(".copen_stack").forEach( function( stackNode ){
+                game.determineTopPolyominoInStack( stackNode.id );
+            });
         },
 
         getStackIdFromPolyominoId: function( polyominoId )
@@ -510,9 +514,12 @@ function (dojo, declare) {
             return Math.ceil((copy * 1.0) / this.whitePolyominosPerStack);
         },
 
-        determineTopPolyominoInStack: function( polyominoClass )
+        determineTopPolyominoInStack: function( stackId )
         {
-            var query = dojo.query( `.${polyominoClass}:last-child` );
+            console.log( "determine top");
+            console.log(`#${stackId} > *:last-child`);
+            var query = dojo.query( `#${stackId} > *:last-child` );
+            console.log( query );
             if( query.length == 0 ) return null; // no more polyominoes in this stack
 
             var topOfStackNode = query[0];
@@ -537,7 +544,7 @@ function (dojo, declare) {
                 var cardsOfColor = game.countColoredCardsInHand( color );
 
                 var cost = squares;
-                if( game.hasPolyominoOfColorOnBoard( color ) ) cost -= 1; // reduce cost by 1 if there's any matching polyominoes on board
+                if( color != "white" && game.hasPolyominoOfColorOnBoard( color ) ) cost -= 1; // reduce cost by 1 if there's any matching polyominoes on board
 
                 // see if player can afford polyomino
                 if( cardsOfColor >= cost ) dojo.addClass( polyomino, "usable");
@@ -547,6 +554,7 @@ function (dojo, declare) {
 
         hasPolyominoOfColorOnBoard: function( color )
         {
+
             for( var x = 0; x < this.boardWidth; x++)
             {
                 for( var y = 0; y < this.boardHeight; y++)
@@ -1275,8 +1283,9 @@ function (dojo, declare) {
         { 
 
             var polyominoData = notif.args.polyomino;
+            var polyominoId = `${polyominoData.color}-${polyominoData.squares}_${polyominoData.copy}`;
             dojo.style(
-                `${polyominoData.color}-${polyominoData.squares}_${polyominoData.copy}`, 
+                polyominoId, 
                 "transform", 
                 `rotateY(${polyominoData.flip}deg) rotateZ(${polyominoData.rotation}deg)`
             );
@@ -1284,7 +1293,8 @@ function (dojo, declare) {
             this.placePolyomino( polyominoData );
 
             // handle the new top of stack
-            var newTopOfStack = this.determineTopPolyominoInStack( `${polyominoData.color}-${polyominoData.squares}`);         
+            var stackId = this.getStackIdFromPolyominoId( polyominoId );
+            var newTopOfStack = this.determineTopPolyominoInStack( stackId );         
             if( newTopOfStack != null ) dojo.connect( newTopOfStack, "onclick", this, "onSelectPolyomino" );
 
             if( this.player_id == notif.args.player_id)

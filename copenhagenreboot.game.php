@@ -45,6 +45,7 @@ class CopenhagenReboot extends Table
             "mermaid_card_id" => 11,
             "total_drawable_cards" => 12,
             "drawn_cards" => 13,
+            "coat_of_arms_earned" => 14,
             
             // VARIANTS
             //    "my_first_game_variant" => 100,
@@ -97,6 +98,7 @@ class CopenhagenReboot extends Table
         // INITIALIZE GLOBAL VALUES
         self::setGameStateValue( 'cards_taken_this_turn', 0 );
         self::setGameStateValue( 'drawn_cards', 0 );
+        self::setGameStateValue( 'coat_of_arms_earned', 0 );
 
         // INITIALIZE GAME STATISTICS
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -864,8 +866,14 @@ class CopenhagenReboot extends Table
         );
 
         // TESTING
-        //$this->gamestate->nextState( "placePolyomino" );
-        $this->gamestate->nextState( "coatOfArms" );
+        $coat_of_arms_earned = self::getGameStateValue( 'coat_of_arms_earned' );
+        if( $color != "white" ) $coat_of_arms_earned = +2;
+        else $coat_of_arms_earned -= 1;
+        self::setGameStateValue( 'coat_of_arms_earned', $coat_of_arms_earned );
+
+        if( $coat_of_arms_earned > 0 ) $this->gamestate->nextState( "coatOfArms" );
+        else $this->gamestate->nextState( "placePolyomino" );
+        
     }
 
     
