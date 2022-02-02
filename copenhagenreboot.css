@@ -424,7 +424,7 @@
 #white-1_12{ left: 365px; top: 396px; z-index: 3;}
 
 
-.player_area
+.copen_player_area
 {
     width: 233px;
     position: relative;
@@ -444,7 +444,7 @@
     height: 241px;
 }
 
-#hand.over_max_hand_size
+#hand.copen_over_max_hand_size
 {
     filter:  drop-shadow(0px 0px 5px red);
     curosr:  pointer;

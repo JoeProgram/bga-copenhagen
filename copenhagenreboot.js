@@ -266,7 +266,7 @@ function (dojo, declare) {
             if( args.active_player != this.player_id ) return;
 
 
-            dojo.addClass("hand","over_max_hand_size");
+            dojo.addClass("hand","copen_over_max_hand_size");
 
             var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
             var cardsInHand = this.getChildElementNodes( cardsInHandNode );
@@ -285,7 +285,7 @@ function (dojo, declare) {
 
             if( this.maxHandSizeDiscardHandlers.length > 0 )
             {
-                dojo.removeClass("hand","over_max_hand_size");
+                dojo.removeClass("hand","copen_over_max_hand_size");
                 dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
                 this.splayCardsInHand();
             }

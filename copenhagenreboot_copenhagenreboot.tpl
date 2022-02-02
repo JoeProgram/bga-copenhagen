@@ -82,7 +82,7 @@
             <div id="hand_bottom_card_target"></div>
             <div id="cards_in_hand"></div>
         </div>
-        <div id="owned_player_area" class="player_area">
+        <div id="owned_player_area" class="copen_player_area">
 
             <!-- BEGIN owned -->
             <div id="player_{ID}_playerboard" class="playerboard">
@@ -116,7 +116,7 @@
         <div id="opponent_playerboards">
    
             <!-- BEGIN opponent_playerboard -->
-                <div id="player_area_{ID}" class="player_area">
+                <div id="player_area_{ID}" class="copen_player_area">
 
                     <div id="player_{ID}_playerboard" class="playerboard playerboard_color_{COLOR}">
                         <div class="board_cells">
