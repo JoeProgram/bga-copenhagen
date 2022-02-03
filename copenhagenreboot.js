@@ -121,7 +121,7 @@ function (dojo, declare) {
                 var player = gamedatas.players[player_id];
                          
                 // Setting up players boards if needed
-                var player_score_div = dojo.query(`#player_board_${player_id} .player_score`)[0];
+                var player_score_div = dojo.query(`#player_board_${player_id} .player_score`)[0];  // doesn't use copen_wrapper - part of bga UI
                 dojo.place( this.format_block(
                     'jstpl_player_board', 
                     {hand_size: gamedatas.hand_sizes[player_id], player_id: player_id}
@@ -183,22 +183,20 @@ function (dojo, declare) {
 
             
             // CONNECT INTERACTIVE ELEMENTS
-            dojo.query("#owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPlacePolyomino');
-            dojo.query("#owned_player_area .copen_board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
-            dojo.query("#owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
-            dojo.query("#polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
-            dojo.query("#polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
+            dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPlacePolyomino');
+            dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
+            dojo.query("#copen_wrapper #owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
+            dojo.query("#copen_wrapper #polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
+            dojo.query("#copen_wrapper #polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
             this.determineTopPolyominoInEveryStack();
-            dojo.query("#polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
+            dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
             console.log( "Ending game setup" );
 
-            // DEBUGGING
-            // dojo.query("#deck").connect('onclick',this,`onDebugStuff`);
         },    
 
         ///////////////////////////////////////////////////
@@ -248,7 +246,7 @@ function (dojo, declare) {
             // HANDLE CARDS
             if( args.active_player == this.player_id ) 
             {
-                dojo.query("#harbor_cards .copen_card").addClass("copen_usable");
+                dojo.query("#copen_wrapper #harbor_cards .copen_card").addClass("copen_usable");
             }
 
             // HANDLE POLYOMINOES
@@ -257,9 +255,9 @@ function (dojo, declare) {
 
         onLeavingPlayerTurn()
         {
-            dojo.query(".copen_card.copen_usable").removeClass("copen_usable");
-            dojo.query(".copen_polyomino.copen_usable").removeClass("copen_usable");
-            dojo.query(".copen_polyomino.copen_unusable").removeClass("copen_unusable");
+            dojo.query("#copen_wrapper .copen_card.copen_usable").removeClass("copen_usable");
+            dojo.query("#copen_wrapper .copen_polyomino.copen_usable").removeClass("copen_usable");
+            dojo.query("#copen_wrapper .copen_polyomino.copen_unusable").removeClass("copen_unusable");
         },
 
         onEnteringStateDiscardDownToMaxHandSize( args )
@@ -270,7 +268,7 @@ function (dojo, declare) {
 
             dojo.addClass("hand","copen_over_max_hand_size");
 
-            var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
+            var cardsInHandNode = dojo.query("#copen_wrapper #cards_in_hand")[0]; 
             var cardsInHand = this.getChildElementNodes( cardsInHandNode );
 
             for( var i = 0; i < cardsInHand.length; i++ )
@@ -297,19 +295,19 @@ function (dojo, declare) {
         {
             if( args.active_player == this.player_id )
             {
-                dojo.query("#harbor_cards .copen_card").addClass("copen_unusable");
+                dojo.query("#copen_wrapper #harbor_cards .copen_card").addClass("copen_unusable");
 
                 for( var i = 0; i < args.args.adjacent_card_ids.length; i++)
                 {
-                    dojo.query(`#card_${args.args.adjacent_card_ids[i]}`).removeClass("copen_unusable").addClass("copen_usable");
+                    dojo.query(`#copen_wrapper #card_${args.args.adjacent_card_ids[i]}`).removeClass("copen_unusable").addClass("copen_usable");
                 }
             }
         },
 
         onLeavingTakeAdjacentCard()
         {
-            dojo.query(".copen_card.copen_usable").removeClass("copen_usable");
-            dojo.query(".copen_card.copen_unusable").removeClass("copen_unusable");
+            dojo.query("#copen_wrapper .copen_card.copen_usable").removeClass("copen_usable");
+            dojo.query("#copen_wrapper .copen_card.copen_unusable").removeClass("copen_unusable");
         },
 
         onEnteringCoatOfArms( args )
@@ -325,7 +323,7 @@ function (dojo, declare) {
 
         onLeavingCoatOfArms()
         {
-            dojo.query(".copen_polyomino.copen_usable").removeClass("copen_usable");
+            dojo.query("#copen_wrapper .copen_polyomino.copen_usable").removeClass("copen_usable");
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -434,7 +432,7 @@ function (dojo, declare) {
         //   we'll do that when we add the card to the hand
         findPositionForNewCardInHand: function( card )
         {
-            var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
+            var cardsInHandNode = dojo.query("#copen_wrapper #cards_in_hand")[0]; 
             var cardsInHand = this.getChildElementNodes( cardsInHandNode );
 
             var position = 0;
@@ -444,7 +442,7 @@ function (dojo, declare) {
                 var color = this.cardColorOrder[i];
 
                 if( dojo.hasClass( card, color)) return position;
-                position += dojo.query(`#cards_in_hand .${color}`).length; // the copen_ prefix is already in the variable here 
+                position += dojo.query(`#copen_wrapper #cards_in_hand .${color}`).length; // the copen_ prefix is already in the variable here 
             }
 
             return -1; // something went wrong - the card didn't have a color class
@@ -452,7 +450,7 @@ function (dojo, declare) {
 
         splayCardsInHand: function()
         {
-            var cardsInHandNode = dojo.query("#cards_in_hand")[0]; 
+            var cardsInHandNode = dojo.query("#copen_wrapper #cards_in_hand")[0]; 
             var cardsInHand = this.getChildElementNodes( cardsInHandNode );
 
             if( cardsInHand == 0 ) return; // do nothing if we don't have any cards in hand
@@ -470,12 +468,12 @@ function (dojo, declare) {
 
         countColoredCardsInHand: function( color )
         {
-            return dojo.query(`#cards_in_hand .copen_card.copen_${color}_card`).length;
+            return dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card`).length;
         },
 
         hasTooManyCardsInHand: function()
         {
-            return dojo.query("#cards_in_hand .copen_card").length > this.maxHandSize;
+            return dojo.query("#copen_wrapper #cards_in_hand .copen_card").length > this.maxHandSize;
         },
 
 
@@ -483,7 +481,7 @@ function (dojo, declare) {
         {
 
             var game = this;
-            dojo.query(".copen_stack").forEach( function( stackNode ){
+            dojo.query("#copen_wrapper .copen_stack").forEach( function( stackNode ){
                 game.determineTopPolyominoInStack( stackNode.id );
             });
         },
@@ -518,10 +516,7 @@ function (dojo, declare) {
 
         determineTopPolyominoInStack: function( stackId )
         {
-            console.log( "determine top");
-            console.log(`#${stackId} > *:last-child`);
-            var query = dojo.query( `#${stackId} > *:last-child` );
-            console.log( query );
+            var query = dojo.query( `#copen_wrapper #${stackId} > *:last-child` );
             if( query.length == 0 ) return null; // no more polyominoes in this stack
 
             var topOfStackNode = query[0];
@@ -534,7 +529,7 @@ function (dojo, declare) {
 
             var game = this;
 
-            dojo.query(".copen_polyomino.copen_top_of_stack").forEach(function(polyomino)
+            dojo.query("#copen_wrapper .copen_polyomino.copen_top_of_stack").forEach(function(polyomino)
             {
                 // clear previously let classes
                 dojo.removeClass(polyomino, "copen_usable");
@@ -757,8 +752,8 @@ function (dojo, declare) {
 
         clearPreview: function()
         {
-            dojo.query(".copen_preview").removeClass("copen_invalid").removeClass("copen_preview");
-            dojo.query("#polyomino_preview").style("display","none");
+            dojo.query("#copen_wrapper .copen_preview").removeClass("copen_invalid").removeClass("copen_preview");
+            dojo.query("#copen_wrapper #polyomino_preview").style("display","none");
         },
 
         fadeInShadowBox: function()
@@ -767,13 +762,13 @@ function (dojo, declare) {
             dojo.style("shadow_box", "opacity","0"); // note - don't use the (#) pound symbol for this function
             
             // set elements behind the shadow box
-            dojo.query("#harbors").addClass("copen_behind_shadow_box");
-            dojo.query("#deck_cards").addClass("copen_behind_shadow_box");
-            dojo.query("#harbor_cards").addClass("copen_behind_shadow_box");
-            dojo.query("#polyominoes").addClass("copen_behind_shadow_box");  
-            dojo.query("#opponent_playerboards").addClass("copen_behind_shadow_box");  
+            dojo.query("#copen_wrapper #harbors").addClass("copen_behind_shadow_box");
+            dojo.query("#copen_wrapper #deck_cards").addClass("copen_behind_shadow_box");
+            dojo.query("#copen_wrapper #harbor_cards").addClass("copen_behind_shadow_box");
+            dojo.query("#copen_wrapper #polyominoes").addClass("copen_behind_shadow_box");  
+            dojo.query("#copen_wrapper #opponent_playerboards").addClass("copen_behind_shadow_box");  
 
-            dojo.query("#polyomino_placement").style("display","block");
+            dojo.query("#copen_wrapper #polyomino_placement").style("display","block");
 
 
             dojo.animateProperty({
@@ -789,9 +784,9 @@ function (dojo, declare) {
 
         fadeOutShadowBox: function()
         {
-            dojo.query(".copen_behind_shadow_box").removeClass("copen_behind_shadow_box");
+            dojo.query("#copen_wrapper .copen_behind_shadow_box").removeClass("copen_behind_shadow_box");
 
-            dojo.query("#polyomino_placement").style("display","none");
+            dojo.query("#copen_wrapper #polyomino_placement").style("display","none");
 
             dojo.animateProperty({
                 node: "shadow_box",
@@ -807,10 +802,10 @@ function (dojo, declare) {
         {
 
             var polyominoNodeId = `${polyominoData.color}-${polyominoData.squares}_${polyominoData.copy}`;
-            var polyominoNode = dojo.query(`#${polyominoNodeId}`)[0];
+            var polyominoNode = dojo.query(`#copen_wrapper #${polyominoNodeId}`)[0];
             dojo.removeClass(polyominoNode, "copen_top_of_stack");
 
-            var boardCellNode = dojo.query(`#player_${polyominoData.owner}_playerboard .copen_board_cell_${polyominoData.x}_${polyominoData.y}`)[0];
+            var boardCellNode = dojo.query(`#copen_wrapper #player_${polyominoData.owner}_playerboard .copen_board_cell_${polyominoData.x}_${polyominoData.y}`)[0];
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
             var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCell( polyominoNode, boardCellNode );
@@ -890,7 +885,7 @@ function (dojo, declare) {
             // FIND THE GRID CELL AT MINX, MINY BOUNDARY
             var minGridCell = this.getMinGridCell( gridCells );
 
-            var minCellNode = dojo.query(`#owned_player_area #board_cell_${minGridCell.x}_${minGridCell.y}`)[0];
+            var minCellNode = dojo.query(`#copen_wrapper #owned_player_area #board_cell_${minGridCell.x}_${minGridCell.y}`)[0];
             var minCellNodePosition = dojo.position(minCellNode);
 
             // POSITION POLYOMINO AT THAT GRID CELL
@@ -997,7 +992,7 @@ function (dojo, declare) {
 
 
             // prepare polyomino preview for use
-            var polyomino = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
+            var polyomino = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
             dojo.style("polyomino_preview","background-position", dojo.getStyle(polyomino, "background-position"));
             dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
             dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
@@ -1010,7 +1005,7 @@ function (dojo, declare) {
 
             if( this.selectedPolyomino == null ) return;  // make sure a polyomino is selected
 
-            var polyominoNode = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
+            var polyominoNode = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
 
             var flip = this.selectedPolyomino["flip"];  // need to pass this to a local variable to use it in animation scope
 
@@ -1046,7 +1041,7 @@ function (dojo, declare) {
 
             if( this.selectedPolyomino == null ) return;  // make sure a polyomino is selected
 
-            var polyominoNode = dojo.query(`#${this.selectedPolyomino["id"]}`)[0];
+            var polyominoNode = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
 
             var rotation = this.selectedPolyomino["rotation"]; // need to pass this to a local variable to use it in animation scope
 
@@ -1091,7 +1086,7 @@ function (dojo, declare) {
             if( !validity )
             {
                 gridCells.forEach( function(cell, index){
-                    var query = dojo.query(`#owned_player_area #board_cell_${cell.x}_${cell.y}`); // the backticks here are for "template literals" - in case I forget javascript has those
+                    var query = dojo.query(`#copen_wrapper #owned_player_area #board_cell_${cell.x}_${cell.y}`); // the backticks here are for "template literals" - in case I forget javascript has those
                     query.addClass("copen_preview").addClass("copen_invalid");
                 });    
             }
@@ -1101,7 +1096,7 @@ function (dojo, declare) {
                 
                 dojo.style("polyomino_preview","display","block"); // have to display node before placing it - or we can't get the height of it correctly for htmlPlacement
 
-                var polyominoPreviewNode = dojo.query("#polyomino_preview")[0];
+                var polyominoPreviewNode = dojo.query("#copen_wrapper #polyomino_preview")[0];
                 var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCells( polyominoPreviewNode, gridCells );
 
                 this.slideToObjectPos( "polyomino_preview",htmlPlacement.minCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 0).play(); // use this instead of placeOnObjectPos, as I placeOnObjectPos does centering I don't want
@@ -1128,7 +1123,7 @@ function (dojo, declare) {
 
             // RECONNECT THE CLICK
             //   I tried connecting with dojo.connect() directly, but couldn't get it to work.             
-            dojo.query( `#${this.selectedPolyomino.id}`).connect("onclick",this,"onSelectPolyomino");
+            dojo.query( `#copen_wrapper #${this.selectedPolyomino.id}`).connect("onclick",this,"onSelectPolyomino");
 
             this.selectedPolyomino = null;
             this.fadeOutShadowBox();
@@ -1252,7 +1247,7 @@ function (dojo, declare) {
             }
 
 
-            if( notif.args.mermaid_card == "deck" && dojo.query("small_mermaid_card").length > 0)
+            if( notif.args.mermaid_card == "deck" && dojo.query("#copen_wrapper small_mermaid_card").length > 0)
             {
                 this.slideToObjectAndDestroy( "small_mermaid_card", "deck");
             } 
