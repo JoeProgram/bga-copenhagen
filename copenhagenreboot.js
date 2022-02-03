@@ -47,6 +47,8 @@ function (dojo, declare) {
 
             this.whitePolyominosPerStack = 3;
 
+            this.log_replace_keys = ['log_polyomino']; // keys in the log that we do post-processing on
+
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
                 "purple-3":[{x:0,y:0},{x:1,y:0},{x:2,y:0}],
@@ -1298,7 +1300,62 @@ function (dojo, declare) {
         notif_updateScore: function(notif)
         {
             this.scoreCtrl[ notif.args.player_id ].toValue( notif.args.score );
-        }
+        },
+
+
+
+        // SCRIPT FOR PUTTING PICTURES IN LOG
+        // from: https://en.doc.boardgamearena.com/BGA_Studio_Cookbook#Inject_images_and_styled_html_in_the_log
+        /* @Override */
+        format_string_recursive : function(log, args) {
+
+            console.log( "format string recursive");
+            console.log( log );
+            console.log( args );
+
+            try {
+                if (log && args && !args.processed) {
+                    args.processed = true;
+                    
+                    for ( var i in this.log_replace_keys) {
+
+                        var key = this.log_replace_keys[i];
+                        if(key in args)  // only replace key if it's present
+                        {  
+                            args[key] = this.postProcessLogKey(key, args); 
+                        }                           
+                    }
+
+                }
+            } catch (e) {
+                console.error(log,args,"Exception thrown", e.stack);
+            }
+            return this.inherited(arguments);
+        },
+
+        postProcessLogKey(key, args)
+        {
+            switch(key)
+            {
+                case 'log_polyomino':
+                    return this.postProcessLogPolyomino( key, args );
+            }
+        },
+
+        postProcessLogPolyomino( key, args )
+        {
+
+            var color = args[key].split("-")[0];
+            var squares = args[key].split("-")[1];
+
+            return this.format_block('jstpl_log_polyomino',{
+                color: color,
+                squares: squares,                
+            }); 
+        },
+
+
+
 
    });             
 });

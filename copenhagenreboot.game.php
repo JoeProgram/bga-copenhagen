@@ -416,18 +416,12 @@ class CopenhagenReboot extends Table
         // NOTE: In PHP, array assignment creates a copy of the array, so it's not going to corrupt the original
         $shape = $this->polyomino_shapes["$color-$squares"];
 
-        self::warn("getTransformedShape - input");
-        self::warn( json_encode($shape));
-
         while( $rotation > 0)
         {
             $shape = $this->rotatePolyominoShape( $shape );
             $rotation -= 90;
         }
         if( $flip == 180) $shape = $this->flipPolyominoShape( $shape );
-
-        self::warn("getTransformedShape - output");
-        self::warn( json_encode($shape));
 
         return $shape;
     }
@@ -436,9 +430,6 @@ class CopenhagenReboot extends Table
     {
         for( $i = 0; $i < count($polyominoShape); $i++)
         {
-
-            self::warn("rotatePolyominoShape");
-            self::warn( json_encode($polyominoShape[$i]));
 
             $polyominoShape[$i] = array( 
                 "x" => $polyominoShape[$i]["y"], 
@@ -604,6 +595,20 @@ class CopenhagenReboot extends Table
         }
 
         return $windows_only ? 4 : 2;
+    }
+
+    function calculateTieBreaker()
+    {
+        $players = self::loadPlayersBasicInfos();
+
+        foreach( $players as $player_id => $player)
+        {
+
+            // SQL NOTE - you can't test equality with NULL in SQL with an equals sign.  You have to use "IS NULL" instead of "= NULL", but the equals won't throw an error.
+            $empty_cells = self::getObjectListFromDB( "SELECT id FROM board_cell WHERE owner ='$player_id' AND fill IS NULL;");
+            $empty_cells_count = -count($empty_cells);
+            $this->DbQuery("UPDATE player SET player_score_aux='$empty_cells_count' WHERE player_id='$player_id'");
+        }
     }
 
 
@@ -880,13 +885,22 @@ class CopenhagenReboot extends Table
             
             $this->cards->moveCards( $discard_ids, "discard");
         }
+        $discarded_card_count = count($discard_ids);
+
+        // DIFFERENT MESSAGES FOR NORMAL AND WHITE TILES
+        $notifyPlayerMessage = clienttranslate('${player_name} discarded ${discarded_card_count} cards and placed ${log_polyomino}.');
+        if( $discarded_card_count == 1) $notifyPlayerMessage = clienttranslate('${player_name} discarded ${discarded_card_count} card and placed ${log_polyomino}.');
+        else if( $color == "white") $notifyPlayerMessage = clienttranslate('${player_name} placed ${log_polyomino}.');
+        
 
         // NOTIFY CLIENTS
         self::notifyAllPlayers( 
             "placePolyomino", 
-            clienttranslate('${player_name} placed a facade tile.'),
+            $notifyPlayerMessage,
             array(
                 "player_name" => self::getActivePlayerName(),
+                "discarded_card_count" => $discarded_card_count, 
+                "log_polyomino" => "$color-$squares",
 
                 "player_id" => $player_id,
                 "polyomino" => array(
@@ -904,7 +918,6 @@ class CopenhagenReboot extends Table
                 "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
             )   
         );
-
 
 
         if( $coat_of_arms_earned > 0 ) $this->gamestate->nextState( "coatOfArms" );
@@ -1001,7 +1014,12 @@ class CopenhagenReboot extends Table
             )   
         );
 
-        if( $this->cards->getCard($mermaid_card_id)["location"] == "harbor") $this->gamestate->nextState("endGame"); // end game if we draw mermaid card
+        if( $this->cards->getCard($mermaid_card_id)["location"] == "harbor")
+        {
+            // END GAME IF WE DRAW THE MERMAID CARD
+            $this->calculateTieBreaker();
+            $this->gamestate->nextState("endGame"); 
+        } 
         else $this->gamestate->nextState("nextPlayer");
     }
 

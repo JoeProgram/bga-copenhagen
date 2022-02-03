@@ -169,6 +169,9 @@ var jstpl_player_board = '<div class="copen_hand_size_wrapper">' +
                             '</div>' + 
                         '</div>';
 
+
+var jstpl_log_polyomino = '<div class="copen_log_polyomino copen_${color}-${squares}"></div>';
+ 
 </script>  
 
 {OVERALL_GAME_FOOTER}
