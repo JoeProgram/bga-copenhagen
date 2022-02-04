@@ -174,8 +174,7 @@
     top: 112px;
 
     width:  477px;
-    height:  370px;
-    
+    height:  370px;   
 }
 
 .copen_polyomino
@@ -596,6 +595,21 @@
     display: inline-block;
 }
 
+#ability_tile_stacks
+{
+
+    display:  block;
+    width:  477px;
+    height:  43px;
+
+    position: absolute;
+    top: 505px;
+
+    text-align: left;
+
+   
+}
+
 .copen_ability_tile_area
 {
     margin-top: 5px;
@@ -603,10 +617,12 @@
 
 .copen_ability_tile
 {
-    /*background-image: url('img/tiles.png'); temp taken out*/
+    display: inline-block;
     width: 43px;
     height: 43px;
-    display: inline-block;
+    /*background-image: url('img/tiles.png');*/
+    position:  absolute;
+    
 }
 
 .copen_ability_tile.copen_any_cards{
@@ -614,17 +630,41 @@
 }
 
 .copen_ability_tile.copen_additional_card{
-        background-position: -145.5px 0px;
+    background-position: -145.5px 0px;
 }
+
+#additional_card_1{ left: 0px; top: 0px; }
+#additional_card_2{ left: 2px; top: -2px; }
+#additional_card_3{ left: 4px; top: -4px; }
+#additional_card_4{ left: 6px; top: -6px; }
+
 .copen_ability_tile.copen_construction_discount{
         background-position: -97px 0px;
 }
+
+#construction_discount_1{ left: 51px; top: 0px; }
+#construction_discount_2{ left: 53px; top: -2px; }
+#construction_discount_3{ left: 55px; top: -4px; }
+#construction_discount_4{ left: 57px; top: -6px; }
+
 .copen_ability_tile.copen_change_of_colors{
         background-position: -48.5px 0px;
 }
+
+#change_of_colors_1{ left: 102px; top: 0px; }
+#change_of_colors_2{ left: 104px; top: -2px; }
+#change_of_colors_3{ left: 106px; top: -4px; }
+#change_of_colors_4{ left: 108px; top: -6px; }
+
 .copen_ability_tile.copen_both_actions{
         background-position: 0px 0px;
 }
+
+#both_actions_1{ left: 151px; top: 0px; }
+#both_actions_2{ left: 153px; top: -2px; }
+#both_actions_3{ left: 155px; top: -4px; }
+#both_actions_4{ left: 157px; top: -6px; }
+
 
 #shadow_box{
     display:  block;

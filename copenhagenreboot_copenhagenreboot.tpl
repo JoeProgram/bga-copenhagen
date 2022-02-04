@@ -78,6 +78,33 @@
 
         </div>
 
+        <div id="ability_tile_stacks">
+            <div id="ability_tile_stack_additional_card">
+                <div id="additional_card_1" class="copen_ability_tile copen_additional_card"></div>
+                <div id="additional_card_2" class="copen_ability_tile copen_additional_card"></div>
+                <div id="additional_card_3" class="copen_ability_tile copen_additional_card"></div>
+                <div id="additional_card_4" class="copen_ability_tile copen_additional_card"></div>
+            </div>
+            <div id="ability_tile_stack_construction_discount">
+                <div id="construction_discount_1" class="copen_ability_tile copen_construction_discount"></div>
+                <div id="construction_discount_2" class="copen_ability_tile copen_construction_discount"></div>
+                <div id="construction_discount_3" class="copen_ability_tile copen_construction_discount"></div>
+                <div id="construction_discount_4" class="copen_ability_tile copen_construction_discount"></div>
+            </div>
+            <div id="ability_tile_stack_change_of_colors">
+                <div id="change_of_colors_1" class="copen_ability_tile copen_change_of_colors"></div>
+                <div id="change_of_colors_2" class="copen_ability_tile copen_change_of_colors"></div>
+                <div id="change_of_colors_3" class="copen_ability_tile copen_change_of_colors"></div>
+                <div id="change_of_colors_4" class="copen_ability_tile copen_change_of_colors"></div>
+            </div>
+            <div id="ability_tile_stack_both_actions">
+                <div id="both_actions_1" class="copen_ability_tile copen_both_actions"></div>
+                <div id="both_actions_2" class="copen_ability_tile copen_both_actions"></div>
+                <div id="both_actions_3" class="copen_ability_tile copen_both_actions"></div>
+                <div id="both_actions_4" class="copen_ability_tile copen_both_actions"></div>
+            </div>
+        </div>
+
         <div id="hand">
             <div id="hand_bottom_card_target"></div>
             <div id="cards_in_hand"></div>
