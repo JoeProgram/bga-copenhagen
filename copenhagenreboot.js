@@ -203,7 +203,8 @@ function (dojo, declare) {
                 else dojo.place( abilityTileHtml, `copen_ability_slot_${abilityTile.ability_name}_${abilityTile.owner}` );
             }
 
-
+            // TOOLTIPS
+            this.updateSpecialAbilityTooltips();
             
             // CONNECT INTERACTIVE ELEMENTS
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPlacePolyomino');
@@ -351,8 +352,10 @@ function (dojo, declare) {
         onLeavingCoatOfArms()
         {
             dojo.query("#copen_wrapper .copen_polyomino.copen_usable").removeClass("copen_usable");
+            dojo.query("#copen_wrapper .copen_polyomino.copen_unusable").removeClass("copen_unusable");
 
             dojo.query("#copen_wrapper .copen_ability_tile.copen_usable").removeClass("copen_usable");
+            dojo.query("#copen_wrapper .copen_ability_tile.copen_unusable").removeClass("copen_unusable");
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -442,6 +445,18 @@ function (dojo, declare) {
             if( numberCardsInDeck == 0 ) dojo.style("deck","display","none");
             else dojo.style("deck","display","block");
             this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in deck"), "");
+        },
+
+        // REAPPLY TOOLTIPS TO SPECIAL ABILITIES
+        //  since we re-parent special ability tokens - that means nodes get destroyed and recreated
+        //  which means we need to hook up the tooltips to the new nodes
+        updateSpecialAbilityTooltips: function()
+        {
+            this.addTooltipToClass('copen_any_cards', _("Any cards"), "");
+            this.addTooltipToClass('copen_additional_card', _("Additional card"), "");
+            this.addTooltipToClass('copen_construction_discount', _("Construction Dicount"), "");
+            this.addTooltipToClass('copen_change_of_colors', _("Change of colors"), "");
+            this.addTooltipToClass('copen_both_actions', _("Both actions"), "");
         },
 
         makeHarborCard: function( cardData )
@@ -1370,13 +1385,15 @@ function (dojo, declare) {
             var abilityTileId = `${notif.args.ability_name}-${notif.args.copy}`;
             var parentId =  `copen_ability_slot_${notif.args.ability_name}_${notif.args.player_id}`;
 
-
             this.attachToNewParent( abilityTileId, parentId );
             this.slideToObject( abilityTileId, parentId, 500  ).play();
 
             // CONNECT THE NEXT ABILITY TILE IN THE STACK TO CLICK EVENT
             dojo.query(`#copen_wrapper #ability_tile_stack_${notif.args.ability_name} .copen_ability_tile:last-child`).connect( 'onclick', this, 'onTakeAbilityTile');
             
+            // REAPPLY TOOLTIPS
+            this.updateSpecialAbilityTooltips();
+
         },
 
 
