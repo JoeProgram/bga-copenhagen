@@ -79,30 +79,10 @@
         </div>
 
         <div id="ability_tile_stacks">
-            <div id="ability_tile_stack_additional_card">
-                <div id="additional_card_1" class="copen_ability_tile copen_additional_card"></div>
-                <div id="additional_card_2" class="copen_ability_tile copen_additional_card"></div>
-                <div id="additional_card_3" class="copen_ability_tile copen_additional_card"></div>
-                <div id="additional_card_4" class="copen_ability_tile copen_additional_card"></div>
-            </div>
-            <div id="ability_tile_stack_construction_discount">
-                <div id="construction_discount_1" class="copen_ability_tile copen_construction_discount"></div>
-                <div id="construction_discount_2" class="copen_ability_tile copen_construction_discount"></div>
-                <div id="construction_discount_3" class="copen_ability_tile copen_construction_discount"></div>
-                <div id="construction_discount_4" class="copen_ability_tile copen_construction_discount"></div>
-            </div>
-            <div id="ability_tile_stack_change_of_colors">
-                <div id="change_of_colors_1" class="copen_ability_tile copen_change_of_colors"></div>
-                <div id="change_of_colors_2" class="copen_ability_tile copen_change_of_colors"></div>
-                <div id="change_of_colors_3" class="copen_ability_tile copen_change_of_colors"></div>
-                <div id="change_of_colors_4" class="copen_ability_tile copen_change_of_colors"></div>
-            </div>
-            <div id="ability_tile_stack_both_actions">
-                <div id="both_actions_1" class="copen_ability_tile copen_both_actions"></div>
-                <div id="both_actions_2" class="copen_ability_tile copen_both_actions"></div>
-                <div id="both_actions_3" class="copen_ability_tile copen_both_actions"></div>
-                <div id="both_actions_4" class="copen_ability_tile copen_both_actions"></div>
-            </div>
+            <div id="ability_tile_stack_additional_card"></div>
+            <div id="ability_tile_stack_construction_discount"></div>
+            <div id="ability_tile_stack_change_of_colors"></div>
+            <div id="ability_tile_stack_both_actions"></div>
         </div>
 
         <div id="hand">
@@ -125,13 +105,15 @@
 
                 
             </div>
+            <!-- BEGIN owned_ability_tile_area -->
             <div class="copen_ability_tile_area">
-                <div class="copen_ability_tile copen_any_cards"></div>
-                <div class="copen_ability_tile copen_additional_card"></div>
-                <div class="copen_ability_tile copen_construction_discount"></div>
-                <div class="copen_ability_tile copen_change_of_colors"></div>
-                <div class="copen_ability_tile copen_both_actions"></div>
+                <div id="copen_ability_slot_any_cards_{ID}" class="copen_ability_slot copen_ability_slot_any_cards"></div>
+                <div id="copen_ability_slot_additional_card_{ID}" class="copen_ability_slot copen_ability_slot_additional_card"></div>
+                <div id="copen_ability_slot_construction_discount_{ID}" class="copen_ability_slot copen_ability_slot_construction_discount"></div>
+                <div id="copen_ability_slot_change_of_colors_{ID}" class="copen_ability_slot copen_ability_slot_change_of_colors"></div>
+                <div id="copen_ability_slot_both_actions_{ID}" class="copen_ability_slot copen_ability_slot_both_actions"></div>
             </div>
+            <!-- END owned_ability_tile_area -->
         </div>
 
               
@@ -156,11 +138,11 @@
                     </div>
 
                     <div class="copen_ability_tile_area">
-                        <div class="copen_ability_tile copen_any_cards"></div>
-                        <div class="copen_ability_tile copen_additional_card"></div>
-                        <div class="copen_ability_tile copen_construction_discount"></div>
-                        <div class="copen_ability_tile copen_change_of_colors"></div>
-                        <div class="copen_ability_tile copen_both_actions"></div>
+                        <div id="copen_ability_slot_any_cards_{ID}"  class="copen_ability_slot copen_ability_slot_any_cards"></div>
+                        <div id="copen_ability_slot_additional_card_{ID}"  class="copen_ability_slot copen_ability_slot_additional_card"></div>
+                        <div id="copen_ability_slot_construction_discount_{ID}"  class="copen_ability_slot copen_ability_slot_construction_discount"></div>
+                        <div id="copen_ability_slot_change_of_colors_{ID}"  class="copen_ability_slot copen_ability_slot_change_of_colors"></div>
+                        <div id="copen_ability_slot_both_actions_{ID}"  class="copen_ability_slot copen_ability_slot_both_actions"></div> 
                     </div>
                 </div>
             <!-- END opponent_playerboard -->
@@ -198,6 +180,8 @@ var jstpl_player_board = '<div class="copen_hand_size_wrapper">' +
 
 
 var jstpl_log_polyomino = '<div class="copen_log_polyomino copen_${color}-${squares}"></div>';
+
+var jstpl_ability_tile='<div id="${ability_name}_${copy}" class="copen_ability_tile copen_${ability_name}"></div>';
  
 </script>  
 

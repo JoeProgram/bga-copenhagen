@@ -613,14 +613,33 @@
 .copen_ability_tile_area
 {
     margin-top: 5px;
+
+    display: block;
+    height:  43px;
+
+    text-align: left;
+
 }
+
+.copen_ability_slot
+{
+    display: inline-block; 
+    width:  43px;
+    height: 43px;  
+}
+
+.copen_ability_slot_any_cards{}
+.copen_ability_slot_additional_card{}
+.copen_ability_slot_construction_discount{}
+.copen_ability_slot_change_of_colors{}
+.copen_ability_slot_both_actions{}
 
 .copen_ability_tile
 {
     display: inline-block;
     width: 43px;
     height: 43px;
-    /*background-image: url('img/tiles.png');*/
+    background-image: url('img/tiles.png');
     position:  absolute;
     
 }

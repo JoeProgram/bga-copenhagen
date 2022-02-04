@@ -181,6 +181,29 @@ function (dojo, declare) {
                 }
             }
 
+            // ABILITY TILES
+            for( var abilityTileId in gamedatas.ability_tiles)
+            {
+                console.log( abilityTileId);
+
+                var abilityTile = gamedatas.ability_tiles[ abilityTileId ];
+
+
+                console.log( abilityTile);
+
+                var abilityTileHtml = this.format_block('jstpl_ability_tile',{   
+                    ability_name: abilityTile.ability,   
+                    copy: abilityTile.copy,            
+                }); 
+
+                console.log( abilityTileHtml);
+                console.log( abilityTile.owner );
+
+                if( abilityTile.owner == null )  dojo.place( abilityTileHtml, `ability_tile_stack_${abilityTile.ability}` );
+                else dojo.place( abilityTileHtml, `copen_ability_slot_any_cards_${abilityTile.owner}` );
+            }
+
+
             
             // CONNECT INTERACTIVE ELEMENTS
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPlacePolyomino');
@@ -570,8 +593,6 @@ function (dojo, declare) {
 
         getPolyominoSquaresFromId: function( polyominoId )
         {
-            console.log("getPolyominoSquaresFromId");
-            console.log( polyominoId);
             return polyominoId.split('-')[1].split('_')[0];
         },
 
@@ -1116,8 +1137,6 @@ function (dojo, declare) {
 
             dojo.style(this.selectedPolyomino.id, "transform", "rotateY(0deg) rotateZ(0deg)");
 
-            console.log( `stack Id is ${stackId}`);
-
             this.attachToNewParent( this.selectedPolyomino["id"], stackId);
             this.slideToObjectPos( this.selectedPolyomino["id"], stackId, this.selectedPolyomino.originalPosition.l, this.selectedPolyomino.originalPosition.t, 500 ).play();
 
@@ -1303,10 +1322,6 @@ function (dojo, declare) {
         // from: https://en.doc.boardgamearena.com/BGA_Studio_Cookbook#Inject_images_and_styled_html_in_the_log
         /* @Override */
         format_string_recursive : function(log, args) {
-
-            console.log( "format string recursive");
-            console.log( log );
-            console.log( args );
 
             try {
                 if (log && args && !args.processed) {

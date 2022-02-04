@@ -50,3 +50,13 @@ CREATE TABLE IF NOT EXISTS `board_cell` (
 
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ; 
+
+CREATE TABLE IF NOT EXISTS `ability_tile` (
+  `id` tinyint(4) unsigned NOT NULL AUTO_INCREMENT,
+  `owner` int(11) DEFAULT NULL,
+  `ability` varchar(21) NOT NULL,
+  `used` BOOLEAN DEFAULT 0,
+  `copy` tinyint(4) unsigned NOT NULL,
+
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ; 

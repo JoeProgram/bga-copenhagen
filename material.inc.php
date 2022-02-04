@@ -30,9 +30,7 @@ $this->end_of_game_points = 12;
 
 $this->colors = array("red", "yellow", "green", "blue", "purple");
 $this->polyomino_colors = array("red", "yellow", "green", "blue", "purple", "white");
-
 $this->white_polyomino_copies = 12;
-
 
 $this->polyomino_shapes = array(
     "purple-2" => array( array( "x" => 0, "y" => 0, "fill" => "brickwork"), array( "x" => 1, "y" => 0, "fill" => "window"), ),
@@ -72,5 +70,7 @@ $this->adjacent_offsets = array(
 
 $this->coat_of_arms_board_cells = array("2-2","4-4","1-6","3-8");
 $this->coat_of_arms_board_rows = array(1,3,5);
+
+$this->special_ability_pile_names = array( "additional_card","construction_discount","change_of_colors","both_actions");
 
 

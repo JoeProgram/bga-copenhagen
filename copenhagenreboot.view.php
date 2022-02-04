@@ -97,6 +97,12 @@
             'ID' => $current_player_id,
         ));
 
+        // DROP NAME ID - ABILITY AREA
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned_ability_tile_area");
+        $this->page->insert_block( "owned_ability_tile_area", array(
+            'ID' => $current_player_id,
+        ));
+
         // BUILDS CELLS OF PLAYERBOARD
         $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "board_cell");
 

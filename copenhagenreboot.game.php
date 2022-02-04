@@ -197,9 +197,31 @@ class CopenhagenReboot extends Table
         {
             $sql .= "('white', 1, $i),";
         }
-        
         $sql = substr($sql, 0, -1) . ";"; // remove the last comma, replace with a semicolon
         self::DbQuery( $sql );
+        
+        // CREATE SPECIAL ABILITY TILES
+        $sql = "INSERT INTO ability_tile(owner, ability, copy) VALUES ";
+        foreach($this->special_ability_pile_names as $special_ability_name)
+        {
+            for( $i = 1; $i <= count($players); $i++)
+            {
+                $sql .= "(NULL, '$special_ability_name', $i),";
+            }
+        }
+
+        // CREATE ANY TILE SPECIAL ABILITIES
+        //   Each player starts with one
+        $index = 1;
+        foreach( $players as $player_id => $player )
+        {
+            $sql .= "($player_id, 'any_cards', $index),";
+            $index ++;
+        }
+
+        $sql = substr($sql, 0, -1) . ";"; // remove the last comma, replace with a semicolon
+        self::DbQuery( $sql );
+
 
         // Activate first player
         $this->activeNextPlayer();
@@ -242,24 +264,11 @@ class CopenhagenReboot extends Table
 
         $result['playerboards'] = $this->getPlayerboards();
 
-
-
         $sql = "SELECT * FROM polyomino;";
         $result['polyominoes'] = self::getCollectionFromDb( $sql );
 
-        /*
-        // GET THE TOTAL NUMBER OF CARDS THAT WILL APPEAR THIS GAME
-        $number_of_playable_cards = self::DbQuery( "SELECT COUNT(card_id) FROM card WHERE color != 'mermaid'");
-        $total_playable_cards = $number_of_playable_cards;
-        if( $this->getPlayersNumber() > 2 ) $total_playable_cards *= 2;
-
-        // GET THE NUMBER OF CARDS REMAINING
-        $cards_remaining = $this->cards->countCardInLocation( "deck "); 
-
-        $mermaid_card_id = self::getGameStateValue( "mermaid_card_id" );
-        if( $this->card->getCard( $mermaid_card_id )["location"] ) $cards_remaining += $number_of_playable_cards;
-
-        $percentage = ($cards_remaining * 100.0)/ $total_playable_cards;*/
+        $sql = "SELECT * FROM ability_tile;";
+        $result['ability_tiles'] = self::getCollectionFromDb( $sql );
 
         return $result;
     }
