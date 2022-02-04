@@ -201,7 +201,7 @@ class CopenhagenReboot extends Table
         self::DbQuery( $sql );
         
         // CREATE SPECIAL ABILITY TILES
-        $sql = "INSERT INTO ability_tile(owner, ability, copy) VALUES ";
+        $sql = "INSERT INTO ability_tile(owner, ability_name, copy) VALUES ";
         foreach($this->special_ability_pile_names as $special_ability_name)
         {
             for( $i = 1; $i <= count($players); $i++)
@@ -938,9 +938,21 @@ class CopenhagenReboot extends Table
     {
         
         $player_id = self::getActivePlayerId();
-        //TODO - SERVER VALIDATION
 
-        $sql = "UPDATE ability_tile SET owner = $player_id WHERE ability = '$ability_name' AND copy = $copy;";
+        // MAKE SURE IT EXISTS
+        $sql = "SELECT owner FROM ability_tile WHERE ability_name = '$ability_name' AND copy = $copy;";  
+        $ability_tile = self::getObjectFromDB( $sql );
+        if( $ability_tile == null ) throw new feException( self::_("That ability tile doesn't exist."));
+
+        // MAKE SURE ITS UNOWNED
+        if( $ability_tile["owner"] != null ) throw new feException( self::_("That ability tile has already been taken by a player."));
+
+        // MAKE SURE YOU DON'T ALREADY HAVE ONE
+        $sql = "SELECT id FROM ability_tile WHERE ability_name = '$ability_name' AND owner = $player_id;";
+        $already_owned_tile = self::getObjectFromDB( $sql );
+        if( $already_owned_tile != null ) throw new feException( self::_("You already own a special ability tile with that ability."));
+
+        $sql = "UPDATE ability_tile SET owner = $player_id WHERE ability_name = '$ability_name' AND copy = $copy;";
         self::DbQuery( $sql );
 
         self::notifyAllPlayers( 

@@ -192,15 +192,15 @@ function (dojo, declare) {
                 console.log( abilityTile);
 
                 var abilityTileHtml = this.format_block('jstpl_ability_tile',{   
-                    ability_name: abilityTile.ability,   
+                    ability_name: abilityTile.ability_name,   
                     copy: abilityTile.copy,            
                 }); 
 
                 console.log( abilityTileHtml);
                 console.log( abilityTile.owner );
 
-                if( abilityTile.owner == null )  dojo.place( abilityTileHtml, `ability_tile_stack_${abilityTile.ability}` );
-                else dojo.place( abilityTileHtml, `copen_ability_slot_${abilityTile.ability}_${abilityTile.owner}` );
+                if( abilityTile.owner == null )  dojo.place( abilityTileHtml, `ability_tile_stack_${abilityTile.ability_name}` );
+                else dojo.place( abilityTileHtml, `copen_ability_slot_${abilityTile.ability_name}_${abilityTile.owner}` );
             }
 
 
@@ -936,7 +936,21 @@ function (dojo, declare) {
 
         determineWhichAbilityTilesAreTakeable: function()
         {
-            dojo.query("#copen_wrapper .copen_ability_tile_stack .copen_ability_tile:last-child").addClass("copen_usable");
+            var game = this;
+            dojo.query("#copen_wrapper .copen_ability_tile_stack .copen_ability_tile:last-child").forEach(function( abilityTile){
+                var abilityName = abilityTile.id.split('-')[0];
+
+                console.log("determineWhichAbilityTilesAreTakeable");
+                console.log( abilityName);
+
+                if( !game.ownsAbility(abilityName) ) dojo.addClass( abilityTile, "copen_usable" );
+                else dojo.addClass( abilityTile, "copen_unusable" );
+            });
+        },
+
+        ownsAbility: function( ability_name )
+        {
+            return dojo.query(`#copen_wrapper #owned_player_area .copen_${ability_name}`).length > 0;
         },
 
         ///////////////////////////////////////////////////
@@ -1203,7 +1217,12 @@ function (dojo, declare) {
         {
             dojo.stopEvent( event );
 
-            //TODO CLIENT SIDE VALIDATION
+            // CHECK THEY DON'T ALREADY HAVE ONE
+            if( dojo.hasClass(event.currentTarget, "copen_unusable"))
+            {
+                this.showMessage( _("You already own that ability"), 'error' );
+                return;
+            } 
 
             // SEND SERVER REQUEST
             if( this.checkAction('takeAbilityTile'))
@@ -1354,6 +1373,10 @@ function (dojo, declare) {
 
             this.attachToNewParent( abilityTileId, parentId );
             this.slideToObject( abilityTileId, parentId, 500  ).play();
+
+            // CONNECT THE NEXT ABILITY TILE IN THE STACK TO CLICK EVENT
+            dojo.query(`#copen_wrapper #ability_tile_stack_${notif.args.ability_name} .copen_ability_tile:last-child`).connect( 'onclick', this, 'onTakeAbilityTile');
+            
         },
 
 
