@@ -166,6 +166,13 @@
     filter:  drop-shadow(0px 0px 5px red);
 }
 
+.copen_activated,
+.copen_activated:hover
+{
+    filter:  drop-shadow(0px 0px 5px blue);
+}
+
+
 #polyominoes
 {
     display:  block;
@@ -645,12 +652,17 @@
     
 }
 
+.copen_used_ability
+{
+    background-position-y: -49px;    
+}
+
 .copen_ability_tile.copen_any_cards{
-    background-position: -194px 0px;
+    background-position-x: -194px;
 }
 
 .copen_ability_tile.copen_additional_card{
-    background-position: -145.5px 0px;
+    background-position-x: -145.5px;
 }
 
 .copen_ability_tile_stack #additional_card-1{ left: 0px; top: 0px; }
@@ -659,7 +671,7 @@
 .copen_ability_tile_stack #additional_card-4{ left: 6px; top: -6px; }
 
 .copen_ability_tile.copen_construction_discount{
-        background-position: -97px 0px;
+        background-position-x: -97px;
 }
 
 .copen_ability_tile_stack #construction_discount-1{ left: 51px; top: 0px; }
@@ -668,7 +680,7 @@
 .copen_ability_tile_stack #construction_discount-4{ left: 57px; top: -6px; }
 
 .copen_ability_tile.copen_change_of_colors{
-        background-position: -48.5px 0px;
+        background-position-x: -48.5px;
 }
 
 .copen_ability_tile_stack #change_of_colors-1{ left: 102px; top: 0px; }
@@ -677,7 +689,7 @@
 .copen_ability_tile_stack #change_of_colors-4{ left: 108px; top: -6px; }
 
 .copen_ability_tile.copen_both_actions{
-        background-position: 0px 0px;
+        background-position-x: 0px;
 }
 
 .copen_ability_tile_stack #both_actions-1{ left: 151px; top: 0px; }

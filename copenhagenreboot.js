@@ -49,6 +49,8 @@ function (dojo, declare) {
 
             this.log_replace_keys = ['log_polyomino']; // keys in the log that we do post-processing on
 
+            this.activated_abilities = [];
+
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
                 "purple-3":[{x:0,y:0},{x:1,y:0},{x:2,y:0}],
@@ -184,23 +186,18 @@ function (dojo, declare) {
             // ABILITY TILES
             for( var abilityTileId in gamedatas.ability_tiles)
             {
-                console.log( abilityTileId);
-
                 var abilityTile = gamedatas.ability_tiles[ abilityTileId ];
-
-
-                console.log( abilityTile);
 
                 var abilityTileHtml = this.format_block('jstpl_ability_tile',{   
                     ability_name: abilityTile.ability_name,   
                     copy: abilityTile.copy,            
                 }); 
 
-                console.log( abilityTileHtml);
-                console.log( abilityTile.owner );
+                var abilityTileNode = null;
+                if( abilityTile.owner == null )  abilityTileNode = dojo.place( abilityTileHtml, `ability_tile_stack_${abilityTile.ability_name}` );
+                else abilityTileNode = dojo.place( abilityTileHtml, `copen_ability_slot_${abilityTile.ability_name}_${abilityTile.owner}` );
 
-                if( abilityTile.owner == null )  dojo.place( abilityTileHtml, `ability_tile_stack_${abilityTile.ability_name}` );
-                else dojo.place( abilityTileHtml, `copen_ability_slot_${abilityTile.ability_name}_${abilityTile.owner}` );
+                if( abilityTile.used == 1 ) dojo.addClass(abilityTileNode, "copen_used_ability");
             }
 
             // TOOLTIPS
@@ -217,6 +214,8 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
 
             dojo.query("#copen_wrapper .copen_ability_tile_stack .copen_ability_tile:last-child").connect( 'onclick', this, 'onTakeAbilityTile');
+
+            dojo.query("#copen_wrapper #owned_player_area .copen_any_cards").connect( 'onclick', this, 'onActivateAbilityAnyCards');
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -321,12 +320,16 @@ function (dojo, declare) {
         {
             if( args.active_player == this.player_id )
             {
-                dojo.query("#copen_wrapper #harbor_cards .copen_card").addClass("copen_unusable");
 
+                // MARK WHICH CARDS ARE USABLE
+                dojo.query("#copen_wrapper #harbor_cards .copen_card").addClass("copen_unusable");
                 for( var i = 0; i < args.args.adjacent_card_ids.length; i++)
                 {
                     dojo.query(`#copen_wrapper #card_${args.args.adjacent_card_ids[i]}`).removeClass("copen_unusable").addClass("copen_usable");
                 }
+
+                // MARK WHICH OWNED ABILITIES ARE USABLE
+                dojo.query("#copen_wrapper #owned_player_area .copen_any_cards:not(.copen_used_ability)").addClass("copen_usable");
             }
         },
 
@@ -963,9 +966,21 @@ function (dojo, declare) {
             });
         },
 
-        ownsAbility: function( ability_name )
+        ownsAbility: function( abilityName )
         {
-            return dojo.query(`#copen_wrapper #owned_player_area .copen_${ability_name}`).length > 0;
+            return dojo.query(`#copen_wrapper #owned_player_area .copen_${abilityName}`).length > 0;
+        },
+
+        deactivateUsedAbilities: function( usedAbilities, playerId)
+        {
+
+            usedAbilities.forEach( function(usedAbility)
+            {
+                dojo.query(`#copen_wrapper #copen_ability_slot_${usedAbility}_${playerId} .copen_${usedAbility}`)
+                    .removeClass("copen_activated")
+                    .removeClass("copen_usable")
+                    .addClass("copen_used_ability");
+            });
         },
 
         ///////////////////////////////////////////////////
@@ -1009,6 +1024,7 @@ function (dojo, declare) {
                     this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeAdjacentCard.html",
                     {
                         card_id:event.currentTarget.id.split("_")[1],
+                        is_using_ability_any_cards: this.activated_abilities.includes("any_cards"),
                     }, this, function( result ){} ); 
                 }
             }
@@ -1254,6 +1270,20 @@ function (dojo, declare) {
             }
         },
 
+        onActivateAbilityAnyCards: function( event )
+        {
+            if( this.stateName != "takeAdjacentCard") return;
+            if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+
+            // SET ABILITY AS ACTIVATED IN CLIENT
+            dojo.addClass( event.currentTarget, "copen_activated");
+            this.activated_abilities.push("any_cards");
+
+            // SHOW ALL CARDS SELECTABLE
+            dojo.query("#copen_wrapper #harbor_cards .copen_card.copen_unusable").removeClass("copen_unusable").addClass("copen_usable");
+
+        },
+
         
         ///////////////////////////////////////////////////
         //// Reaction to cometD notifications
@@ -1311,6 +1341,8 @@ function (dojo, declare) {
             // UPDATE CARD AMOUNT UI
             dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
 
+            // DEACTIVATE ANY USED UP ABILITIES
+            this.deactivateUsedAbilities( notif.args.used_abilities, notif.args.player_id);
 
         },
 

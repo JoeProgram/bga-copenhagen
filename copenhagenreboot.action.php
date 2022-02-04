@@ -56,7 +56,8 @@
         self::setAjaxMode();  
 
         $card_id = self::getArg( "card_id", AT_posint, true );
-        $this->game->takeAdjacentCard( $card_id );
+        $is_using_ability_any_cards = self::getArg( "is_using_ability_any_cards", AT_bool, true );
+        $this->game->takeAdjacentCard( $card_id, $is_using_ability_any_cards );
 
         self::ajaxResponse(); 
     }

@@ -655,6 +655,8 @@ class CopenhagenReboot extends Table
         $drawn_cards = self::getGameStateValue( "drawn_cards" );
         self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );        
 
+        $used_abilities = [];
+
         self::notifyAllPlayers( 
             "takeCard", 
             clienttranslate('${player_name} takes a ${color} card.'),
@@ -664,13 +666,14 @@ class CopenhagenReboot extends Table
                 "player_name" => self::getActivePlayerName(),
                 "color" => $card["type"],
                 "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
+                "used_abilities" => $used_abilities,
             )   
         );
 
         $this->gamestate->nextState( "takeCard");
     }
 
-     function takeAdjacentCard( $card_id )
+     function takeAdjacentCard( $card_id, $is_using_ability_any_cards )
     {
         self::checkAction( 'takeCard' );
 
@@ -691,17 +694,35 @@ class CopenhagenReboot extends Table
         $empty_harbors = $this->getEmptyHarbors();
         if( count($empty_harbors) > 1 ) throw new feException( self::_("You have more than one empty harbor."));
 
-        // MAKE SURE TAKEN CARD IS ADJACENT TO PREVIOUSLY TAKEN CARD
-        $is_adjacent = $empty_harbors[0] + 1 == $card["location_arg"] || $empty_harbors[0] - 1 == $card["location_arg"];
-        if( ! $is_adjacent) throw new feException( self::_("You're trying to take a card that's not adjacent to the first taken card."));
+        // IF WE'RE USING A SPECIAL ABILITY, MAKE SURE WE HAVE IT
+        $any_cards_ability_tile = null;
+        if( $is_using_ability_any_cards )
+        {
+            $any_cards_ability_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = 'any_cards' AND owner = $player_id AND used = 0;");
+            if( $any_cards_ability_tile == null ) throw new feException( self::_("You're trying to use the 'Any cards' ability when you can't."));
+        }
 
+        // MAKE SURE TAKEN CARD IS ADJACENT TO PREVIOUSLY TAKEN CARD, OR WE'RE USING THE SPECIAL ABILITY
+        $is_adjacent = $empty_harbors[0] + 1 == $card["location_arg"] || $empty_harbors[0] - 1 == $card["location_arg"];
+        if( !$is_adjacent && !$is_using_ability_any_cards) throw new feException( self::_("You're trying to take a card that's not adjacent to the first taken card."));
+
+
+        // VALIDATION CLEARED - UPDATE DB
         $this->cards->moveCard( $card_id, "hand", $player_id );
 
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
         self::setGameStateValue( 'cards_taken_this_turn', $cards_taken_this_turn + 1 );
 
         $drawn_cards = self::getGameStateValue( "drawn_cards" );
-        self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );   
+        self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );  
+
+        // USE UP ANY USED ABILITIES
+        $used_abilities = [];
+        if( $is_using_ability_any_cards )
+        {
+            self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'any_cards' AND owner = $player_id");
+            $used_abilities[] = "any_cards";
+        } 
 
         self::notifyAllPlayers( 
             "takeCard", 
@@ -712,6 +733,7 @@ class CopenhagenReboot extends Table
                 "player_name" => self::getActivePlayerName(),
                 "color" => $card["type"],
                 "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
+                "used_abilities" => $used_abilities,
             )   
         );
 
