@@ -88,6 +88,18 @@
         self::ajaxResponse(); 
     }
 
+    public function takeAbilityTile()
+    {
+        self::setAjaxMode();  
+
+        $ability_name = self::getArg( "ability_name", AT_alphanum, true );
+        $copy = $copy = self::getArg( "copy", AT_posint, true );
+
+        $this->game->takeAbilityTile( $ability_name, $copy );
+
+        self::ajaxResponse(); 
+    }
+
   }
   
 

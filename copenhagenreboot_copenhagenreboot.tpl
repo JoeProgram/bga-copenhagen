@@ -79,10 +79,10 @@
         </div>
 
         <div id="ability_tile_stacks">
-            <div id="ability_tile_stack_additional_card"></div>
-            <div id="ability_tile_stack_construction_discount"></div>
-            <div id="ability_tile_stack_change_of_colors"></div>
-            <div id="ability_tile_stack_both_actions"></div>
+            <div id="ability_tile_stack_additional_card" class="copen_ability_tile_stack"></div>
+            <div id="ability_tile_stack_construction_discount" class="copen_ability_tile_stack"></div>
+            <div id="ability_tile_stack_change_of_colors" class="copen_ability_tile_stack"></div>
+            <div id="ability_tile_stack_both_actions" class="copen_ability_tile_stack"></div>
         </div>
 
         <div id="hand">
@@ -181,7 +181,7 @@ var jstpl_player_board = '<div class="copen_hand_size_wrapper">' +
 
 var jstpl_log_polyomino = '<div class="copen_log_polyomino copen_${color}-${squares}"></div>';
 
-var jstpl_ability_tile='<div id="${ability_name}_${copy}" class="copen_ability_tile copen_${ability_name}"></div>';
+var jstpl_ability_tile='<div id="${ability_name}-${copy}" class="copen_ability_tile copen_${ability_name}"></div>';
  
 </script>  
 

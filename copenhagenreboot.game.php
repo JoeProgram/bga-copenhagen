@@ -931,9 +931,39 @@ class CopenhagenReboot extends Table
 
         if( $coat_of_arms_earned > 0 ) $this->gamestate->nextState( "coatOfArms" );
         else $this->gamestate->nextState( "placePolyomino" );
-        
+
     }
 
+    function takeAbilityTile( $ability_name, $copy)
+    {
+        
+        $player_id = self::getActivePlayerId();
+        //TODO - SERVER VALIDATION
+
+        $sql = "UPDATE ability_tile SET owner = $player_id WHERE ability = '$ability_name' AND copy = $copy;";
+        self::DbQuery( $sql );
+
+        self::notifyAllPlayers( 
+            "takeAbilityTile", 
+            "Player took an ability tile",
+            array(
+                "player_name" => self::getActivePlayerName(),
+                "player_id" => $player_id,
+                "ability_name" => $ability_name,
+                "copy" => $copy,
+            )   
+        );
+
+
+        // COAT OF ARMS
+        $coat_of_arms_earned = self::getGameStateValue( 'coat_of_arms_earned' );
+        $coat_of_arms_earned -= 1;
+        self::setGameStateValue( 'coat_of_arms_earned', $coat_of_arms_earned );
+
+        if( $coat_of_arms_earned > 0 ) $this->gamestate->nextState( "coatOfArms" );
+        else $this->gamestate->nextState( "nextPlayer" );
+
+    }
     
 //////////////////////////////////////////////////////////////////////////////
 //////////// Game state arguments

@@ -200,7 +200,7 @@ function (dojo, declare) {
                 console.log( abilityTile.owner );
 
                 if( abilityTile.owner == null )  dojo.place( abilityTileHtml, `ability_tile_stack_${abilityTile.ability}` );
-                else dojo.place( abilityTileHtml, `copen_ability_slot_any_cards_${abilityTile.owner}` );
+                else dojo.place( abilityTileHtml, `copen_ability_slot_${abilityTile.ability}_${abilityTile.owner}` );
             }
 
 
@@ -214,6 +214,8 @@ function (dojo, declare) {
 
             this.determineTopPolyominoInEveryStack();
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
+
+            dojo.query("#copen_wrapper .copen_ability_tile_stack .copen_ability_tile:last-child").connect( 'onclick', this, 'onTakeAbilityTile');
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -342,11 +344,15 @@ function (dojo, declare) {
             {
                 dojo.addClass( polyomino, "copen_usable");
             });
+
+            this.determineWhichAbilityTilesAreTakeable();
         },
 
         onLeavingCoatOfArms()
         {
             dojo.query("#copen_wrapper .copen_polyomino.copen_usable").removeClass("copen_usable");
+
+            dojo.query("#copen_wrapper .copen_ability_tile.copen_usable").removeClass("copen_usable");
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -928,6 +934,11 @@ function (dojo, declare) {
             return {htmlX:0, htmlY:htmlY };
         },
 
+        determineWhichAbilityTilesAreTakeable: function()
+        {
+            dojo.query("#copen_wrapper .copen_ability_tile_stack .copen_ability_tile:last-child").addClass("copen_usable");
+        },
+
         ///////////////////////////////////////////////////
         //// Player's action
         
@@ -1188,6 +1199,27 @@ function (dojo, declare) {
             }
         },
 
+        onTakeAbilityTile: function( event )
+        {
+            dojo.stopEvent( event );
+
+            //TODO CLIENT SIDE VALIDATION
+
+            // SEND SERVER REQUEST
+            if( this.checkAction('takeAbilityTile'))
+            {
+
+                var ability_name = event.currentTarget.id.split("-")[0];
+                var copy = event.currentTarget.id.split("-")[1];
+
+                this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeAbilityTile.html",
+                {
+                    ability_name: ability_name,
+                    copy: copy,
+                }, this, function( result ){} ); 
+            }
+        },
+
         
         ///////////////////////////////////////////////////
         //// Reaction to cometD notifications
@@ -1214,6 +1246,9 @@ function (dojo, declare) {
 
             dojo.subscribe( 'placePolyomino', this, 'notif_placePolyomino' );
             this.notifqueue.setSynchronous( 'placePolyomino', 500 );
+
+            dojo.subscribe( 'takeAbilityTile', this, 'notif_takeAbilityTile' );
+            this.notifqueue.setSynchronous( 'takeAbilityTile', 500 );
 
             dojo.subscribe( 'updateScore', this, 'notif_updateScore' );
             this.notifqueue.setSynchronous( 'updateScore', 500 );
@@ -1310,6 +1345,17 @@ function (dojo, declare) {
             dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
             
         },
+
+        notif_takeAbilityTile: function(notif)
+        {
+            var abilityTileId = `${notif.args.ability_name}-${notif.args.copy}`;
+            var parentId =  `copen_ability_slot_${notif.args.ability_name}_${notif.args.player_id}`;
+
+
+            this.attachToNewParent( abilityTileId, parentId );
+            this.slideToObject( abilityTileId, parentId, 500  ).play();
+        },
+
 
         notif_updateScore: function(notif)
         {

@@ -626,6 +626,7 @@
     display: inline-block; 
     width:  43px;
     height: 43px;  
+    position: relative;
 }
 
 .copen_ability_slot_any_cards{}
@@ -652,37 +653,37 @@
     background-position: -145.5px 0px;
 }
 
-#additional_card_1{ left: 0px; top: 0px; }
-#additional_card_2{ left: 2px; top: -2px; }
-#additional_card_3{ left: 4px; top: -4px; }
-#additional_card_4{ left: 6px; top: -6px; }
+.copen_ability_tile_stack #additional_card-1{ left: 0px; top: 0px; }
+.copen_ability_tile_stack #additional_card-2{ left: 2px; top: -2px; }
+.copen_ability_tile_stack #additional_card-3{ left: 4px; top: -4px; }
+.copen_ability_tile_stack #additional_card-4{ left: 6px; top: -6px; }
 
 .copen_ability_tile.copen_construction_discount{
         background-position: -97px 0px;
 }
 
-#construction_discount_1{ left: 51px; top: 0px; }
-#construction_discount_2{ left: 53px; top: -2px; }
-#construction_discount_3{ left: 55px; top: -4px; }
-#construction_discount_4{ left: 57px; top: -6px; }
+.copen_ability_tile_stack #construction_discount-1{ left: 51px; top: 0px; }
+.copen_ability_tile_stack #construction_discount-2{ left: 53px; top: -2px; }
+.copen_ability_tile_stack #construction_discount-3{ left: 55px; top: -4px; }
+.copen_ability_tile_stack #construction_discount-4{ left: 57px; top: -6px; }
 
 .copen_ability_tile.copen_change_of_colors{
         background-position: -48.5px 0px;
 }
 
-#change_of_colors_1{ left: 102px; top: 0px; }
-#change_of_colors_2{ left: 104px; top: -2px; }
-#change_of_colors_3{ left: 106px; top: -4px; }
-#change_of_colors_4{ left: 108px; top: -6px; }
+.copen_ability_tile_stack #change_of_colors-1{ left: 102px; top: 0px; }
+.copen_ability_tile_stack #change_of_colors-2{ left: 104px; top: -2px; }
+.copen_ability_tile_stack #change_of_colors-3{ left: 106px; top: -4px; }
+.copen_ability_tile_stack #change_of_colors-4{ left: 108px; top: -6px; }
 
 .copen_ability_tile.copen_both_actions{
         background-position: 0px 0px;
 }
 
-#both_actions_1{ left: 151px; top: 0px; }
-#both_actions_2{ left: 153px; top: -2px; }
-#both_actions_3{ left: 155px; top: -4px; }
-#both_actions_4{ left: 157px; top: -6px; }
+.copen_ability_tile_stack #both_actions-1{ left: 151px; top: 0px; }
+.copen_ability_tile_stack #both_actions-2{ left: 153px; top: -2px; }
+.copen_ability_tile_stack #both_actions-3{ left: 155px; top: -4px; }
+.copen_ability_tile_stack #both_actions-4{ left: 157px; top: -6px; }
 
 
 #shadow_box{

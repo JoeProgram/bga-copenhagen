@@ -138,11 +138,11 @@ $machinestates = array(
 
     8 => array(
         "name" => "coatOfArms",
-        "description" => clienttranslate('${actplayer} must place a special facade tile'),
-        "descriptionmyturn" => clienttranslate('${you} must place a special facade tile'),
+        "description" => clienttranslate('${actplayer} must place a special facade tile or ability tile'),
+        "descriptionmyturn" => clienttranslate('${you} must place a special facade tile or ability tile'),
         "type" => "activeplayer",
-        "possibleactions" => array( "placePolyomino", "coatOfArms" ),
-        "transitions" => array( "placePolyomino" => 7, "coatOfArms" => 8 ),
+        "possibleactions" => array( "placePolyomino", "coatOfArms", "takeAbilityTile" ),
+        "transitions" => array( "placePolyomino" => 7, "coatOfArms" => 8, "nextPlayer" => 2 ),
     ), 
 
     50 => array(
