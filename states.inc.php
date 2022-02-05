@@ -62,7 +62,7 @@ $machinestates = array(
     ),
     
     // Note: ID=2 => your first state
-    // NEXT UNUSED STATE: 10 
+    // NEXT UNUSED STATE: 11
 
     2 => array(
         "name" => "nextPlayer",
@@ -100,6 +100,15 @@ $machinestates = array(
         "possibleactions" => array( "takeCard", ),
         "transitions" => array(  "checkHandSize" => 4 )
     ), 
+
+    10 => array(
+        "name" => "takeCardsLastCall",
+        "description" => clienttranslate('${actplayer} may use special ability tiles.'),
+        "descriptionmyturn" => clienttranslate('${you} may use special ability tiles.'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "activateAbilityAdditionalCard", "endTurn" ),
+        "transitions" => array(  "takeAdditionalCard" => 9, "refillHarbor" => 50 )
+    ), 
     
     4 => array(
         "name" => "checkHandSize",
@@ -110,6 +119,7 @@ $machinestates = array(
             "takeAdjacentCard" => 5,
             "takeAdditionalCard" => 9,
             "discardDownToMaxHandSize" => 6,
+            "takeCardsLastCall" => 10,
             "refillHarbor" => 50
          ),
     ), 
@@ -126,6 +136,7 @@ $machinestates = array(
             "takeAdjacentCard" => 5,
             "takeAdditionalCard" => 9,
             "discardDownToMaxHandSize" => 6,
+            "takeCardsLastCall" => 10,
             "refillHarbor" => 50
         )
     ), 

@@ -395,9 +395,12 @@ class CopenhagenReboot extends Table
     //  Multiple functions need to figure out which one to send the game to next
     function getNextTakeCardsState()
     {
+        $player_id = self::getActivePlayerId();
 
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
         $is_using_ability_additional_card = self::getGameStateValue( "ability_activated_additional_card" );
+
+        $has_additional_card_ability_available = self::getObjectFromDB("SELECT id FROM ability_tile WHERE ability_name = 'additional_card' AND OWNER = $player_id AND used = 0") != null;
 
         if( $cards_taken_this_turn == 1 )
         {
@@ -405,7 +408,11 @@ class CopenhagenReboot extends Table
         }
         else if( $is_using_ability_additional_card && $cards_taken_this_turn == 2)
         {
-            return"takeAdditionalCard";
+            return "takeAdditionalCard";
+        }
+        else if( $has_additional_card_ability_available && $cards_taken_this_turn == 2)
+        {
+            return "takeCardsLastCall";
         }
         else return "refillHarbor";        
 
@@ -1154,6 +1161,15 @@ class CopenhagenReboot extends Table
         // NOTIFICATION
         $this->notifyPlayerOfActivatedAbility("additional_card", $player_id, $player_name);
 
+        // SPECIAL - if we're in last call, change state to use the ability right away
+        if( $this->getStateName() == "takeCardsLastCall") $this->gamestate->nextState( "takeAdditionalCard" );
+
+    }
+
+    function endTurn()
+    {
+        self::checkAction( 'endTurn' );
+        $this->gamestate->nextState( "refillHarbor" );
     }
     
 //////////////////////////////////////////////////////////////////////////////

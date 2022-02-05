@@ -277,6 +277,10 @@ function (dojo, declare) {
                     this.onEnteringTakeAdditionalCard( args );
                     break;
 
+                case 'takeCardsLastCall':
+                    this.onEnteringTakeCardsLastCall( args );
+                    break;
+
                 case 'coatOfArms':
                     this.onEnteringCoatOfArms( args );
                     break;
@@ -385,7 +389,22 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper .copen_card.copen_usable").removeClass("copen_usable");
             dojo.query("#copen_wrapper .copen_card.copen_unusable").removeClass("copen_unusable");
 
-        },        
+        },   
+
+        onEnteringTakeCardsLastCall( args )
+        {
+            if( args.active_player == this.player_id )
+            {
+                this.setAbilityAsUsable( "additional_card");
+                this.addActionButton( 'end_turn', _("End Turn"), "onEndTurn", null, false, "red");
+
+            }
+        },
+
+        onLeavingTakeCardsLastCall()
+        {
+
+        },      
 
         onEnteringCoatOfArms( args )
         {
@@ -430,9 +449,13 @@ function (dojo, declare) {
                     this.onLeavingTakeAdjacentCard();
                     break;
 
-               case 'takeAdditionalCard':
+                case 'takeAdditionalCard':
                     this.onLeavingTakeAdditionalCard();
-                    break;                    
+                    break;      
+
+                case 'takeCardsLastCall':
+                    this.onLeavingTakeCardsLastCall();
+                    break;               
 
                 case 'coatOfArms':
                     this.onLeavingCoatOfArms();
@@ -1352,6 +1375,17 @@ function (dojo, declare) {
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
 
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityAdditionalCard.html",
+            {
+            }, this, function( result ){} ); 
+
+        },
+
+        onEndTurn: function( event )
+        {
+
+            if( !this.checkAction('endTurn')) return;
+
+            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/endTurn.html",
             {
             }, this, function( result ){} ); 
 
