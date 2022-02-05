@@ -1349,6 +1349,9 @@ function (dojo, declare) {
         notif_takeCard: function(notif)
         {
 
+            console.log("take card notif");
+            console.log( notif );
+
             // IF ITS YOUR CARD
             if( notif.args.player_id == this.player_id )
             {

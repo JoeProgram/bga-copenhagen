@@ -41,10 +41,10 @@ class CopenhagenReboot extends Table
         self::initGameStateLabels( array(
 
             // GLOBAL VARIABLES 
-            "cards_taken_this_turn" => 10,  // keep track of how many cards have been taken this turn.  10 is not the value to track - just an internal ID
+            "cards_taken_this_turn" => 10,  // keep track of how many cards have been taken this turn. 
             "mermaid_card_id" => 11,
             "total_drawable_cards" => 12,
-            "drawn_cards" => 13,
+            "drawn_cards" => 13,            // keep track of total cards drawn this game, for progression purposes
             "coat_of_arms_earned" => 14,
             
             // VARIANTS
@@ -298,7 +298,10 @@ class CopenhagenReboot extends Table
 //////////// Utility functions
 ////////////    
 
-
+    function getStateName() {
+        $state = $this->gamestate->state();
+        return $state['name'];
+    }
 
     function getStartingCardsForPlayerNumber( $player_number, $player_count )
     {
@@ -620,6 +623,68 @@ class CopenhagenReboot extends Table
         }
     }
 
+    // SEE IF ABILITY IS IN LIST
+    function checkAbilityIsPossible( $ability_name, $possible_abilities )
+    {
+        foreach( $possible_abilities as $possible_ability) if( $possible_ability["ability_name"] == $ability_name) return true;
+        return false;
+    }
+
+    function getValidatedHarborCard( $card_id )
+    {
+        // MAKE SURE CARD EXISTS
+        $card = $this->cards->getCard( $card_id );
+        if($card == NULL ) throw new feException( self::_("That card does not exist.")); 
+
+        // MAKE SURE CARD IS IN HARBOR
+        if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
+
+        return $card;
+    }
+
+    function givePlayerCard( $player_id, $card_id)
+    {
+        $this->cards->moveCard( $card_id, "hand", $player_id );
+
+        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+        self::setGameStateValue( 'cards_taken_this_turn', $cards_taken_this_turn + 1 );
+
+        $drawn_cards = self::getGameStateValue( "drawn_cards" );
+        self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );  
+    }
+
+    function notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name)
+    {
+        foreach( $used_abilities as $used_ability)
+        {
+            self::notifyAllPlayers(
+                "usedAbility",
+                clienttranslate('${player_name} used ${log_ability_tile}'),
+                array(
+                    "player_id" => $player_id,
+                    "player_name" => $player_name,
+                    "log_ability_tile" => $used_ability,
+                    "used_ability" => $used_ability,
+                )
+            );
+        }
+    }
+
+    function notifyPlayersOfTakenCard( $card_id, $color, $player_id, $player_name)
+    {
+        self::notifyAllPlayers( 
+            "takeCard", 
+            clienttranslate('${player_name} takes a ${color} card.'),
+            array(
+                "card_id" => $card_id,
+                "player_id" => $player_id,
+                "player_name" => $player_name,
+                "color" => $color,
+                "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
+            )   
+        );
+    }
+
 
 //////////////////////////////////////////////////////////////////////////////
 //////////// Player actions
@@ -635,99 +700,55 @@ class CopenhagenReboot extends Table
         self::checkAction( 'takeCard' );
 
         $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
+
+        // VALIDATION
 
         // CAN'T HAVE TAKEN ANY CARDS THIS TURN
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
         if ($cards_taken_this_turn != 0 ) throw new feException( self::_("You've already taken your first card this turn."));
 
-        // MAKE SURE CARD EXISTS
-        $card = $this->cards->getCard( $card_id );
-        if($card == NULL ) throw new feException( self::_("That card does not exist.")); 
+        $card = $this->getValidatedHarborCard( $card_id );
 
-        // MAKE SURE CARD IS IN HARBOR
-        if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
+        // UPDATE DATA
+        $this->givePlayerCard( $player_id, $card_id);
+        $this->notifyPlayersOfTakenCard( $card_id, $card["type"], $player_id, $player_name );
 
-        $this->cards->moveCard( $card_id, "hand", $player_id );
-
-        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
-        self::setGameStateValue( 'cards_taken_this_turn', $cards_taken_this_turn + 1 );
-
-        $drawn_cards = self::getGameStateValue( "drawn_cards" );
-        self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );        
-
-        $used_abilities = [];
-
-        foreach( $used_abilities as $used_ability)
-        {
-            self::notifyAllPlayers(
-                "usedAbility",
-                clienttranslate('${player_name} used ${log_ability_tile}'),
-                array(
-                    "player_id" => $player_id,
-                    "player_name" => self::getActivePlayerName(),
-                    "log_ability_tile" => $used_ability,
-                    "used_ability" => $used_ability,
-                )
-            );
-        }
-
-        self::notifyAllPlayers( 
-            "takeCard", 
-            clienttranslate('${player_name} takes a ${color} card.'),
-            array(
-                "card_id" => $card_id,
-                "player_id" => $player_id,
-                "player_name" => self::getActivePlayerName(),
-                "color" => $card["type"],
-                "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
-            )   
-        );
-
-        $this->gamestate->nextState( "takeCard");
+        $this->gamestate->nextState( "checkHandSize");
     }
 
-     function takeAdjacentCard( $card_id, $is_using_ability_any_cards )
+    function takeAdjacentCard( $card_id, $is_using_ability_any_cards )
     {
         self::checkAction( 'takeCard' );
 
         $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
 
-        // MUST HAVE TAKEN 1 CARD ALREADY
-        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
-        if ($cards_taken_this_turn != 1 ) throw new feException( self::_("You're trying to take your second card before your first."));
-
-        // MAKE SURE CARD EXISTS
-        $card = $this->cards->getCard( $card_id );
-        if($card == NULL ) throw new feException( self::_("That card does not exist.")); 
-
-        // MAKE SURE CARD IS IN HARBOR
-        if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
+        // VALIDATION
+        $card = $this->getValidatedHarborCard( $card_id );
 
         // MAKE SURE WE ONLY HAVE 1 EMPTY HARBOR
         $empty_harbors = $this->getEmptyHarbors();
         if( count($empty_harbors) > 1 ) throw new feException( self::_("You have more than one empty harbor."));
 
+        // TODO- MAKE SURE CARD IS BESIDE EMPTY HARBOR SLOT
+
         // IF WE'RE USING A SPECIAL ABILITY, MAKE SURE WE HAVE IT
-        $any_cards_ability_tile = null;
-        if( $is_using_ability_any_cards )
-        {
-            $any_cards_ability_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = 'any_cards' AND owner = $player_id AND used = 0;");
-            if( $any_cards_ability_tile == null ) throw new feException( self::_("You're trying to use the 'Any cards' ability when you can't."));
-        }
+        //$any_cards_ability_tile = null;
+        //if( $is_using_ability_any_cards )
+        //{
+        //    $any_cards_ability_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = 'any_cards' AND owner = $player_id AND used = 0;");
+        //    if( $any_cards_ability_tile == null ) throw new feException( self::_("You're trying to use the 'Any cards' ability when you can't."));
+        //}
 
-        // MAKE SURE TAKEN CARD IS ADJACENT TO PREVIOUSLY TAKEN CARD, OR WE'RE USING THE SPECIAL ABILITY
-        $is_adjacent = $empty_harbors[0] + 1 == $card["location_arg"] || $empty_harbors[0] - 1 == $card["location_arg"];
-        if( !$is_adjacent && !$is_using_ability_any_cards) throw new feException( self::_("You're trying to take a card that's not adjacent to the first taken card."));
+        // MUST HAVE TAKEN 1 CARD ALREADY
+        //$cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+        //if ($cards_taken_this_turn != 1 ) throw new feException( self::_("You're trying to take your second card before your first."));
 
 
-        // VALIDATION CLEARED - UPDATE DB
-        $this->cards->moveCard( $card_id, "hand", $player_id );
+        // UPDATE DATA
+        $this->givePlayerCard( $player_id, $card_id);
 
-        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
-        self::setGameStateValue( 'cards_taken_this_turn', $cards_taken_this_turn + 1 );
-
-        $drawn_cards = self::getGameStateValue( "drawn_cards" );
-        self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );  
 
         // USE UP ANY USED ABILITIES
         $used_abilities = [];
@@ -736,34 +757,11 @@ class CopenhagenReboot extends Table
             self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'any_cards' AND owner = $player_id");
             $used_abilities[] = "any_cards";
         } 
+        if( count($used_abilities) > 0) $this->notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name );
 
-        foreach( $used_abilities as $used_ability)
-        {
-            self::notifyAllPlayers(
-                "usedAbility",
-                clienttranslate('${player_name} used ${log_ability_tile}'),
-                array(
-                    "player_id" => $player_id,
-                    "player_name" => self::getActivePlayerName(),
-                    "log_ability_tile" => $used_ability,
-                    "used_ability" => $used_ability,
-                )
-            );
-        }
+        $this->notifyPlayersOfTakenCard( $card_id, $card["type"], $player_id, $player_name );
 
-        self::notifyAllPlayers( 
-            "takeCard", 
-            clienttranslate('${player_name} takes a ${color} card.'),
-            array(
-                "card_id" => $card_id,
-                "player_id" => $player_id,
-                "player_name" => self::getActivePlayerName(),
-                "color" => $card["type"],
-                "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
-            )   
-        );
-
-        $this->gamestate->nextState( "takeCard");
+        $this->gamestate->nextState( "checkHandSize");
     }
 
     function discardDownToMaxHandSize( $card_id )
