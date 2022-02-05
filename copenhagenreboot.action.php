@@ -124,6 +124,13 @@
         self::ajaxResponse(); 
     }
 
+    public function activateAbilityBothActions()
+    {
+        self::setAjaxMode();  
+        $this->game->activateAbilityBothActions();
+        self::ajaxResponse(); 
+    }
+
     public function endTurn()
     {
         self::setAjaxMode();  

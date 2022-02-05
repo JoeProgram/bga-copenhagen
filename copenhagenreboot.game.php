@@ -399,8 +399,10 @@ class CopenhagenReboot extends Table
 
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
         $is_using_ability_additional_card = self::getGameStateValue( "ability_activated_additional_card" );
+        $is_using_ability_both_actions = self::getGameStateValue( "ability_activated_both_actions" );
 
         $has_additional_card_ability_available = self::getObjectFromDB("SELECT id FROM ability_tile WHERE ability_name = 'additional_card' AND OWNER = $player_id AND used = 0") != null;
+        $has_both_actions_ability_available = self::getObjectFromDB("SELECT id FROM ability_tile WHERE ability_name = 'both_actions' AND OWNER = $player_id AND used = 0") != null;
 
         if( $cards_taken_this_turn == 1 )
         {
@@ -410,7 +412,11 @@ class CopenhagenReboot extends Table
         {
             return "takeAdditionalCard";
         }
-        else if( $has_additional_card_ability_available && $cards_taken_this_turn == 2)
+        else if( $is_using_ability_both_actions && $cards_taken_this_turn >= 2 )
+        {
+            return "placePolyominoAfterTakingCards";
+        }
+        else if( ($has_additional_card_ability_available || $has_both_actions_ability_available) && $cards_taken_this_turn == 2)
         {
             return "takeCardsLastCall";
         }
@@ -709,8 +715,11 @@ class CopenhagenReboot extends Table
 
     function validateActivatedAbility( $ability_name, $player_id)
     {
-        $already_owned_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = '$ability_name' AND owner = $player_id AND used = 0;");
-        if( $already_owned_tile == null ) throw new feException( self::_("You can't activate that special ability."));
+        self::warn("validateActivatedAbility");
+        self::warn("SELECT * FROM ability_tile WHERE ability_name = '$ability_name' AND owner = $player_id AND used = 0;");
+
+        $ability_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = '$ability_name' AND owner = $player_id AND used = 0;");
+        if( $ability_tile == null ) throw new feException( self::_("You can't activate that special ability."));
 
         $activated = self::getGameStateValue( "ability_activated_" . $ability_name );
         if( $activated == 1 ) throw new feException( self::_("You've already activated that special ability."));
@@ -1166,6 +1175,28 @@ class CopenhagenReboot extends Table
 
     }
 
+    function activateAbilityBothActions()
+    {
+
+        self::checkAction( 'activateAbilityBothActions' );
+
+        $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
+
+        // VALIDATION
+        $this->validateActivatedAbility( "both_actions", $player_id);
+
+        // UPDATE DATA
+        self::setGameStateValue( 'ability_activated_both_actions', 1 );
+
+        // NOTIFICATION
+        $this->notifyPlayerOfActivatedAbility("both_actions", $player_id, $player_name);
+
+        // SPECIAL - if we're in last call, change state to use the ability right away
+        if( $this->getStateName() == "takeCardsLastCall") $this->gamestate->nextState( "placePolyominoAfterTakingCards" );
+
+    }
+
     function endTurn()
     {
         self::checkAction( 'endTurn' );
@@ -1237,6 +1268,19 @@ class CopenhagenReboot extends Table
         $this->gamestate->nextState( $state_name );        
     }
 
+    // USE UP THE SPECIAL ABILITY TILE
+    //   even though this is a player action, we can use an "st" action to 
+    //   prepare the data for the player's turn - in this case using up the special action tile.
+    function stPlacePolyominoAfterTakingCards()
+    {
+        $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
+
+        $used_abilities = ["both_actions"];
+        self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'both_actions' AND owner = $player_id"); 
+        $this->notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name );
+    }
+
 
 
     function stRefillHarbor()
@@ -1300,7 +1344,7 @@ class CopenhagenReboot extends Table
             )   
         );
 
-        if( $points < $this->end_of_game_points ) $this->gamestate->nextState("nextPlayer");
+        if( $points < $this->end_of_game_points ) $this->gamestate->nextState("refillHarbor");
         else $this->gamestate->nextState("endGame"); 
     }
 

@@ -62,7 +62,7 @@ $machinestates = array(
     ),
     
     // Note: ID=2 => your first state
-    // NEXT UNUSED STATE: 11
+    // NEXT UNUSED STATE: 12
 
     2 => array(
         "name" => "nextPlayer",
@@ -78,7 +78,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} must take a card or place a facade tile.'),
         "descriptionmyturn" => clienttranslate('${you} must take a card or place a facade tile.'),
         "type" => "activeplayer",
-        "possibleactions" => array( "takeCard", "placePolyomino", "coatOfArms", "activateAbilityAnyCards", "activateAbilityAdditionalCard" ),
+        "possibleactions" => array( "takeCard", "placePolyomino", "coatOfArms", "activateAbilityAnyCards", "activateAbilityAdditionalCard", "activateAbilityBothActions" ),
         "transitions" => array(  "checkHandSize" => 4, "placePolyomino" => 7, "coatOfArms" => 8 )
     ), 
 
@@ -88,7 +88,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} must take another card.'),
         "descriptionmyturn" => clienttranslate('${you} must take another card next to the one you just took.'),
         "type" => "activeplayer",
-        "possibleactions" => array( "takeCard", "activateAbilityAnyCards", "activateAbilityAdditionalCard" ),
+        "possibleactions" => array( "takeCard", "activateAbilityAnyCards", "activateAbilityAdditionalCard", "activateAbilityBothActions" ),
         "transitions" => array(  "checkHandSize" => 4 )
     ), 
 
@@ -97,7 +97,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} must take another card.'),
         "descriptionmyturn" => clienttranslate('${you} must take another card.'),
         "type" => "activeplayer",
-        "possibleactions" => array( "takeCard", ),
+        "possibleactions" => array( "takeCard", "activateAbilityBothActions"),
         "transitions" => array(  "checkHandSize" => 4 )
     ), 
 
@@ -106,8 +106,18 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} may use special ability tiles.'),
         "descriptionmyturn" => clienttranslate('${you} may use special ability tiles.'),
         "type" => "activeplayer",
-        "possibleactions" => array( "activateAbilityAdditionalCard", "endTurn" ),
-        "transitions" => array(  "takeAdditionalCard" => 9, "refillHarbor" => 50 )
+        "possibleactions" => array( "activateAbilityAdditionalCard", "activateAbilityBothActions", "endTurn" ),
+        "transitions" => array(  "takeAdditionalCard" => 9, "placePolyominoAfterTakingCards" => 11,  "refillHarbor" => 50 )
+    ), 
+
+    11 => array(
+        "name" => "placePolyominoAfterTakingCards",
+        "action" => "stPlacePolyominoAfterTakingCards",
+        "description" => clienttranslate('${actplayer} may place a facade tile.'),
+        "descriptionmyturn" => clienttranslate('${you} may place a facade tile.'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "placePolyomino", "endTurn"),
+        "transitions" => array(  "placePolyomino" => 7, "coatOfArms" => 8, "refillHarbor" => 50 )
     ), 
     
     4 => array(
@@ -120,6 +130,7 @@ $machinestates = array(
             "takeAdditionalCard" => 9,
             "discardDownToMaxHandSize" => 6,
             "takeCardsLastCall" => 10,
+            "placePolyominoAfterTakingCards" => 11,
             "refillHarbor" => 50
          ),
     ), 
@@ -137,6 +148,7 @@ $machinestates = array(
             "takeAdditionalCard" => 9,
             "discardDownToMaxHandSize" => 6,
             "takeCardsLastCall" => 10,
+            "placePolyominoAfterTakingCards" => 11,
             "refillHarbor" => 50
         )
     ), 
@@ -146,7 +158,7 @@ $machinestates = array(
         "description" => "",
         "type" => "game",
         "action" => "stCalculateScore",
-        "transitions" => array(  "nextPlayer" => 2, "endGame" => 99 )
+        "transitions" => array(  "refillHarbor" => 50, "endGame" => 99 )
     ), 
 
     8 => array(
@@ -154,7 +166,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} must place a special facade tile or ability tile.'),
         "descriptionmyturn" => clienttranslate('${you} must place a special facade tile or ability tile.'),
         "type" => "activeplayer",
-        "possibleactions" => array( "placePolyomino", "coatOfArms", "takeAbilityTile" ),
+        "possibleactions" => array( "placePolyomino", "takeAbilityTile" ),
         "transitions" => array( "placePolyomino" => 7, "coatOfArms" => 8, "nextPlayer" => 2 ),
     ), 
 

@@ -235,6 +235,7 @@ function (dojo, declare) {
 
             dojo.query("#copen_wrapper #owned_player_area .copen_any_cards").connect( 'onclick', this, 'onActivateAbilityAnyCards');
             dojo.query("#copen_wrapper #owned_player_area .copen_additional_card").connect( 'onclick', this, 'onActivateAbilityAdditionalCard');
+            dojo.query("#copen_wrapper #owned_player_area .copen_both_actions").connect( 'onclick', this, 'onActivateAbilityBothActions');
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -281,6 +282,10 @@ function (dojo, declare) {
                     this.onEnteringTakeCardsLastCall( args );
                     break;
 
+               case 'placePolyominoAfterTakingCards':
+                    this.onEnteringPlacePolyominoAfterTakingCards( args );
+                    break;
+
                 case 'coatOfArms':
                     this.onEnteringCoatOfArms( args );
                     break;
@@ -307,6 +312,7 @@ function (dojo, declare) {
             // MARK WHICH OWNED ABILITIES ARE USABLE
             this.setAbilityAsUsable( "any_cards");
             this.setAbilityAsUsable( "additional_card");
+            this.setAbilityAsUsable( "both_actions");
 
         },
 
@@ -363,6 +369,7 @@ function (dojo, declare) {
                 // MARK WHICH OWNED ABILITIES ARE USABLE
                 this.setAbilityAsUsable( "any_cards");
                 this.setAbilityAsUsable( "additional_card");
+                this.setAbilityAsUsable( "both_actions");
 
                 // TRIGGER BEHAVIOR OF ANY PREPARED ABILITIES
                 if( args.args.ability_activated_any_cards == 1) this.triggerAnyCardsAbility();
@@ -381,6 +388,9 @@ function (dojo, declare) {
             if( args.active_player == this.player_id )
             {
                 dojo.query("#copen_wrapper #harbor_cards .copen_card").addClass("copen_usable");
+
+
+                this.setAbilityAsUsable( "both_actions");
             }
         },
 
@@ -396,8 +406,7 @@ function (dojo, declare) {
             if( args.active_player == this.player_id )
             {
                 this.setAbilityAsUsable( "additional_card");
-                this.addActionButton( 'end_turn', _("End Turn"), "onEndTurn", null, false, "red");
-
+                this.setAbilityAsUsable( "both_actions");                
             }
         },
 
@@ -405,6 +414,21 @@ function (dojo, declare) {
         {
 
         },      
+
+        onEnteringPlacePolyominoAfterTakingCards( args )
+        {
+            if( args.active_player == this.player_id )
+            {
+                // HANDLE POLYOMINOES
+                this.determineUsablePolyominoes();
+            }
+        },
+
+        onLeavingPlacePolyominoAfterTakingCards()
+        {
+            dojo.query("#copen_wrapper .copen_polyomino.copen_usable").removeClass("copen_usable");
+            dojo.query("#copen_wrapper .copen_polyomino.copen_unusable").removeClass("copen_unusable");
+        },    
 
         onEnteringCoatOfArms( args )
         {
@@ -455,7 +479,11 @@ function (dojo, declare) {
 
                 case 'takeCardsLastCall':
                     this.onLeavingTakeCardsLastCall();
-                    break;               
+                    break;        
+
+               case 'placePolyominoAfterTakingCards':
+                    this.onLeavingPlacePolyominoAfterTakingCards();
+                    break;       
 
                 case 'coatOfArms':
                     this.onLeavingCoatOfArms();
@@ -486,6 +514,16 @@ function (dojo, declare) {
                 {
 
                 case 'playerTurn':
+                    this.addActionButton( 'cancel_polyomino_placement', _("Cancel"), "onCancelPolyominoPlacement", null, false, "red");
+                    dojo.style("cancel_polyomino_placement","display","none");
+                    break;
+
+                case 'takeCardsLastCall':
+                    this.addActionButton( 'end_turn', _("End Turn"), "onEndTurn", null, false, "red");
+                    break;
+
+                case 'placePolyominoAfterTakingCards':
+                    this.addActionButton( 'end_turn', _("End Turn"), "onEndTurn", null, false, "red");
                     this.addActionButton( 'cancel_polyomino_placement', _("Cancel"), "onCancelPolyominoPlacement", null, false, "red");
                     dojo.style("cancel_polyomino_placement","display","none");
                     break;
@@ -1369,12 +1407,22 @@ function (dojo, declare) {
         onActivateAbilityAdditionalCard: function( event )
         {
 
-            console.log("onActivateAbilityAdditionalCard");
-
             if( !this.checkAction('activateAbilityAdditionalCard')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
 
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityAdditionalCard.html",
+            {
+            }, this, function( result ){} ); 
+
+        },
+
+        onActivateAbilityBothActions: function( event )
+        {
+
+            if( !this.checkAction('activateAbilityBothActions')) return;
+            if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+
+            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityBothActions.html",
             {
             }, this, function( result ){} ); 
 
@@ -1616,6 +1664,10 @@ function (dojo, declare) {
 
         postProcessLogAbilityTile( key, args )
         {
+            console.log("postProcessLogAbilityTile");
+            console.log( key );
+            console.log( args );
+
             return this.format_block('jstpl_log_ability_tile',{
                 log_ability_tile: args[key],               
             }); 
