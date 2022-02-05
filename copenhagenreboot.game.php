@@ -769,7 +769,7 @@ class CopenhagenReboot extends Table
     function discardDownToMaxHandSize( $card_id )
     {
 
-        self::checkAction( 'discardedAndDone' ); // I think I only need to check one of the actions for this particular case
+        self::checkAction( 'discard' ); 
 
         $player_id = self::getActivePlayerId();
         $card = $this->cards->getCard( $card_id ); 
@@ -809,6 +809,9 @@ class CopenhagenReboot extends Table
 
     function placePolyomino( $color, $squares, $copy, $x, $y, $flip, $rotation )
     {
+
+        self::checkAction( 'placePolyomino' );
+
         $player_id = self::getActivePlayerId();
 
         // BASIC INPUT VALIDATION
@@ -985,6 +988,8 @@ class CopenhagenReboot extends Table
     function takeAbilityTile( $ability_name, $copy)
     {
         
+        self::checkAction( 'takeAbilityTile' );
+
         $player_id = self::getActivePlayerId();
 
         // MAKE SURE IT EXISTS

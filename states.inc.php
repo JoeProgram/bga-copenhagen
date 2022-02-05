@@ -118,8 +118,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must discard a card. You can only have 7 cards in hand.'),
         "type" => "activeplayer",
         "possibleactions" => array( 
-            "discardedAndTakeAnother",
-            "discardedAndDone",
+            "discard",
          ),
         "transitions" => array(  
             "discardedAndTakeAnother" => 5,

@@ -1059,7 +1059,7 @@ function (dojo, declare) {
             dojo.stopEvent( event );
 
             // SEND SERVER REQUEST
-            if( this.checkAction('discardedAndDone'))
+            if( this.checkAction('discard'))
             {
 
                 this.ajaxcall( "/copenhagenreboot/copenhagenreboot/discardDownToMaxHandSize.html",
