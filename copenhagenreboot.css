@@ -649,7 +649,15 @@
     height: 43px;
     background-image: url('img/tiles.png');
     position:  absolute;
-    
+}
+
+.copen_log_ability_tile
+{
+    display: inline-block;
+    width: 43px;
+    height: 43px;
+    background-image: url('img/tiles.png');
+    position: relative;
 }
 
 .copen_used_ability
@@ -657,11 +665,13 @@
     background-position-y: -49px;    
 }
 
-.copen_ability_tile.copen_any_cards{
+.copen_ability_tile.copen_any_cards,
+.copen_log_ability_tile_any_cards{
     background-position-x: -194px;
 }
 
-.copen_ability_tile.copen_additional_card{
+.copen_ability_tile.copen_additional_card,
+.copen_log_ability_tile_additional_card{
     background-position-x: -145.5px;
 }
 
@@ -670,7 +680,8 @@
 .copen_ability_tile_stack #additional_card-3{ left: 4px; top: -4px; }
 .copen_ability_tile_stack #additional_card-4{ left: 6px; top: -6px; }
 
-.copen_ability_tile.copen_construction_discount{
+.copen_ability_tile.copen_construction_discount
+.copen_log_ability_tile_construction_discount{
         background-position-x: -97px;
 }
 
@@ -679,7 +690,8 @@
 .copen_ability_tile_stack #construction_discount-3{ left: 55px; top: -4px; }
 .copen_ability_tile_stack #construction_discount-4{ left: 57px; top: -6px; }
 
-.copen_ability_tile.copen_change_of_colors{
+.copen_ability_tile.copen_change_of_colors
+.copen_log_ability_tile_change_of_colors{
         background-position-x: -48.5px;
 }
 
@@ -688,7 +700,8 @@
 .copen_ability_tile_stack #change_of_colors-3{ left: 106px; top: -4px; }
 .copen_ability_tile_stack #change_of_colors-4{ left: 108px; top: -6px; }
 
-.copen_ability_tile.copen_both_actions{
+.copen_ability_tile.copen_both_actions
+.copen_log_ability_tile_both_actions{
         background-position-x: 0px;
 }
 

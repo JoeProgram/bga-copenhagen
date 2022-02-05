@@ -47,7 +47,7 @@ function (dojo, declare) {
 
             this.whitePolyominosPerStack = 3;
 
-            this.log_replace_keys = ['log_polyomino']; // keys in the log that we do post-processing on
+            this.log_replace_keys = ['log_polyomino', 'log_ability_tile']; // keys in the log that we do post-processing on
 
             this.activated_abilities = [];
 
@@ -971,16 +971,12 @@ function (dojo, declare) {
             return dojo.query(`#copen_wrapper #owned_player_area .copen_${abilityName}`).length > 0;
         },
 
-        deactivateUsedAbilities: function( usedAbilities, playerId)
+        deactivateUsedAbility: function( usedAbility, playerId)
         {
-
-            usedAbilities.forEach( function(usedAbility)
-            {
-                dojo.query(`#copen_wrapper #copen_ability_slot_${usedAbility}_${playerId} .copen_${usedAbility}`)
-                    .removeClass("copen_activated")
-                    .removeClass("copen_usable")
-                    .addClass("copen_used_ability");
-            });
+            dojo.query(`#copen_wrapper #copen_ability_slot_${usedAbility}_${playerId} .copen_${usedAbility}`)
+                .removeClass("copen_activated")
+                .removeClass("copen_usable")
+                .addClass("copen_used_ability");
         },
 
         ///////////////////////////////////////////////////
@@ -1314,6 +1310,8 @@ function (dojo, declare) {
             dojo.subscribe( 'takeAbilityTile', this, 'notif_takeAbilityTile' );
             this.notifqueue.setSynchronous( 'takeAbilityTile', 500 );
 
+            dojo.subscribe( 'usedAbility', this, 'notif_usedAbility' );
+
             dojo.subscribe( 'updateScore', this, 'notif_updateScore' );
             this.notifqueue.setSynchronous( 'updateScore', 500 );
         },  
@@ -1340,9 +1338,6 @@ function (dojo, declare) {
 
             // UPDATE CARD AMOUNT UI
             dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
-
-            // DEACTIVATE ANY USED UP ABILITIES
-            this.deactivateUsedAbilities( notif.args.used_abilities, notif.args.player_id);
 
         },
 
@@ -1428,6 +1423,13 @@ function (dojo, declare) {
 
         },
 
+        notif_usedAbility: function(notif)
+        {
+            // DEACTIVATE ANY USED UP ABILITIES
+            this.deactivateUsedAbility( notif.args.used_ability, notif.args.player_id);
+
+        },
+
 
         notif_updateScore: function(notif)
         {
@@ -1463,10 +1465,15 @@ function (dojo, declare) {
 
         postProcessLogKey(key, args)
         {
+            console.log( "post process" + key);
+
             switch(key)
             {
                 case 'log_polyomino':
                     return this.postProcessLogPolyomino( key, args );
+
+                case 'log_ability_tile':
+                    return this.postProcessLogAbilityTile( key, args );
             }
         },
 
@@ -1479,6 +1486,13 @@ function (dojo, declare) {
             return this.format_block('jstpl_log_polyomino',{
                 color: color,
                 squares: squares,                
+            }); 
+        },
+
+        postProcessLogAbilityTile( key, args )
+        {
+            return this.format_block('jstpl_log_ability_tile',{
+                log_ability_tile: args[key],               
             }); 
         },
 

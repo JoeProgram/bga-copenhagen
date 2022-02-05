@@ -657,6 +657,20 @@ class CopenhagenReboot extends Table
 
         $used_abilities = [];
 
+        foreach( $used_abilities as $used_ability)
+        {
+            self::notifyAllPlayers(
+                "usedAbility",
+                clienttranslate('${player_name} used ${log_ability_tile}'),
+                array(
+                    "player_id" => $player_id,
+                    "player_name" => self::getActivePlayerName(),
+                    "log_ability_tile" => $used_ability,
+                    "used_ability" => $used_ability,
+                )
+            );
+        }
+
         self::notifyAllPlayers( 
             "takeCard", 
             clienttranslate('${player_name} takes a ${color} card.'),
@@ -666,7 +680,6 @@ class CopenhagenReboot extends Table
                 "player_name" => self::getActivePlayerName(),
                 "color" => $card["type"],
                 "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
-                "used_abilities" => $used_abilities,
             )   
         );
 
@@ -724,6 +737,20 @@ class CopenhagenReboot extends Table
             $used_abilities[] = "any_cards";
         } 
 
+        foreach( $used_abilities as $used_ability)
+        {
+            self::notifyAllPlayers(
+                "usedAbility",
+                clienttranslate('${player_name} used ${log_ability_tile}'),
+                array(
+                    "player_id" => $player_id,
+                    "player_name" => self::getActivePlayerName(),
+                    "log_ability_tile" => $used_ability,
+                    "used_ability" => $used_ability,
+                )
+            );
+        }
+
         self::notifyAllPlayers( 
             "takeCard", 
             clienttranslate('${player_name} takes a ${color} card.'),
@@ -733,7 +760,6 @@ class CopenhagenReboot extends Table
                 "player_name" => self::getActivePlayerName(),
                 "color" => $card["type"],
                 "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
-                "used_abilities" => $used_abilities,
             )   
         );
 
