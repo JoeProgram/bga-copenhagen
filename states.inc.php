@@ -62,6 +62,7 @@ $machinestates = array(
     ),
     
     // Note: ID=2 => your first state
+    // NEXT UNUSED STATE: 10 
 
     2 => array(
         "name" => "nextPlayer",
@@ -74,55 +75,58 @@ $machinestates = array(
     
     3 => array(
         "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must take a card or place a facade tile'),
-        "descriptionmyturn" => clienttranslate('${you} must take a card or place a facade tile'),
+        "description" => clienttranslate('${actplayer} must take a card or place a facade tile.'),
+        "descriptionmyturn" => clienttranslate('${you} must take a card or place a facade tile.'),
         "type" => "activeplayer",
-        "possibleactions" => array( "takeCard", "placePolyomino", "coatOfArms", "activateAbilityAnyCards" ),
+        "possibleactions" => array( "takeCard", "placePolyomino", "coatOfArms", "activateAbilityAnyCards", "activateAbilityAdditionalCard" ),
         "transitions" => array(  "checkHandSize" => 4, "placePolyomino" => 7, "coatOfArms" => 8 )
     ), 
 
+    5 => array(
+        "name" => "takeAdjacentCard",
+        "args" => "argTakeAdjacentCard",
+        "description" => clienttranslate('${actplayer} must take another card.'),
+        "descriptionmyturn" => clienttranslate('${you} must take another card next to the one you just took.'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "takeCard", "activateAbilityAnyCards", "activateAbilityAdditionalCard" ),
+        "transitions" => array(  "checkHandSize" => 4 )
+    ), 
+
+    9 => array(
+        "name" => "takeAdditionalCard",
+        "description" => clienttranslate('${actplayer} must take another card.'),
+        "descriptionmyturn" => clienttranslate('${you} must take another card.'),
+        "type" => "activeplayer",
+        "possibleactions" => array( "takeCard", ),
+        "transitions" => array(  "checkHandSize" => 4 )
+    ), 
+    
     4 => array(
         "name" => "checkHandSize",
         "description" => "",
         "type" => "game",
         "action" => "stCheckHandSize",
-        "possibleactions" => array( 
-            "takeAdjacentCard",
-            "discardDownToMaxHandSize",
-            "refillHarbor"
-         ),
         "transitions" => array( 
             "takeAdjacentCard" => 5,
+            "takeAdditionalCard" => 9,
             "discardDownToMaxHandSize" => 6,
             "refillHarbor" => 50
          ),
     ), 
 
-    // WE USE DIFFERENT ENDPOINTS FOR TAKING THE FIRST AND SECOND CARD
-    //   Once a player takes a card, they cannot place a polyomino
-    //   So we have a distinct state for taking a second card to cut off that option 
-    5 => array(
-        "name" => "takeAdjacentCard",
-        "args" => "argTakeAdjacentCard",
-        "description" => clienttranslate('${actplayer} must take another card'),
-        "descriptionmyturn" => clienttranslate('${you} must take another card next to the one you just took.'),
-        "type" => "activeplayer",
-        "possibleactions" => array( "takeCard", "activateAbilityAnyCards" ),
-        "transitions" => array(  "checkHandSize" => 4 )
-    ), 
-    
-
     6 => array(
         "name" => "discardDownToMaxHandSize",
-        "description" => clienttranslate('${actplayer} must discard a card'),
+        "description" => clienttranslate('${actplayer} must discard a card.'),
         "descriptionmyturn" => clienttranslate('${you} must discard a card. You can only have 7 cards in hand.'),
         "type" => "activeplayer",
         "possibleactions" => array( 
             "discard",
          ),
         "transitions" => array(  
-            "discardedAndTakeAnother" => 5,
-            "discardedAndDone" => 50, 
+            "takeAdjacentCard" => 5,
+            "takeAdditionalCard" => 9,
+            "discardDownToMaxHandSize" => 6,
+            "refillHarbor" => 50
         )
     ), 
 
@@ -131,14 +135,13 @@ $machinestates = array(
         "description" => "",
         "type" => "game",
         "action" => "stCalculateScore",
-        "possibleactions" => array( "nextPlayer", "endGame" ),
         "transitions" => array(  "nextPlayer" => 2, "endGame" => 99 )
     ), 
 
     8 => array(
         "name" => "coatOfArms",
-        "description" => clienttranslate('${actplayer} must place a special facade tile or ability tile'),
-        "descriptionmyturn" => clienttranslate('${you} must place a special facade tile or ability tile'),
+        "description" => clienttranslate('${actplayer} must place a special facade tile or ability tile.'),
+        "descriptionmyturn" => clienttranslate('${you} must place a special facade tile or ability tile.'),
         "type" => "activeplayer",
         "possibleactions" => array( "placePolyomino", "coatOfArms", "takeAbilityTile" ),
         "transitions" => array( "placePolyomino" => 7, "coatOfArms" => 8, "nextPlayer" => 2 ),
@@ -149,7 +152,6 @@ $machinestates = array(
         "description" => "",
         "type" => "game",
         "action" => "stRefillHarbor",
-        "possibleactions" => array( "nextPlayer" ),
         "transitions" => array(  "nextPlayer" => 2, "endGame" => 99 )
     ), 
 

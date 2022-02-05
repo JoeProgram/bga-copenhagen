@@ -390,6 +390,27 @@ class CopenhagenReboot extends Table
         return $card_ids;
     }
 
+    // WHICH OF THE TAKING CARDS STATES SHOULD WE GO TO?
+    //  We have 3 different taking card states, since each has slightly different rules and text
+    //  Multiple functions need to figure out which one to send the game to next
+    function getNextTakeCardsState()
+    {
+
+        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+        $is_using_ability_additional_card = self::getGameStateValue( "ability_activated_additional_card" );
+
+        if( $cards_taken_this_turn == 1 )
+        {
+            return "takeAdjacentCard";
+        }
+        else if( $is_using_ability_additional_card && $cards_taken_this_turn == 2)
+        {
+            return"takeAdditionalCard";
+        }
+        else return "refillHarbor";        
+
+    }
+
     function shuffleDiscardIntoDeck()
     {
         $this->cards->moveAllCardsInLocation( "discard", "deck");
@@ -641,13 +662,6 @@ class CopenhagenReboot extends Table
         }
     }
 
-    // SEE IF ABILITY IS IN LIST
-    function checkAbilityIsPossible( $ability_name, $possible_abilities )
-    {
-        foreach( $possible_abilities as $possible_ability) if( $possible_ability["ability_name"] == $ability_name) return true;
-        return false;
-    }
-
     function getValidatedHarborCard( $card_id )
     {
         // MAKE SURE CARD EXISTS
@@ -671,6 +685,52 @@ class CopenhagenReboot extends Table
         self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );  
     }
 
+    function notifyPlayersOfTakenCard( $card_id, $color, $player_id, $player_name)
+    {
+        self::notifyAllPlayers( 
+            "takeCard", 
+            clienttranslate('${player_name} takes a ${color} card.'),
+            array(
+                "card_id" => $card_id,
+                "player_id" => $player_id,
+                "player_name" => $player_name,
+                "color" => $color,
+                "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
+            )   
+        );
+    }
+
+    function validateActivatedAbility( $ability_name, $player_id)
+    {
+        $already_owned_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = '$ability_name' AND owner = $player_id AND used = 0;");
+        if( $already_owned_tile == null ) throw new feException( self::_("You can't activate that special ability."));
+
+        $activated = self::getGameStateValue( "ability_activated_" . $ability_name );
+        if( $activated == 1 ) throw new feException( self::_("You've already activated that special ability."));
+    }
+
+    function notifyPlayerOfActivatedAbility( $ability_name, $player_id, $player_name)
+    {
+
+
+
+        $ability_log_name = $this->ability_log_names[$ability_name];
+
+        self::notifyPlayer( 
+            $player_id,
+            "activateAbility", 
+            clienttranslate('${player_name} is using the ${ability_log_name} ability.'),
+            array(
+                "player_name" => $player_name,
+                "ability_log_name" => $ability_log_name,
+
+                "player_id" => $player_id,
+                "ability_name" => $ability_name,
+            )   
+        );
+    }
+
+
     function notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name)
     {
         foreach( $used_abilities as $used_ability)
@@ -686,21 +746,6 @@ class CopenhagenReboot extends Table
                 )
             );
         }
-    }
-
-    function notifyPlayersOfTakenCard( $card_id, $color, $player_id, $player_name)
-    {
-        self::notifyAllPlayers( 
-            "takeCard", 
-            clienttranslate('${player_name} takes a ${color} card.'),
-            array(
-                "card_id" => $card_id,
-                "player_id" => $player_id,
-                "player_name" => $player_name,
-                "color" => $color,
-                "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
-            )   
-        );
     }
 
 
@@ -779,6 +824,39 @@ class CopenhagenReboot extends Table
         $this->gamestate->nextState( "checkHandSize");
     }
 
+    function takeAdditionalCard( $card_id  )
+    {
+        self::checkAction( 'takeCard' );
+
+        $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
+
+        // VALIDATION
+        $card = $this->getValidatedHarborCard( $card_id );
+
+        // MUST HAVE TAKEN 2 CARDS ALREADY
+        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+        if ($cards_taken_this_turn != 2 ) throw new feException( self::_("You're trying to take your third card before your second."));
+
+        // MUST BE USING ADDITIONAL CARD ABILITY
+        if( self::getGameStateValue("ability_activated_additional_card") == 0 ) throw new feException( self::_("You must be using the Additional Card ability to take a third card."));
+        
+
+        // UPDATE DATA
+        $this->givePlayerCard( $player_id, $card_id);
+
+
+        // USE UP ANY USED ABILITIES
+        $used_abilities = ["additional_card"];
+        self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'additional_card' AND owner = $player_id");    
+
+
+        $this->notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name );
+        $this->notifyPlayersOfTakenCard( $card_id, $card["type"], $player_id, $player_name );
+
+        $this->gamestate->nextState( "checkHandSize");
+    }
+
     function discardDownToMaxHandSize( $card_id )
     {
 
@@ -799,7 +877,7 @@ class CopenhagenReboot extends Table
         // DISCARD THE CARD
         $this->cards->moveCard( $card_id, "discard");
 
-        // TELL THE CLIENTS
+        // NOTIFY
         //   Cards are discarded face up, so it's okay to notify all players of the specific card discarded
         self::notifyAllPlayers( 
             "discardDownToMaxHandSize", 
@@ -813,10 +891,7 @@ class CopenhagenReboot extends Table
             )   
         );
         
-        // NEXT PHASE
-        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
-        if( $cards_taken_this_turn == 1 ) $this->gamestate->nextState( "discardedAndTakeAnother");
-        else $this->gamestate->nextState( "discardedAndDone");
+        $this->gamestate->nextState( $this->getNextTakeCardsState() );
 
     }
 
@@ -1050,25 +1125,35 @@ class CopenhagenReboot extends Table
         self::checkAction( 'activateAbilityAnyCards' );
 
         $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
 
-        $already_owned_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = 'any_cards' AND owner = $player_id AND used = 0;");
-        if( $already_owned_tile == null ) throw new feException( self::_("You can't activate that special ability."));
+        // VALIDATION
+        $this->validateActivatedAbility( "any_cards", $player_id);
 
-        $activated = self::getGameStateValue( 'ability_activated_any_cards' );
-        if( $activated == 1 ) throw new feException( self::_("You've already activated that special ability."));
-
+        // UPDATE DATA
         self::setGameStateValue( 'ability_activated_any_cards', 1 );
 
-        self::notifyPlayer( 
-            $player_id,
-            "activateAbility", 
-            clienttranslate('${player_name} is using the Any cards ability.'),
-            array(
-                "player_name" => self::getActivePlayerName(),
-                "player_id" => $player_id,
-                "ability_name" => "any_cards",
-            )   
-        );
+        // NOTIFICATION
+        $this->notifyPlayerOfActivatedAbility("any_cards", $player_id, $player_name);
+    }
+
+    function activateAbilityAdditionalCard()
+    {
+
+        self::checkAction( 'activateAbilityAdditionalCard' );
+
+        $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
+
+        // VALIDATION
+        $this->validateActivatedAbility( "additional_card", $player_id);
+
+        // UPDATE DATA
+        self::setGameStateValue( 'ability_activated_additional_card', 1 );
+
+        // NOTIFICATION
+        $this->notifyPlayerOfActivatedAbility("additional_card", $player_id, $player_name);
+
     }
     
 //////////////////////////////////////////////////////////////////////////////
@@ -1122,16 +1207,18 @@ class CopenhagenReboot extends Table
         $player_id = self::getActivePlayerId();
 
         $cards_in_hand = $this->cards->countCardInLocation( "hand", $player_id);
-        if( $cards_in_hand > $this->max_hand_size ) $this->gamestate->nextState("discardDownToMaxHandSize");
-        else
+
+        // PLAYER HAS TOO MANY CARDS
+        if( $cards_in_hand > $this->max_hand_size )
         {
-            // PLAYER DOESN'T HAVE TOO MANY CARDS
-            $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
-            if( $cards_taken_this_turn == 1 ) $this->gamestate->nextState("takeAdjacentCard");
-            else $this->gamestate->nextState("refillHarbor");
-        }
-        
-        
+            $this->gamestate->nextState("discardDownToMaxHandSize");
+            return;  
+        } 
+
+        // PLAYER DOESN'T HAVE TOO MANY CARDS
+
+        $state_name = $this->getNextTakeCardsState();
+        $this->gamestate->nextState( $state_name );        
     }
 
 

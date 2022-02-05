@@ -72,5 +72,11 @@ $this->coat_of_arms_board_cells = array("2-2","4-4","1-6","3-8");
 $this->coat_of_arms_board_rows = array(1,3,5);
 
 $this->special_ability_pile_names = array( "additional_card","construction_discount","change_of_colors","both_actions");
-
+$this->ability_log_names = array(
+    "any_cards" => "Any cards",
+    "additional_card" => "Additional card" ,
+    "construction_discount" =>"Construction discount" ,
+    "change_of_colors" => "Change of colors" ,
+    "both_actions" => "Both actions" ,
+);
 

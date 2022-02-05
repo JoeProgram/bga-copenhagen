@@ -49,8 +49,6 @@ function (dojo, declare) {
 
             this.log_replace_keys = ['log_polyomino', 'log_ability_tile']; // keys in the log that we do post-processing on
 
-            //this.activated_abilities = [];
-
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
                 "purple-3":[{x:0,y:0},{x:1,y:0},{x:2,y:0}],
@@ -81,6 +79,14 @@ function (dojo, declare) {
             };
 
             this.selectedPolyomino = null;
+
+            this.abilityEventHandlers = {
+                "any_cards":"onActivateAbilityAnyCards",
+                "additional_card":"onActivateAbilityAdditionalCard",
+                "construction_discount":"onActivateAbilityConstructionDiscount",
+                "change_of_colors":"onActivateAbilityChangeOfColors",
+                "both_actions":"onActivateAbilityBothActions",
+            };
 
         },
         
@@ -228,6 +234,7 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper .copen_ability_tile_stack .copen_ability_tile:last-child").connect( 'onclick', this, 'onTakeAbilityTile');
 
             dojo.query("#copen_wrapper #owned_player_area .copen_any_cards").connect( 'onclick', this, 'onActivateAbilityAnyCards');
+            dojo.query("#copen_wrapper #owned_player_area .copen_additional_card").connect( 'onclick', this, 'onActivateAbilityAdditionalCard');
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -266,6 +273,10 @@ function (dojo, declare) {
                     this.onEnteringTakeAdjacentCard( args );
                     break;
 
+                case 'takeAdditionalCard':
+                    this.onEnteringTakeAdditionalCard( args );
+                    break;
+
                 case 'coatOfArms':
                     this.onEnteringCoatOfArms( args );
                     break;
@@ -291,6 +302,7 @@ function (dojo, declare) {
 
             // MARK WHICH OWNED ABILITIES ARE USABLE
             this.setAbilityAsUsable( "any_cards");
+            this.setAbilityAsUsable( "additional_card");
 
         },
 
@@ -346,6 +358,7 @@ function (dojo, declare) {
 
                 // MARK WHICH OWNED ABILITIES ARE USABLE
                 this.setAbilityAsUsable( "any_cards");
+                this.setAbilityAsUsable( "additional_card");
 
                 // TRIGGER BEHAVIOR OF ANY PREPARED ABILITIES
                 if( args.args.ability_activated_any_cards == 1) this.triggerAnyCardsAbility();
@@ -358,6 +371,21 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper .copen_card.copen_unusable").removeClass("copen_unusable");
 
         },
+
+        onEnteringTakeAdditionalCard( args )
+        {
+            if( args.active_player == this.player_id )
+            {
+                dojo.query("#copen_wrapper #harbor_cards .copen_card").addClass("copen_usable");
+            }
+        },
+
+        onLeavingTakeAdditionalCard()
+        {
+            dojo.query("#copen_wrapper .copen_card.copen_usable").removeClass("copen_usable");
+            dojo.query("#copen_wrapper .copen_card.copen_unusable").removeClass("copen_unusable");
+
+        },        
 
         onEnteringCoatOfArms( args )
         {
@@ -401,6 +429,10 @@ function (dojo, declare) {
                 case 'takeAdjacentCard':
                     this.onLeavingTakeAdjacentCard();
                     break;
+
+               case 'takeAdditionalCard':
+                    this.onLeavingTakeAdditionalCard();
+                    break;                    
 
                 case 'coatOfArms':
                     this.onLeavingCoatOfArms();
@@ -1037,6 +1069,8 @@ function (dojo, declare) {
 
             dojo.stopEvent( event );
 
+
+
             // CLIENT-SIDE VALIDATION
             if( this.hasTooManyCardsInHand()) return; // doesn't work if your hand already has too many cards
 
@@ -1045,22 +1079,15 @@ function (dojo, declare) {
             // SEND SERVER REQUEST
             if( this.checkAction('takeCard'))
             {
+                var endPoint = "";
+                if( this.stateName == "playerTurn") endPoint = "/copenhagenreboot/copenhagenreboot/takeCard.html";
+                else if( this.stateName == "takeAdjacentCard") endPoint = "/copenhagenreboot/copenhagenreboot/takeAdjacentCard.html";
+                else if( this.stateName == "takeAdditionalCard") endPoint = "/copenhagenreboot/copenhagenreboot/takeAdditionalCard.html";
 
-                // WE SEND TO DIFFERENT SERVER POINTS FOR FIRST AND SECOND CARD
-                if( this.stateName == "playerTurn")
+                this.ajaxcall( endPoint,
                 {
-                    this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeCard.html",
-                    {
-                        card_id:event.currentTarget.id.split("_")[1],
-                    }, this, function( result ){} ); 
-                } 
-                else if( this.stateName == "takeAdjacentCard")
-                {
-                    this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeAdjacentCard.html",
-                    {
-                        card_id:event.currentTarget.id.split("_")[1],
-                    }, this, function( result ){} ); 
-                }
+                    card_id:event.currentTarget.id.split("_")[1],
+                }, this, function( result ){} ); 
             }
  
         },
@@ -1316,6 +1343,20 @@ function (dojo, declare) {
 
         },
 
+        onActivateAbilityAdditionalCard: function( event )
+        {
+
+            console.log("onActivateAbilityAdditionalCard");
+
+            if( !this.checkAction('activateAbilityAdditionalCard')) return;
+            if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+
+            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityAdditionalCard.html",
+            {
+            }, this, function( result ){} ); 
+
+        },
+
         
         ///////////////////////////////////////////////////
         //// Reaction to cometD notifications
@@ -1354,9 +1395,6 @@ function (dojo, declare) {
 
         notif_takeCard: function(notif)
         {
-
-            console.log("take card notif");
-            console.log( notif );
 
             // IF ITS YOUR CARD
             if( notif.args.player_id == this.player_id )
@@ -1452,9 +1490,13 @@ function (dojo, declare) {
             this.attachToNewParent( abilityTileId, parentId );
             this.slideToObject( abilityTileId, parentId, 500  ).play();
 
+            // CONNECT THE TAKEN ABILITY TILE TO ITS NEW CLICK EVENT
+            dojo.query(`#copen_wrapper #${abilityTileId}`).connect( 'onclick', this, this.abilityEventHandlers[notif.args.ability_name]);
+
             // CONNECT THE NEXT ABILITY TILE IN THE STACK TO CLICK EVENT
             dojo.query(`#copen_wrapper #ability_tile_stack_${notif.args.ability_name} .copen_ability_tile:last-child`).connect( 'onclick', this, 'onTakeAbilityTile');
             
+
             // REAPPLY TOOLTIPS
             this.updateSpecialAbilityTooltips();
 
@@ -1462,6 +1504,10 @@ function (dojo, declare) {
 
         notif_activateAbility: function(notif)
         {
+
+            console.log("notif_activateAbility");
+            console.log( notif);
+
             var node = dojo.query(`#copen_wrapper #copen_ability_slot_${notif.args.ability_name}_${notif.args.player_id} .copen_ability_tile`)[0];
             dojo.addClass( node, "copen_activated");
 

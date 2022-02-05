@@ -61,6 +61,16 @@
         self::ajaxResponse(); 
     }
 
+    public function takeAdditionalCard()
+    {
+        self::setAjaxMode();  
+
+        $card_id = self::getArg( "card_id", AT_posint, true );
+        $this->game->takeAdditionalCard( $card_id );
+
+        self::ajaxResponse(); 
+    }
+
     public function discardDownToMaxHandSize()
     {
         self::setAjaxMode();  
@@ -104,6 +114,13 @@
     {
         self::setAjaxMode();  
         $this->game->activateAbilityAnyCards();
+        self::ajaxResponse(); 
+    }
+
+    public function activateAbilityAdditionalCard()
+    {
+        self::setAjaxMode();  
+        $this->game->activateAbilityAdditionalCard();
         self::ajaxResponse(); 
     }
 
