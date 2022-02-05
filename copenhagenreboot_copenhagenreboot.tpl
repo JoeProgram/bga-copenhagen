@@ -181,7 +181,12 @@ var jstpl_player_board = '<div class="copen_hand_size_wrapper">' +
 
 var jstpl_log_polyomino = '<div class="copen_log_polyomino copen_${color}-${squares}"></div>';
 
-var jstpl_ability_tile='<div id="${ability_name}-${copy}" class="copen_ability_tile copen_${ability_name}"></div>';
+var jstpl_ability_tile= '<div id="${ability_name}-${copy}" class="copen_ability_tile copen_${ability_name}">'+
+                            '<div class="copen_ability_tile_inner">' +
+                                '<div class="copen_ability_tile_front"></div>' +
+                                '<div class="copen_ability_tile_back"></div>' +                                
+                            '</div>' +      
+                        '</div>';
  
 var jstpl_log_ability_tile = '<div class="copen_log_ability_tile copen_log_ability_tile_${log_ability_tile}"></div>';
 
