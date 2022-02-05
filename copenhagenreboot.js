@@ -276,6 +276,10 @@ function (dojo, declare) {
 
             // HANDLE POLYOMINOES
             this.determineUsablePolyominoes();
+
+            // MARK WHICH OWNED ABILITIES ARE USABLE
+            this.setAbilityAsUsable( "any_cards");
+
         },
 
         onLeavingPlayerTurn()
@@ -329,7 +333,10 @@ function (dojo, declare) {
                 }
 
                 // MARK WHICH OWNED ABILITIES ARE USABLE
-                dojo.query("#copen_wrapper #owned_player_area .copen_any_cards:not(.copen_used_ability)").addClass("copen_usable");
+                this.setAbilityAsUsable( "any_cards");
+
+                // TRIGGER BEHAVIOR OF ANY PREPARED ABILITIES
+                if( this.activated_abilities.includes("any_cards")) this.triggerAnyCardsAbility();
             }
         },
 
@@ -337,6 +344,7 @@ function (dojo, declare) {
         {
             dojo.query("#copen_wrapper .copen_card.copen_usable").removeClass("copen_usable");
             dojo.query("#copen_wrapper .copen_card.copen_unusable").removeClass("copen_unusable");
+
         },
 
         onEnteringCoatOfArms( args )
@@ -356,9 +364,6 @@ function (dojo, declare) {
         {
             dojo.query("#copen_wrapper .copen_polyomino.copen_usable").removeClass("copen_usable");
             dojo.query("#copen_wrapper .copen_polyomino.copen_unusable").removeClass("copen_unusable");
-
-            dojo.query("#copen_wrapper .copen_ability_tile.copen_usable").removeClass("copen_usable");
-            dojo.query("#copen_wrapper .copen_ability_tile.copen_unusable").removeClass("copen_unusable");
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -368,6 +373,8 @@ function (dojo, declare) {
         {
             console.log( 'Leaving state: '+stateName );
             
+
+
             switch( stateName )
             {
             
@@ -390,6 +397,11 @@ function (dojo, declare) {
                 case 'dummmy':
                     break;
             }               
+
+            // TURN OFF USABLE ABILITIES AT THE END OF ANY STATE
+            //   each state is response for turning the proper ones back on
+            dojo.query("#copen_wrapper .copen_ability_tile.copen_usable").removeClass("copen_usable");
+            dojo.query("#copen_wrapper .copen_ability_tile.copen_unusable").removeClass("copen_unusable");
         }, 
 
 
@@ -971,12 +983,27 @@ function (dojo, declare) {
             return dojo.query(`#copen_wrapper #owned_player_area .copen_${abilityName}`).length > 0;
         },
 
+        setAbilityAsUsable: function (abilityName)
+        {
+            dojo.query(`#copen_wrapper #owned_player_area .copen_${abilityName}:not(.copen_used_ability)`).addClass("copen_usable");
+        },
+
         deactivateUsedAbility: function( usedAbility, playerId)
         {
             dojo.query(`#copen_wrapper #copen_ability_slot_${usedAbility}_${playerId} .copen_${usedAbility}`)
                 .removeClass("copen_activated")
                 .removeClass("copen_usable")
                 .addClass("copen_used_ability");
+        },
+
+        triggerAnyCardsAbility: function()
+        {
+            // SHOW ALL CARDS SELECTABLE
+            dojo.query("#copen_wrapper #harbor_cards .copen_card.copen_unusable").removeClass("copen_unusable").addClass("copen_usable");
+
+            // CHANGE THE INSTRUCTION TITLE TEXT
+            this.gamedatas.gamestate.descriptionmyturn = _("You must take another card");
+            this.updatePageTitle();
         },
 
         ///////////////////////////////////////////////////
@@ -1268,15 +1295,16 @@ function (dojo, declare) {
 
         onActivateAbilityAnyCards: function( event )
         {
-            if( this.stateName != "takeAdjacentCard") return;
+            if( this.stateName != "takeAdjacentCard" && this.stateName != "playerTurn" ) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
 
             // SET ABILITY AS ACTIVATED IN CLIENT
             dojo.addClass( event.currentTarget, "copen_activated");
             this.activated_abilities.push("any_cards");
 
-            // SHOW ALL CARDS SELECTABLE
-            dojo.query("#copen_wrapper #harbor_cards .copen_card.copen_unusable").removeClass("copen_unusable").addClass("copen_usable");
+
+            // trigger ability behavior if in correct state.  Otherwise, wait.
+            if( this.stateName == "takeAdjacentCard" ) this.triggerAnyCardsAbility();
 
         },
 
