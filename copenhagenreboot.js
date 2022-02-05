@@ -49,7 +49,7 @@ function (dojo, declare) {
 
             this.log_replace_keys = ['log_polyomino', 'log_ability_tile']; // keys in the log that we do post-processing on
 
-            this.activated_abilities = [];
+            //this.activated_abilities = [];
 
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
@@ -200,6 +200,18 @@ function (dojo, declare) {
                 if( abilityTile.used == 1 ) dojo.addClass(abilityTileNode, "copen_used_ability");
             }
 
+            // ACITVATED ABILITIES
+            //  show which abilities are activated
+            //  individual states will handle any special triggered client-side behavior
+            for( var abilityNameId in gamedatas.activated_abilities)
+            {
+                var abilityName = gamedatas.activated_abilities[ abilityNameId ];
+
+                var node = dojo.query(`#copen_wrapper #copen_ability_slot_${abilityName}_${this.player_id} .copen_ability_tile`)[0];
+                dojo.addClass( node, "copen_activated");
+            }
+
+
             // TOOLTIPS
             this.updateSpecialAbilityTooltips();
             
@@ -336,7 +348,7 @@ function (dojo, declare) {
                 this.setAbilityAsUsable( "any_cards");
 
                 // TRIGGER BEHAVIOR OF ANY PREPARED ABILITIES
-                if( this.activated_abilities.includes("any_cards")) this.triggerAnyCardsAbility();
+                if( args.args.ability_activated_any_cards == 1) this.triggerAnyCardsAbility();
             }
         },
 
@@ -1047,7 +1059,6 @@ function (dojo, declare) {
                     this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeAdjacentCard.html",
                     {
                         card_id:event.currentTarget.id.split("_")[1],
-                        is_using_ability_any_cards: this.activated_abilities.includes("any_cards"),
                     }, this, function( result ){} ); 
                 }
             }
@@ -1295,16 +1306,13 @@ function (dojo, declare) {
 
         onActivateAbilityAnyCards: function( event )
         {
-            if( this.stateName != "takeAdjacentCard" && this.stateName != "playerTurn" ) return;
+
+            if( !this.checkAction('activateAbilityAnyCards')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
 
-            // SET ABILITY AS ACTIVATED IN CLIENT
-            dojo.addClass( event.currentTarget, "copen_activated");
-            this.activated_abilities.push("any_cards");
-
-
-            // trigger ability behavior if in correct state.  Otherwise, wait.
-            if( this.stateName == "takeAdjacentCard" ) this.triggerAnyCardsAbility();
+            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityAnyCards.html",
+            {
+            }, this, function( result ){} ); 
 
         },
 
@@ -1327,21 +1335,19 @@ function (dojo, declare) {
             dojo.subscribe( 'takeCard', this, 'notif_takeCard' );
 
             dojo.subscribe( 'discardDownToMaxHandSize', this, 'notif_discardDownToMaxHandSize' );
-            this.notifqueue.setSynchronous( 'discardDownToMaxHandSize', 500 );
 
             dojo.subscribe( 'refillHarbor', this, 'notif_refillHarbor' );
             this.notifqueue.setSynchronous( 'refillHarbor', 500 );
 
             dojo.subscribe( 'placePolyomino', this, 'notif_placePolyomino' );
-            this.notifqueue.setSynchronous( 'placePolyomino', 500 );
 
             dojo.subscribe( 'takeAbilityTile', this, 'notif_takeAbilityTile' );
-            this.notifqueue.setSynchronous( 'takeAbilityTile', 500 );
+
+            dojo.subscribe( 'activateAbility', this, 'notif_activateAbility' );
 
             dojo.subscribe( 'usedAbility', this, 'notif_usedAbility' );
 
             dojo.subscribe( 'updateScore', this, 'notif_updateScore' );
-            this.notifqueue.setSynchronous( 'updateScore', 500 );
         },  
         
         // TODO: from this point and below, you can write your game notifications handling methods
@@ -1452,6 +1458,14 @@ function (dojo, declare) {
             // REAPPLY TOOLTIPS
             this.updateSpecialAbilityTooltips();
 
+        },
+
+        notif_activateAbility: function(notif)
+        {
+            var node = dojo.query(`#copen_wrapper #copen_ability_slot_${notif.args.ability_name}_${notif.args.player_id} .copen_ability_tile`)[0];
+            dojo.addClass( node, "copen_activated");
+
+            if( this.stateName == "takeAdjacentCard" && notif.args.ability_name == "any_cards") this.triggerAnyCardsAbility();
         },
 
         notif_usedAbility: function(notif)

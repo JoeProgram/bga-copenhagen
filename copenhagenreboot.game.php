@@ -46,6 +46,11 @@ class CopenhagenReboot extends Table
             "total_drawable_cards" => 12,
             "drawn_cards" => 13,            // keep track of total cards drawn this game, for progression purposes
             "coat_of_arms_earned" => 14,
+            "ability_activated_any_cards" => 15,
+            "ability_activated_additional_card" => 16,
+            "ability_activated_construction_discount" => 17,
+            "ability_activated_change_of_colors" => 18,
+            "ability_activated_both_actions" => 19,
             
             // VARIANTS
             //    "my_first_game_variant" => 100,
@@ -269,6 +274,19 @@ class CopenhagenReboot extends Table
 
         $sql = "SELECT * FROM ability_tile;";
         $result['ability_tiles'] = self::getCollectionFromDb( $sql );
+
+        // SHOW WHICH ABILTIES ARE ACTIVE
+        //  only show it to the active player
+        $result['activated_abilities'] = array();
+        if( self::getActivePlayerId() == $current_player_id)
+        {
+            if( self::getGameStateValue('ability_activated_any_cards') == 1 ) $result['activated_abilities'][] = "any_cards";
+            if( self::getGameStateValue('ability_activated_additional_card') == 1 ) $result['activated_abilities'][] = "additional_card";
+            if( self::getGameStateValue('ability_activated_construction_discount') == 1 ) $result['activated_abilities'][] = "construction_discount";
+            if( self::getGameStateValue('ability_activated_change_of_colors') == 1 ) $result['activated_abilities'][] = "change_of_colors";
+            if( self::getGameStateValue('ability_activated_both_actions') == 1 ) $result['activated_abilities'][] = "both_actions";
+        }
+
 
         return $result;
     }
@@ -717,7 +735,7 @@ class CopenhagenReboot extends Table
         $this->gamestate->nextState( "checkHandSize");
     }
 
-    function takeAdjacentCard( $card_id, $is_using_ability_any_cards )
+    function takeAdjacentCard( $card_id  )
     {
         self::checkAction( 'takeCard' );
 
@@ -727,24 +745,21 @@ class CopenhagenReboot extends Table
         // VALIDATION
         $card = $this->getValidatedHarborCard( $card_id );
 
+        // MUST HAVE TAKEN 1 CARD ALREADY
+        $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
+        if ($cards_taken_this_turn != 1 ) throw new feException( self::_("You're trying to take your second card before your first."));
+
         // MAKE SURE WE ONLY HAVE 1 EMPTY HARBOR
         $empty_harbors = $this->getEmptyHarbors();
         if( count($empty_harbors) > 1 ) throw new feException( self::_("You have more than one empty harbor."));
 
         // TODO- MAKE SURE CARD IS BESIDE EMPTY HARBOR SLOT
-
-        // IF WE'RE USING A SPECIAL ABILITY, MAKE SURE WE HAVE IT
-        //$any_cards_ability_tile = null;
-        //if( $is_using_ability_any_cards )
-        //{
-        //    $any_cards_ability_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = 'any_cards' AND owner = $player_id AND used = 0;");
-        //    if( $any_cards_ability_tile == null ) throw new feException( self::_("You're trying to use the 'Any cards' ability when you can't."));
-        //}
-
-        // MUST HAVE TAKEN 1 CARD ALREADY
-        //$cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
-        //if ($cards_taken_this_turn != 1 ) throw new feException( self::_("You're trying to take your second card before your first."));
-
+        $is_using_ability_any_cards = self::getGameStateValue("ability_activated_any_cards");
+        if( !$is_using_ability_any_cards )
+        {
+            $adjacent_card_ids = $this->getCardIdsAdjacentToEmptyHarbor(); 
+            if( !in_array( $card_id, $adjacent_card_ids)) throw new feException( self::_("You have to take an adjacent card."));
+        }
 
         // UPDATE DATA
         $this->givePlayerCard( $player_id, $card_id);
@@ -1008,7 +1023,7 @@ class CopenhagenReboot extends Table
 
         self::notifyAllPlayers( 
             "takeAbilityTile", 
-            "Player took an ability tile",
+            clienttranslate('${player_name} took an ability tile'),
             array(
                 "player_name" => self::getActivePlayerName(),
                 "player_id" => $player_id,
@@ -1027,6 +1042,34 @@ class CopenhagenReboot extends Table
         else $this->gamestate->nextState( "nextPlayer" );
 
     }
+
+
+    function activateAbilityAnyCards()
+    {
+
+        self::checkAction( 'activateAbilityAnyCards' );
+
+        $player_id = self::getActivePlayerId();
+
+        $already_owned_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = 'any_cards' AND owner = $player_id AND used = 0;");
+        if( $already_owned_tile == null ) throw new feException( self::_("You can't activate that special ability."));
+
+        $activated = self::getGameStateValue( 'ability_activated_any_cards' );
+        if( $activated == 1 ) throw new feException( self::_("You've already activated that special ability."));
+
+        self::setGameStateValue( 'ability_activated_any_cards', 1 );
+
+        self::notifyPlayer( 
+            $player_id,
+            "activateAbility", 
+            clienttranslate('${player_name} is using the Any cards ability.'),
+            array(
+                "player_name" => self::getActivePlayerName(),
+                "player_id" => $player_id,
+                "ability_name" => "any_cards",
+            )   
+        );
+    }
     
 //////////////////////////////////////////////////////////////////////////////
 //////////// Game state arguments
@@ -1042,6 +1085,7 @@ class CopenhagenReboot extends Table
     {
         return array(
             "adjacent_card_ids" => $this->getCardIdsAdjacentToEmptyHarbor(),
+            "ability_activated_any_cards" => self::getGameStateValue("ability_activated_any_cards"),
         );
     }
 
@@ -1063,6 +1107,12 @@ class CopenhagenReboot extends Table
 
         // NEXT PLAYER'S TURN
         self::setGameStateValue( 'cards_taken_this_turn', 0 );
+
+        self::setGameStateValue( 'ability_activated_any_cards', 0 );
+        self::setGameStateValue( 'ability_activated_additional_card', 0 );
+        self::setGameStateValue( 'ability_activated_construction_discount', 0 );
+        self::setGameStateValue( 'ability_activated_change_of_colors', 0 );
+        self::setGameStateValue( 'ability_activated_both_actions', 0 );
 
         $this->gamestate->nextState("playerTurn");
     }
