@@ -131,6 +131,13 @@
         self::ajaxResponse(); 
     }
 
+    public function activateAbilityConstructionDiscount()
+    {
+        self::setAjaxMode();  
+        $this->game->activateAbilityConstructionDiscount();
+        self::ajaxResponse(); 
+    }
+
     public function endTurn()
     {
         self::setAjaxMode();  

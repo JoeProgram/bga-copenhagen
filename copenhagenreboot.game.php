@@ -275,8 +275,8 @@ class CopenhagenReboot extends Table
         $sql = "SELECT * FROM ability_tile;";
         $result['ability_tiles'] = self::getCollectionFromDb( $sql );
 
-        // SHOW WHICH ABILTIES ARE ACTIVE
-        //  only show it to the active player
+
+        //  ACTIVE PLAYER ONLY STUFF
         $result['activated_abilities'] = array();
         if( self::getActivePlayerId() == $current_player_id)
         {
@@ -285,6 +285,7 @@ class CopenhagenReboot extends Table
             if( self::getGameStateValue('ability_activated_construction_discount') == 1 ) $result['activated_abilities'][] = "construction_discount";
             if( self::getGameStateValue('ability_activated_change_of_colors') == 1 ) $result['activated_abilities'][] = "change_of_colors";
             if( self::getGameStateValue('ability_activated_both_actions') == 1 ) $result['activated_abilities'][] = "both_actions";
+
         }
 
 
@@ -979,6 +980,7 @@ class CopenhagenReboot extends Table
         {
             $cost = $squares;
             if( $this->isAdjacentToSameColor($grid_cells, $playerboard, $color)) $cost -= 1;
+            if( self::getGameStateValue("ability_activated_construction_discount") == 1 ) $cost -= 1;
 
             $valid_cards = self::getCollectionFromDb("SELECT card_id FROM card WHERE card_type = '$color' AND card_location = 'hand' AND card_location_arg = $player_id");
             if( count($valid_cards) < $cost )  throw new feException( self::_("You don't have enough cards to place that facade tile in that spot."));
@@ -1195,6 +1197,28 @@ class CopenhagenReboot extends Table
         // SPECIAL - if we're in last call, change state to use the ability right away
         if( $this->getStateName() == "takeCardsLastCall") $this->gamestate->nextState( "placePolyominoAfterTakingCards" );
 
+    }
+
+        function activateAbilityConstructionDiscount()
+    {
+
+        self::checkAction( 'activateAbilityConstructionDiscount' );
+
+        $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
+
+        // VALIDATION
+        $this->validateActivatedAbility( "construction_discount", $player_id);
+
+        // UPDATE DATA
+        //   construction discount is used immediately
+        self::setGameStateValue( 'ability_activated_construction_discount', 1 );
+        self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'construction_discount' AND owner = $player_id"); 
+
+        // NOTIFICATION - it's used right away
+        $used_abilities = ["construction_discount"];
+        $this->notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name);
+        
     }
 
     function endTurn()

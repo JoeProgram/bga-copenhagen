@@ -88,6 +88,8 @@ function (dojo, declare) {
                 "both_actions":"onActivateAbilityBothActions",
             };
 
+            this.hasConstructionDiscounted = false;
+
         },
         
         /*
@@ -213,8 +215,15 @@ function (dojo, declare) {
             {
                 var abilityName = gamedatas.activated_abilities[ abilityNameId ];
 
-                var node = dojo.query(`#copen_wrapper #copen_ability_slot_${abilityName}_${this.player_id} .copen_ability_tile`)[0];
-                dojo.addClass( node, "copen_activated");
+                var query = dojo.query(`#copen_wrapper #copen_ability_slot_${abilityName}_${this.player_id} .copen_ability_tile:not(.copen_used_ability)`);
+                if( query.length > 0 ) dojo.addClass( query[0], "copen_activated");
+
+                // SPECIAL BEHAVIOR FOR CONSTRUCTION DISCOUNT
+                if( abilityName == "construction_discount")
+                {
+                    this.hasConstructionDiscounted = true;
+                    this.determineUsablePolyominoes();
+                }
             }
 
 
@@ -236,6 +245,7 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #owned_player_area .copen_any_cards").connect( 'onclick', this, 'onActivateAbilityAnyCards');
             dojo.query("#copen_wrapper #owned_player_area .copen_additional_card").connect( 'onclick', this, 'onActivateAbilityAdditionalCard');
             dojo.query("#copen_wrapper #owned_player_area .copen_both_actions").connect( 'onclick', this, 'onActivateAbilityBothActions');
+            dojo.query("#copen_wrapper #owned_player_area .copen_construction_discount").connect( 'onclick', this, 'onActivateAbilityConstructionDiscount');
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
@@ -282,12 +292,16 @@ function (dojo, declare) {
                     this.onEnteringTakeCardsLastCall( args );
                     break;
 
-               case 'placePolyominoAfterTakingCards':
+                case 'placePolyominoAfterTakingCards':
                     this.onEnteringPlacePolyominoAfterTakingCards( args );
                     break;
 
                 case 'coatOfArms':
                     this.onEnteringCoatOfArms( args );
+                    break;
+
+                case 'refillHarbor':
+                    this.onEnteringRefillHarbor( args );
                     break;
            
                 case 'dummmy':
@@ -313,6 +327,7 @@ function (dojo, declare) {
             this.setAbilityAsUsable( "any_cards");
             this.setAbilityAsUsable( "additional_card");
             this.setAbilityAsUsable( "both_actions");
+            this.setAbilityAsUsable( "construction_discount");
 
         },
 
@@ -421,6 +436,8 @@ function (dojo, declare) {
             {
                 // HANDLE POLYOMINOES
                 this.determineUsablePolyominoes();
+
+                this.setAbilityAsUsable( "construction_discount");
             }
         },
 
@@ -447,6 +464,11 @@ function (dojo, declare) {
         {
             dojo.query("#copen_wrapper .copen_polyomino.copen_usable").removeClass("copen_usable");
             dojo.query("#copen_wrapper .copen_polyomino.copen_unusable").removeClass("copen_unusable");
+        },
+
+        onEnteringRefillHarbor( args )
+        {
+            this.hasConstructionDiscounted = false; // reset between turns
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -705,7 +727,15 @@ function (dojo, declare) {
                 var cardsOfColor = game.countColoredCardsInHand( color );
 
                 var cost = squares;
+                console.log( `Squares ${squares}`);
                 if( color != "white" && game.hasPolyominoOfColorOnBoard( color ) ) cost -= 1; // reduce cost by 1 if there's any matching polyominoes on board
+                console.log( `Adjacent Bonus ${cost}`);
+                if( game.hasConstructionDiscounted ) cost -= 1;
+
+                console.log( `Construction Discounted ${cost}`);
+
+                console.log( `Cost for ${ polyomino.id} is ${cost}`);
+                console.log( `Construction discount is ${game.hasConstructionDiscounted}`);
 
                 // see if player can afford polyomino
                 if( cardsOfColor >= cost ) dojo.addClass( polyomino, "copen_usable");
@@ -826,6 +856,7 @@ function (dojo, declare) {
 
             var cost = squares;
             if( this.isAdjacentToSameColor( coordinates, color)) cost -= 1;
+            if( this.hasConstructionDiscounted ) cost -= 1;
 
             return cardsOfColor >= cost;
         },
@@ -1428,6 +1459,18 @@ function (dojo, declare) {
 
         },
 
+       onActivateAbilityConstructionDiscount: function( event )
+        {
+
+            if( !this.checkAction('activateAbilityConstructionDiscount')) return;
+            if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+
+            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityConstructionDiscount.html",
+            {
+            }, this, function( result ){} ); 
+
+        },
+
         onEndTurn: function( event )
         {
 
@@ -1600,6 +1643,13 @@ function (dojo, declare) {
         {
             // DEACTIVATE ANY USED UP ABILITIES
             this.deactivateUsedAbility( notif.args.used_ability, notif.args.player_id);
+
+            // SPECIAL CASE FOR CONSTRUCTION DISCOUNT
+            if( notif.args.used_ability == "construction_discount" && notif.args.player_id == this.player_id)
+            {
+                this.hasConstructionDiscounted = true;
+                this.determineUsablePolyominoes();
+            }
 
         },
 
