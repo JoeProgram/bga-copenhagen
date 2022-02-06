@@ -479,6 +479,8 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #owned_player_area .copen_used_ability").removeClass("copen_usable");
         },
 
+        // ALSO RESETS VARIABLES - PREP FOR NEXT TURN
+        //  we always enter refill Harbor, so we use it to do some client side cleanup
         onEnteringRefillHarbor( args )
         {
             this.hasConstructionDiscounted = false; // reset between turns
@@ -486,7 +488,10 @@ function (dojo, declare) {
             // DEACTIVATE UNUSED ABILITIES
             //  sometimes a player might activate an ability, but not actually use it
             //  make sure to turn it off on the client side
-            dojo.query("#copen_wrapper .copen_activated").removeClass(".copen_activated");
+            dojo.query("#copen_wrapper .copen_activated").removeClass("copen_activated");
+
+            // CLEANUP CHANGE OF COLORS
+            this.clearChangeOfColorsAbility();
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -682,7 +687,9 @@ function (dojo, declare) {
 
         countColoredCardsInHand: function( color )
         {
-            return dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card`).length;
+            var normalCardsNumber = dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card .copen_new_color.copen_hidden`).length;
+            var changedColorCardsNumber = dojo.query(`#copen_wrapper #cards_in_hand .copen_card .copen_new_color.copen_${color}_card`).length;
+            return normalCardsNumber + changedColorCardsNumber;
         },
 
         hasTooManyCardsInHand: function()
@@ -1162,13 +1169,12 @@ function (dojo, declare) {
 
         triggerChangeOfColorsAbility: function( fromColor, toColor)
         {
-            console.log("triggerChangeOfColorsAbility");
-            console.log(fromColor);
-            console.log(toColor);
 
             dojo.query(`#copen_wrapper #cards_in_hand .copen_${fromColor}_card .copen_new_color`)
                 .removeClass('copen_hidden')
                 .addClass(`copen_${toColor}_card`);
+
+            this.determineUsablePolyominoes();
         },
 
         clearChangeOfColorsAbility: function()
@@ -1599,6 +1605,7 @@ function (dojo, declare) {
             this.fadeInHand();
             dojo.addClass(event.currentTarget, "copen_activated");
 
+            this.gamedatas.gamestate.originaldescriptionmyturn = this.gamedatas.gamestate.descriptionmyturn;
             this.gamedatas.gamestate.descriptionmyturn = _("Select a color from your hand.");
             this.updatePageTitle();
 
@@ -1654,6 +1661,9 @@ function (dojo, declare) {
             }, this, function( result ){} ); 
 
             this.fadeOutChangeOfColorsUI();
+
+            this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate.originaldescriptionmyturn;
+            this.updatePageTitle();
 
         },
 
@@ -1759,7 +1769,6 @@ function (dojo, declare) {
             {
                 this.makeHarborCard( notif.args.harbor[cardId] );
             }
-
 
             if( notif.args.mermaid_card == "deck" && dojo.query("#copen_wrapper small_mermaid_card").length > 0)
             {

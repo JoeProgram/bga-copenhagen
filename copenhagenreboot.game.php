@@ -717,6 +717,35 @@ class CopenhagenReboot extends Table
         self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );  
     }
 
+    function getCardsOfColorInHand( $color )
+    {
+
+        $cards = $this->cards->getCardsInLocation("hand", self::getActivePlayerId());
+
+        self::warn("countCardsOfColorInHand");
+        self::warn(json_encode($cards));
+
+        // SPECIAL ABILITY - CHANGE OF COLORS
+        if( self::getGameStateValue("ability_activated_change_of_colors") == 1 )
+        {
+            $from_color = $this->colors[ self::getGameStateValue("change_of_colors_from") ];
+            $to_color = $this->colors[ self::getGameStateValue("change_of_colors_to") ];
+
+            self::warn("From color $from_color");
+            self::warn("To color $to_color");
+
+            // PHP NOTE:
+            //  The default foreach is going to pass by value - so you can't modify on the go
+            //  Putting the & in front of the $card here switches it to pass by reference - so modifications will work
+            foreach( $cards as $card_id => &$card) if( $card["type"] == $from_color ) $card["type"] = $to_color;
+        }
+
+        self::warn("----");
+        self::warn(json_encode($cards));
+
+        return array_filter( $cards, function($x) { return $x['type'] == "purple"; });
+    }
+
     function notifyPlayersOfTakenCard( $card_id, $color, $player_id, $player_name)
     {
         self::notifyAllPlayers( 
@@ -999,7 +1028,7 @@ class CopenhagenReboot extends Table
             if( $this->isAdjacentToSameColor($grid_cells, $playerboard, $color)) $cost -= 1;
             if( self::getGameStateValue("ability_activated_construction_discount") == 1 ) $cost -= 1;
 
-            $valid_cards = self::getCollectionFromDb("SELECT card_id FROM card WHERE card_type = '$color' AND card_location = 'hand' AND card_location_arg = $player_id");
+            $valid_cards = $this->getCardsOfColorInHand( $color );
             if( count($valid_cards) < $cost )  throw new feException( self::_("You don't have enough cards to place that facade tile in that spot."));
         }
 
@@ -1080,6 +1109,12 @@ class CopenhagenReboot extends Table
         {
             self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'construction_discount' AND owner = $player_id"); 
             $this->notifyPlayersOfUsedAbilities( ["construction_discount"], $player_id, $player_name);
+        }
+
+        if( self::getGameStateValue("ability_activated_change_of_colors") == 1)
+        {
+            self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'change_of_colors' AND owner = $player_id"); 
+            $this->notifyPlayersOfUsedAbilities( ["change_of_colors"], $player_id, $player_name);
         }
 
         // NOTIFY CLIENTS
