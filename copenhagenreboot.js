@@ -707,6 +707,16 @@ function (dojo, declare) {
             return baseCards.map( function(node){
                 return node.parentNode;
             });
+        },
+
+
+        hasMixOfBaseCardsAndChangedColorCards: function( color )
+        {
+            
+            var baseCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card .copen_new_color.copen_hidden`);
+            var changedColorCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card .copen_new_color.copen_${color}_card`);
+            
+            return baseCards.length > 0 && changedColorCards.length > 0;
         },        
 
         hasTooManyCardsInHand: function()
@@ -1106,7 +1116,12 @@ function (dojo, declare) {
                 var cardsOfColor = this.countColoredCardsInHand( color );
                 var cost = this.getCostOfShapeAtPosition( gridCells, color);
 
-                if( cardsOfColor - cost > 0 )
+                // SEE IF WE CAN AUTOMATE DISCARDING
+                //  It's a better experience for the player if they don't have to pick discards when there isn't a real choice
+                //  there's two clear times for that:
+                //  1. With the color change, they have the exact number of cards needed in hand
+                //  2. They only have base cards or color changed cards
+                if( cardsOfColor - cost > 0 && this.hasMixOfBaseCardsAndChangedColorCards(color))
                 {
                     if( this.cardsToDiscard.length == 0 )
                     {
@@ -1119,9 +1134,6 @@ function (dojo, declare) {
                     }
                 }
             }
-
-            console.log("about to place");
-            console.log(this.cardsToDiscard.join(","));
 
             // SEND SERVER REQUEST
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/placePolyomino.html",
