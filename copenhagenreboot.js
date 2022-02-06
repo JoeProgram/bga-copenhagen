@@ -1636,7 +1636,15 @@ function (dojo, declare) {
             var node = dojo.query(`#copen_wrapper #copen_ability_slot_${notif.args.ability_name}_${notif.args.player_id} .copen_ability_tile`)[0];
             dojo.addClass( node, "copen_activated");
 
+            // SPECIAL CASEW FOR ANY CARDS
             if( this.stateName == "takeAdjacentCard" && notif.args.ability_name == "any_cards") this.triggerAnyCardsAbility();
+
+            // SPECIAL CASE FOR CONSTRUCTION DISCOUNT
+            if( notif.args.ability_name == "construction_discount")
+            {
+                this.hasConstructionDiscounted = true;
+                this.determineUsablePolyominoes();
+            }
         },
 
         notif_usedAbility: function(notif)
@@ -1644,12 +1652,7 @@ function (dojo, declare) {
             // DEACTIVATE ANY USED UP ABILITIES
             this.deactivateUsedAbility( notif.args.used_ability, notif.args.player_id);
 
-            // SPECIAL CASE FOR CONSTRUCTION DISCOUNT
-            if( notif.args.used_ability == "construction_discount" && notif.args.player_id == this.player_id)
-            {
-                this.hasConstructionDiscounted = true;
-                this.determineUsablePolyominoes();
-            }
+
 
         },
 

@@ -918,6 +918,7 @@ class CopenhagenReboot extends Table
         self::checkAction( 'placePolyomino' );
 
         $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
 
         // BASIC INPUT VALIDATION
         if( !in_array($color, $this->polyomino_colors, true)) throw new feException( self::_("The provided color isn't valid."));
@@ -1058,13 +1059,19 @@ class CopenhagenReboot extends Table
         if( $discarded_card_count == 1) $notifyPlayerMessage = clienttranslate('${player_name} discarded ${discarded_card_count} card and placed ${log_polyomino}.');
         else if( $color == "white") $notifyPlayerMessage = clienttranslate('${player_name} placed ${log_polyomino}.');
         
+        // USE UP ANY ACTIVATED ABILITIES
+        if( self::getGameStateValue("ability_activated_construction_discount") == 1)
+        {
+            self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'construction_discount' AND owner = $player_id"); 
+            $this->notifyPlayersOfUsedAbilities( ["construction_discount"], $player_id, $player_name);
+        }
 
         // NOTIFY CLIENTS
         self::notifyAllPlayers( 
             "placePolyomino", 
             $notifyPlayerMessage,
             array(
-                "player_name" => self::getActivePlayerName(),
+                "player_name" => $player_name,
                 "discarded_card_count" => $discarded_card_count, 
                 "log_polyomino" => "$color-$squares",
 
@@ -1211,13 +1218,11 @@ class CopenhagenReboot extends Table
         $this->validateActivatedAbility( "construction_discount", $player_id);
 
         // UPDATE DATA
-        //   construction discount is used immediately
         self::setGameStateValue( 'ability_activated_construction_discount', 1 );
-        self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'construction_discount' AND owner = $player_id"); 
 
-        // NOTIFICATION - it's used right away
-        $used_abilities = ["construction_discount"];
-        $this->notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name);
+        // NOTIFICATION
+        $this->notifyPlayerOfActivatedAbility( "construction_discount", $player_id, $player_name);
+
         
     }
 
