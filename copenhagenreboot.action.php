@@ -93,8 +93,13 @@
         $y = self::getArg( "y", AT_posint, true );
         $flip = self::getArg( "flip", AT_posint, true );
         $rotation = self::getArg( "rotation", AT_posint, true );
+        $discards = self::getArg( "discards", AT_numberlist, false, "" );
 
-        $this->game->placePolyomino( $color, $squares, $copy, $x, $y, $flip, $rotation );
+        // transform discards into array
+        if( $discards == "") $discards = array();
+        else $discards = explode( ",", $discards);
+
+        $this->game->placePolyomino( $color, $squares, $copy, $x, $y, $flip, $rotation, $discards );
 
         self::ajaxResponse(); 
     }

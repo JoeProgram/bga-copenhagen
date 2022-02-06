@@ -722,17 +722,11 @@ class CopenhagenReboot extends Table
 
         $cards = $this->cards->getCardsInLocation("hand", self::getActivePlayerId());
 
-        self::warn("countCardsOfColorInHand");
-        self::warn(json_encode($cards));
-
         // SPECIAL ABILITY - CHANGE OF COLORS
         if( self::getGameStateValue("ability_activated_change_of_colors") == 1 )
         {
             $from_color = $this->colors[ self::getGameStateValue("change_of_colors_from") ];
             $to_color = $this->colors[ self::getGameStateValue("change_of_colors_to") ];
-
-            self::warn("From color $from_color");
-            self::warn("To color $to_color");
 
             // PHP NOTE:
             //  The default foreach is going to pass by value - so you can't modify on the go
@@ -740,10 +734,10 @@ class CopenhagenReboot extends Table
             foreach( $cards as $card_id => &$card) if( $card["type"] == $from_color ) $card["type"] = $to_color;
         }
 
-        self::warn("----");
-        self::warn(json_encode($cards));
-
-        return array_filter( $cards, function($x) { return $x['type'] == "purple"; });
+        // PHP NOTE: CLOSURES
+        //  anonymous functions don't get access to the enclosing functions variables by default.
+        //  you pass them along with the "use" keyword, as below.
+        return array_filter( $cards, function($x) use ($color) { return $x['type'] == $color; });
     }
 
     function notifyPlayersOfTakenCard( $card_id, $color, $player_id, $player_name)
@@ -957,7 +951,7 @@ class CopenhagenReboot extends Table
 
     }
 
-    function placePolyomino( $color, $squares, $copy, $x, $y, $flip, $rotation )
+    function placePolyomino( $color, $squares, $copy, $x, $y, $flip, $rotation, $discards )
     {
 
         self::checkAction( 'placePolyomino' );
@@ -1017,7 +1011,6 @@ class CopenhagenReboot extends Table
         if( !$this->isGroundedPosition($grid_cells, $playerboard)) throw new feException( self::_("The polyomino must sit on the bottom of the facade, or on another facade tile."));
 
         // CHECK PLAYER CAN AFFORD POLYOMINO
-
         if( $color == "white")
         {
             if($this->gamestate->state()["name"] != "coatOfArms") throw new feException( self::_("You can only play special facade tiles from a coat of arms action"));
@@ -1030,6 +1023,19 @@ class CopenhagenReboot extends Table
 
             $valid_cards = $this->getCardsOfColorInHand( $color );
             if( count($valid_cards) < $cost )  throw new feException( self::_("You don't have enough cards to place that facade tile in that spot."));
+
+            // (OPTIONAL) CHECK DISCARDS ARE VALID
+            if( count($discards) > 0)
+            {
+                // MAKE SURE THE DISCARDS MATCH THE COST
+                self::warn("discards is ". count($discards) . "     ");
+                self::warn("cost is ". $cost . "     ");
+
+                if( count($discards) != $cost )  throw new feException( self::_("You are trying to discard the wrong number of cards."));
+
+                // MAKE SURE EACH DISCARDED CARD IS VALID
+                foreach( $discards as $discard ) if( !array_key_exists( $discard, $valid_cards)) throw new feException( self::_("You are trying to discard an invalid card to play that facade tile."));
+            }
         }
 
 
@@ -1092,8 +1098,17 @@ class CopenhagenReboot extends Table
         $discard_ids = array();
         if( $color != "white")
         {
-            $discard_ids = array_keys( $valid_cards );
-            $discard_ids = array_slice($discard_ids, 0, $cost);
+            // IF PLAYER HAS SPECIFIED DISCARDS, USE THOSE
+            if( count($discards) > 0 )
+            {
+                $discard_ids = $discards;
+            }
+            // OTHERWISE, PICK FOR THEM
+            else
+            {
+                $discard_ids = array_keys( $valid_cards );
+                $discard_ids = array_slice($discard_ids, 0, $cost);    
+            }
             
             $this->cards->moveCards( $discard_ids, "discard");
         }

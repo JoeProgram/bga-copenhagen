@@ -62,7 +62,7 @@ $machinestates = array(
     ),
     
     // Note: ID=2 => your first state
-    // NEXT UNUSED STATE: 12
+    // NEXT UNUSED STATE: 13
 
     2 => array(
         "name" => "nextPlayer",
@@ -125,7 +125,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} may place a facade tile.'),
         "type" => "activeplayer",
         "possibleactions" => array( "placePolyomino", "endTurn", "activateAbilityConstructionDiscount", "activateAbilityChangeOfColors",),
-        "transitions" => array(  "placePolyomino" => 7, "coatOfArms" => 8, "refillHarbor" => 50 )
+        "transitions" => array(  "placePolyomino" => 7, "coatOfArms" => 8, "refillHarbor" => 50, )
     ), 
     
     4 => array(

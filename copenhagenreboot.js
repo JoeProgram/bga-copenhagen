@@ -90,7 +90,10 @@ function (dojo, declare) {
 
             this.hasConstructionDiscounted = false;
             this.changeOfColorsCardHandlers = []; // keep track of the click handles attached to the hand of cards (doing it this way since cards in hand change all the time)
-
+            this.changeColorsFromTo = null;
+            this.cardsToDiscard = [];
+            this.cellToPlacePolyomino = null;
+            this.discardHandlers = []; // keep track of click handles attached to cards in hand when choosing which cards to discard
 
         },
         
@@ -230,6 +233,7 @@ function (dojo, declare) {
                 if( abilityName == "change_of_colors")
                 {
                     this.triggerChangeOfColorsAbility( this.gamedatas.change_of_colors.from_color, this.gamedatas.change_of_colors.to_color);
+                    this.col
                 }
             }
 
@@ -492,6 +496,8 @@ function (dojo, declare) {
 
             // CLEANUP CHANGE OF COLORS
             this.clearChangeOfColorsAbility();
+
+
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -526,7 +532,7 @@ function (dojo, declare) {
                     this.onLeavingTakeCardsLastCall();
                     break;        
 
-               case 'placePolyominoAfterTakingCards':
+                case 'placePolyominoAfterTakingCards':
                     this.onLeavingPlacePolyominoAfterTakingCards();
                     break;       
 
@@ -687,10 +693,21 @@ function (dojo, declare) {
 
         countColoredCardsInHand: function( color )
         {
-            var normalCardsNumber = dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card .copen_new_color.copen_hidden`).length;
-            var changedColorCardsNumber = dojo.query(`#copen_wrapper #cards_in_hand .copen_card .copen_new_color.copen_${color}_card`).length;
-            return normalCardsNumber + changedColorCardsNumber;
+            return this.getNodeListOfColoredCardsInHand( color ).length;
         },
+
+        getNodeListOfColoredCardsInHand: function( color )
+        {
+            // NOTE - have to go down to the copen_new_color layer to make sure this card hasn't had its color changed
+            // but then we actually return the parents, since its the .copen_cards we'll be operating on.
+            var baseCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card .copen_new_color.copen_hidden`);
+            var changedColorCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card .copen_new_color.copen_${color}_card`);
+            var baseCards = baseCards.concat( changedColorCards );
+
+            return baseCards.map( function(node){
+                return node.parentNode;
+            });
+        },        
 
         hasTooManyCardsInHand: function()
         {
@@ -795,7 +812,7 @@ function (dojo, declare) {
             return polyominoId.split('-')[1].split('_')[0];
         },
 
-       getPolyominoCopyFromId: function( polyominoId )
+        getPolyominoCopyFromId: function( polyominoId )
         {
             return polyominoId.split('_')[1];
         },
@@ -809,17 +826,17 @@ function (dojo, declare) {
             };
         },
 
-        isCellEmpty: function( coordinates )
+        isCellEmpty: function( gridCell )
         {
-            return this.playerboard[coordinates.x][coordinates.y].fill == null;
+            return this.playerboard[gridCell.x][gridCell.y].fill == null;
         },
 
-        areCellsEmpty: function( coordinates )
+        areCellsEmpty: function( gridCells )
         {
 
-            for( var i = 0; i < coordinates.length; i++)
+            for( var i = 0; i < gridCells.length; i++)
             {
-                if( !this.isCellEmpty( coordinates[i]) )
+                if( !this.isCellEmpty( gridCells[i]) )
                 {
                     return false;
                 }
@@ -827,13 +844,13 @@ function (dojo, declare) {
             return true;
         },
 
-        isGroundedPosition: function( coordinates )
+        isGroundedPosition: function( gridCells )
         {
-            for( var i = 0; i < coordinates.length; i++)
+            for( var i = 0; i < gridCells.length; i++)
             {
-                if( coordinates[i].y == 0 ) return true;
+                if( gridCells[i].y == 0 ) return true;
 
-                var coordBelow = {x:coordinates[i].x, y:coordinates[i].y - 1};
+                var coordBelow = {x:gridCells[i].x, y:gridCells[i].y - 1};
                 if( !this.isCellEmpty(coordBelow)) return true;
             }
 
@@ -849,13 +866,22 @@ function (dojo, declare) {
             return false;
         },
 
-        isCellAdjacentToSameColor: function( coordinate, color )
+
+        getCostOfShapeAtPosition( gridCells, color )
+        {
+            var cost = gridCells.length;
+            if( this.isAdjacentToSameColor( gridCells, color) ) cost -= 1;
+            if( this.hasConstructionDiscounted ) cost -= 1;
+            return cost;
+        },
+
+        isCellAdjacentToSameColor: function( gridCells, color )
         {
             for( var i = 0; i < this.adjacentOffsets.length ; i++)
             {
 
-                var x = coordinate.x + this.adjacentOffsets[i].x;
-                var y = coordinate.y + this.adjacentOffsets[i].y;
+                var x = gridCells.x + this.adjacentOffsets[i].x;
+                var y = gridCells.y + this.adjacentOffsets[i].y;
 
                 // make sure its a valid square
                 if( x < 0 || x >= this.boardWidth || y < 0 || y >= this.boardHeight) continue;
@@ -866,11 +892,11 @@ function (dojo, declare) {
             return false;
         },
 
-        isValidPlacementPosition: function( coordinates )
+        isValidPlacementPosition: function( gridCells )
         {
 
             // CHECK EASY CONDITIONS FIRST
-            if( !this.areCellsEmpty( coordinates ) || !this.isGroundedPosition( coordinates )) return false; 
+            if( !this.areCellsEmpty( gridCells ) || !this.isGroundedPosition( gridCells )) return false; 
 
             // CHECK IF WE CAN AFFORD IT
             var color = this.getPolyominoColorFromId( this.selectedPolyomino.id);
@@ -880,13 +906,17 @@ function (dojo, declare) {
             
             // STANDARD RULES FOR OTHER COLORS
             var cardsOfColor = this.countColoredCardsInHand( color );
-            var squares = this.getPolyominoSquaresFromId( this.selectedPolyomino.id);
-
-            var cost = squares;
-            if( this.isAdjacentToSameColor( coordinates, color)) cost -= 1;
-            if( this.hasConstructionDiscounted ) cost -= 1;
-
+            //var squares = this.getPolyominoSquaresFromId( this.selectedPolyomino.id );
+            var cost = this.getCostOfShapeAtPosition( gridCells, color);
             return cardsOfColor >= cost;
+        },
+
+        getDifferenceBetweenCostAndCards: function( gridCells )
+        {
+            var color = this.getPolyominoColorFromId( this.selectedPolyomino.id);
+            var cardsOfColor = this.countColoredCardsInHand( color );
+            var cost = this.getCostOfShapeAtPosition( gridCells, color);
+            return cardsOfColor - cost;
         },
 
         // There's a few different systems we're using to identify polyomino placement
@@ -990,6 +1020,7 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #opponent_playerboards").addClass("copen_behind_shadow_box");  
 
             dojo.query("#copen_wrapper #polyomino_placement").style("display","block");
+            dojo.query("#copen_wrapper #polyomino_placement_buttons").style("display","block"); // sometimes we turn this off seperately from its parent - so make sure it's back on too
 
 
             dojo.animateProperty({
@@ -1000,6 +1031,39 @@ function (dojo, declare) {
                     opacity: {start: 0, end: 0.5},
                 }
             }).play();
+
+        },
+
+        showSelectDiscardUI: function( color, cost )
+        {
+            // MAKE SURE WE'RE COMING IN WITH CLEAN DATA STRUCTURE
+            this.discardHandlers = [];
+
+            // HIDE ADDITIONAL ELEMENTS
+            dojo.query("#copen_wrapper #polyomino_placement_buttons").style("display","none");
+            dojo.query(`#copen_wrapper #owned_player_area`).addClass("copen_behind_shadow_box");  
+
+            // FIRST, TAG ALL CARDS IN HAND AS UNUSABLE
+            dojo.query("#copen_wrapper #cards_in_hand .copen_card").addClass("copen_unusable");
+
+            // NEXT, GET SET CORRECT CARDS TO BE USABLE
+            var query = this.getNodeListOfColoredCardsInHand( color );
+            
+            for( var i = 0; i < query.length; i++ )
+            {
+                // CONNECT HANDLERS IN A WAY TO REMOVE THEM LATER
+                var handler = dojo.connect( query[i], "onclick", this, "onSelectCardToDiscard");
+                this.discardHandlers.push( handler ); 
+
+                // SHOW THEM AS USABLE
+                dojo.removeClass( query[i], "copen_unusable");
+                dojo.addClass( query[i], "copen_usable");
+            }
+
+            // DISPLAY INSTRUCTIONS TO USER
+            if( cost == 1 ) _(`Select 1 card to discard`);
+            else this.gamedatas.gamestate.descriptionmyturn = _(`Select ${cost} cards to discard`);
+            this.updatePageTitle();
 
         },
 
@@ -1017,6 +1081,63 @@ function (dojo, declare) {
                     opacity: {start: 0.5, end: 0},
                 }
             }).play(); 
+        },
+
+        // SEND REQUEST TO SERVER TO TRY AND PLACE POLYOMINO
+        //  or, in special circumstances, ask the player which cards they would like to discard first
+        requestPlacePolyomino: function()
+        {
+            var color = this.getPolyominoColorFromId( this.selectedPolyomino.id );
+            var coordinates = this.getCoordinatesFromId( this.cellToPlacePolyomino );
+            var adjustedCoordinates = this.getAdjustedCoordinates( this.selectedPolyomino["shape"], coordinates);
+            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , adjustedCoordinates );
+            
+            // CLIENT VALIDATION - CHECK FOR A VALID POSITION
+            var validity = this.isValidPlacementPosition( gridCells );
+            if( !validity ) return; // can't place polyomino if space isn't valid
+
+            // SPECIAL CASE - CHOOSING DISCARD CARDS
+            //  usually, the player doesn't need to pick which cards to discard
+            //  but if they've used change of color, and have more cards than needed - they might care which ones are spent
+            //  if that's the case, redirect them to choose which cards to discard
+            if( this.changeColorsFromTo != null)
+            {
+
+                var cardsOfColor = this.countColoredCardsInHand( color );
+                var cost = this.getCostOfShapeAtPosition( gridCells, color);
+
+                if( cardsOfColor - cost > 0 )
+                {
+                    if( this.cardsToDiscard.length == 0 )
+                    {
+                        this.showSelectDiscardUI( color, cost );
+                        return;
+                    }
+                    else if( this.cardsToDiscard.length < cost )
+                    {
+                        return;
+                    }
+                }
+            }
+
+            console.log("about to place");
+            console.log(this.cardsToDiscard.join(","));
+
+            // SEND SERVER REQUEST
+            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/placePolyomino.html",
+            {
+                color: this.getPolyominoColorFromId( this.selectedPolyomino.id) ,
+                squares: this.getPolyominoSquaresFromId( this.selectedPolyomino.id),
+                copy:this.getPolyominoCopyFromId( this.selectedPolyomino.id),
+                x:adjustedCoordinates.x,
+                y:adjustedCoordinates.y,
+                flip:this.selectedPolyomino["flip"],
+                rotation:this.selectedPolyomino["rotation"],
+                discards:this.cardsToDiscard.join(","),
+            }, this, function( result ){} ); 
+
+            // IF WE USED THE DISCARD UI, CLEAN UP THE HANDLERS NOW THAT WE'RE DONE WITH IT
+            dojo.forEach( this.discardHandlers, dojo.disconnect);
         },
 
         placePolyomino: function( polyominoData )
@@ -1170,6 +1291,9 @@ function (dojo, declare) {
         triggerChangeOfColorsAbility: function( fromColor, toColor)
         {
 
+            this.changeColorsFromTo = {};
+            this.changeColorsFromTo[fromColor] = toColor;
+
             dojo.query(`#copen_wrapper #cards_in_hand .copen_${fromColor}_card .copen_new_color`)
                 .removeClass('copen_hidden')
                 .addClass(`copen_${toColor}_card`);
@@ -1184,6 +1308,10 @@ function (dojo, declare) {
                 dojo.query(`#copen_wrapper #cards_in_hand .copen_new_color`).removeClass( this.cardColorOrder[i]);
             }
             dojo.query(`#copen_wrapper #cards_in_hand .copen_new_color`).addClass("copen_hidden");
+
+            this.changeColorsFromTo = null;
+            this.cardsToDiscard = [];
+            this.cellToPlacePolyomino = null;
         },
 
         fadeInHand: function()
@@ -1483,32 +1611,28 @@ function (dojo, declare) {
         {
             dojo.stopEvent( event );
 
+            // CLIENT VALIDATION
             if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
- 
-            var coordinates = this.getCoordinatesFromId( event.currentTarget.id);
-            var adjustedCoordinates = this.getAdjustedCoordinates( this.selectedPolyomino["shape"], coordinates);
-            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , adjustedCoordinates );
-            
-            // CLIENT VALIDATION - CHECK FOR A VALID POSITION
-            var validity = this.isValidPlacementPosition( gridCells );
-            if( !validity ) return; // can't place polyomino if space isn't valid
+            if( !this.checkAction('placePolyomino')) return;
 
-            // SEND SERVER REQUEST
-            if( this.checkAction('placePolyomino'))
+            // WE'LL NEED TO STORE THIS, IN CASE THE PLAYER NEEDS TO SELECT THEIR DISCARDS
+            this.cellToPlacePolyomino = event.currentTarget.id;
+
+            this.requestPlacePolyomino();
+        },
+
+        onSelectCardToDiscard: function(event)
+        {
+            console.log( "onSelectCardToDiscard" );
+
+            dojo.addClass(event.currentTarget, "copen_activated");
+
+            if( !this.cardsToDiscard.includes(event.currentTarget.id))
             {
-
-                this.ajaxcall( "/copenhagenreboot/copenhagenreboot/placePolyomino.html",
-                {
-                    color: this.getPolyominoColorFromId( this.selectedPolyomino.id) ,
-                    squares: this.getPolyominoSquaresFromId( this.selectedPolyomino.id),
-                    copy:this.getPolyominoCopyFromId( this.selectedPolyomino.id),
-                    x:adjustedCoordinates.x,
-                    y:adjustedCoordinates.y,
-                    flip:this.selectedPolyomino["flip"],
-                    rotation:this.selectedPolyomino["rotation"],
-                    card_id:event.currentTarget.id.split("_")[1],
-                }, this, function( result ){} ); 
+                this.cardsToDiscard.push( event.currentTarget.id.split("_")[1]);
+                this.requestPlacePolyomino();
             }
+            
         },
 
         onTakeAbilityTile: function( event )
