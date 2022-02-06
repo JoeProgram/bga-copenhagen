@@ -1143,6 +1143,34 @@ class CopenhagenReboot extends Table
 
     }
 
+    function resetUsedAbilities()
+    {
+
+        self::checkAction( 'resetUsedAbilities' );
+
+        $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
+
+        self::DbQuery("UPDATE ability_tile SET used = 0 WHERE owner = $player_id");
+
+        self::notifyAllPlayers( 
+            "resetUsedAbilities", 
+            clienttranslate('${player_name} flipped over their used ability tiles.'),
+            array(
+                "player_name" => $player_name,
+                "player_id" => $player_id,
+            )   
+        );
+
+        // COAT OF ARMS
+        $coat_of_arms_earned = self::getGameStateValue( 'coat_of_arms_earned' );
+        $coat_of_arms_earned -= 1;
+        self::setGameStateValue( 'coat_of_arms_earned', $coat_of_arms_earned );
+
+        if( $coat_of_arms_earned > 0 ) $this->gamestate->nextState( "coatOfArms" );
+        else $this->gamestate->nextState( "nextPlayer" );
+    }
+
 
     function activateAbilityAnyCards()
     {

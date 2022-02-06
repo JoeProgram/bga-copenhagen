@@ -452,23 +452,29 @@ function (dojo, declare) {
 
             if( args.active_player != this.player_id ) return;
 
-            dojo.query(".copen_white_polyomino.copen_top_of_stack").forEach(function(polyomino)
-            {
-                dojo.addClass( polyomino, "copen_usable");
-            });
-
+            dojo.query("#copen_wrapper .copen_white_polyomino.copen_top_of_stack").addClass( "copen_usable");
+            dojo.query("#copen_wrapper #owned_player_area .copen_used_ability").addClass("copen_usable");
             this.determineWhichAbilityTilesAreTakeable();
+
+
+
         },
 
         onLeavingCoatOfArms()
         {
             dojo.query("#copen_wrapper .copen_polyomino.copen_usable").removeClass("copen_usable");
             dojo.query("#copen_wrapper .copen_polyomino.copen_unusable").removeClass("copen_unusable");
+            dojo.query("#copen_wrapper #owned_player_area .copen_used_ability").removeClass("copen_usable");
         },
 
         onEnteringRefillHarbor( args )
         {
             this.hasConstructionDiscounted = false; // reset between turns
+
+            // DEACTIVATE UNUSED ABILITIES
+            //  sometimes a player might activate an ability, but not actually use it
+            //  make sure to turn it off on the client side
+            dojo.query("#copen_wrapper .copen_activated").removeClass(".copen_activated");
         },
 
         // onLeavingState: this method is called each time we are leaving a game state.
@@ -727,15 +733,8 @@ function (dojo, declare) {
                 var cardsOfColor = game.countColoredCardsInHand( color );
 
                 var cost = squares;
-                console.log( `Squares ${squares}`);
                 if( color != "white" && game.hasPolyominoOfColorOnBoard( color ) ) cost -= 1; // reduce cost by 1 if there's any matching polyominoes on board
-                console.log( `Adjacent Bonus ${cost}`);
                 if( game.hasConstructionDiscounted ) cost -= 1;
-
-                console.log( `Construction Discounted ${cost}`);
-
-                console.log( `Cost for ${ polyomino.id} is ${cost}`);
-                console.log( `Construction discount is ${game.hasConstructionDiscounted}`);
 
                 // see if player can afford polyomino
                 if( cardsOfColor >= cost ) dojo.addClass( polyomino, "copen_usable");
@@ -1106,9 +1105,6 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper .copen_ability_tile_stack .copen_ability_tile:last-child").forEach(function( abilityTile){
                 var abilityName = abilityTile.id.split('-')[0];
 
-                console.log("determineWhichAbilityTilesAreTakeable");
-                console.log( abilityName);
-
                 if( !game.ownsAbility(abilityName) ) dojo.addClass( abilityTile, "copen_usable" );
                 else dojo.addClass( abilityTile, "copen_unusable" );
             });
@@ -1425,6 +1421,8 @@ function (dojo, declare) {
 
         onActivateAbilityAnyCards: function( event )
         {
+            // SPECIAL CASE - Do something different if the ability is used
+            if( dojo.hasClass(event.currentTarget, "copen_used_ability")) return this.onResetUsedAbilities( event ); 
 
             if( !this.checkAction('activateAbilityAnyCards')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
@@ -1437,6 +1435,8 @@ function (dojo, declare) {
 
         onActivateAbilityAdditionalCard: function( event )
         {
+            // SPECIAL CASE - Do something different if the ability is used
+            if( dojo.hasClass(event.currentTarget, "copen_used_ability")) return this.onResetUsedAbilities( event );
 
             if( !this.checkAction('activateAbilityAdditionalCard')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
@@ -1449,6 +1449,8 @@ function (dojo, declare) {
 
         onActivateAbilityBothActions: function( event )
         {
+            // SPECIAL CASE - Do something different if the ability is used
+            if( dojo.hasClass(event.currentTarget, "copen_used_ability")) return this.onResetUsedAbilities( event );
 
             if( !this.checkAction('activateAbilityBothActions')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
@@ -1459,8 +1461,10 @@ function (dojo, declare) {
 
         },
 
-       onActivateAbilityConstructionDiscount: function( event )
+        onActivateAbilityConstructionDiscount: function( event )
         {
+            // SPECIAL CASE - Do something different if the ability is used
+            if( dojo.hasClass(event.currentTarget, "copen_used_ability")) return this.onResetUsedAbilities( event );
 
             if( !this.checkAction('activateAbilityConstructionDiscount')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
@@ -1469,6 +1473,16 @@ function (dojo, declare) {
             {
             }, this, function( result ){} ); 
 
+        },
+
+        onResetUsedAbilities: function( event )
+        {
+            if( !this.checkAction('resetUsedAbilities')) return;
+            if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+
+            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/resetUsedAbilities.html",
+            {
+            }, this, function( result ){} ); 
         },
 
         onEndTurn: function( event )
@@ -1512,6 +1526,8 @@ function (dojo, declare) {
             dojo.subscribe( 'activateAbility', this, 'notif_activateAbility' );
 
             dojo.subscribe( 'usedAbility', this, 'notif_usedAbility' );
+
+            dojo.subscribe( 'resetUsedAbilities', this, 'notif_resetUsedAbilities' );
 
             dojo.subscribe( 'updateScore', this, 'notif_updateScore' );
         },  
@@ -1630,9 +1646,6 @@ function (dojo, declare) {
         notif_activateAbility: function(notif)
         {
 
-            console.log("notif_activateAbility");
-            console.log( notif);
-
             var node = dojo.query(`#copen_wrapper #copen_ability_slot_${notif.args.ability_name}_${notif.args.player_id} .copen_ability_tile`)[0];
             dojo.addClass( node, "copen_activated");
 
@@ -1651,8 +1664,14 @@ function (dojo, declare) {
         {
             // DEACTIVATE ANY USED UP ABILITIES
             this.deactivateUsedAbility( notif.args.used_ability, notif.args.player_id);
+        },
 
-
+        notif_resetUsedAbilities: function(notif)
+        {
+            if( notif.args.player_id == this.player_id)
+            {
+                dojo.query(`#copen_wrapper #owned_player_area .copen_used_ability`).removeClass("copen_used_ability");    
+            }
 
         },
 
@@ -1691,7 +1710,6 @@ function (dojo, declare) {
 
         postProcessLogKey(key, args)
         {
-            console.log( "post process" + key);
 
             switch(key)
             {
@@ -1717,9 +1735,6 @@ function (dojo, declare) {
 
         postProcessLogAbilityTile( key, args )
         {
-            console.log("postProcessLogAbilityTile");
-            console.log( key );
-            console.log( args );
 
             return this.format_block('jstpl_log_ability_tile',{
                 log_ability_tile: args[key],               

@@ -138,6 +138,13 @@
         self::ajaxResponse(); 
     }
 
+    public function resetUsedAbilities()
+    {
+        self::setAjaxMode();  
+        $this->game->resetUsedAbilities();
+        self::ajaxResponse(); 
+    }
+
     public function endTurn()
     {
         self::setAjaxMode();  
