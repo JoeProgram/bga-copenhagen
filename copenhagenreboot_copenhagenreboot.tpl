@@ -116,7 +116,16 @@
             <!-- END owned_ability_tile_area -->
         </div>
 
-              
+        <div id="change_of_color_ui">
+            <!-- BEGIN change_of_color_option -->
+                <div class="copen_change_of_color_option copen_usable">
+                    <div class="copen_card"></div>
+                    <div class="copen_new_color"></div>
+                </div>
+            <!-- END change_of_color_option -->
+        </div>
+
+
     </div>
  
     <div id="bottom_chunk">
@@ -159,6 +168,7 @@
             <div id="polyomino_flip_button"></div>
         </div>
     </div>
+
 
 
 </div>

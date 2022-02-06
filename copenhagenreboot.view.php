@@ -117,6 +117,11 @@
             }
         }
 
+        // BUILDS COLOR CHANGE OPTIONS
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "change_of_color_option");
+        for( $i = 0; $i < 4; $i++ ) $this->page->insert_block( "change_of_color_option", []);
+
+
         /*
         
         // Examples: set the value of some element defined in your tpl file like this: {MY_VARIABLE_ELEMENT}
@@ -131,28 +136,6 @@
         $this->tpl['MY_VARIABLE_ELEMENT'] = self::raw( $some_html_code );
         
         */
-        
-        /*
-        
-        // Example: display a specific HTML block for each player in this game.
-        // (note: the block is defined in your .tpl file like this:
-        //      <!-- BEGIN myblock --> 
-        //          ... my HTML code ...
-        //      <!-- END myblock --> 
-        
-
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "myblock" );
-        foreach( $players as $player )
-        {
-            $this->page->insert_block( "myblock", array( 
-                                                    "PLAYER_NAME" => $player['player_name'],
-                                                    "SOME_VARIABLE" => $some_value
-                                                    ...
-                                                     ) );
-        }
-        
-        */
-
 
 
         /*********** Do not change anything below this line  ************/

@@ -250,6 +250,10 @@ function (dojo, declare) {
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
+            // TESTING
+            dojo.query("#deck").connect("onclick", this, 'fadeInShadowBox');
+
+
             console.log( "Ending game setup" );
 
         },    

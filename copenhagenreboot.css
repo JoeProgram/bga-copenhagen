@@ -830,6 +830,47 @@
     background-position: -55px -57px
 }
 
+
+#change_of_color_ui
+{
+    display: none;
+    width: 353px;
+    height: 101px;
+
+    position:  absolute;
+    left: 23px;
+    top: 350px;
+}
+
+.copen_change_of_color_option
+{
+    display:  inline-block;
+    width: 66px;
+    height: 101px;
+    margin-right: 4px;
+    position:  relative;
+}
+
+.copen_new_color
+{
+    display: block;
+    width: 66px;
+    height:  101px;
+
+    position: absolute;
+
+    background-image:  url('img/cards.png');
+    background-position: -70px 0px;
+
+    -webkit-mask-image: url('img/cards.png');
+    mask-image: url('img/cards.png');
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    -webkit-mask-position: -420px 0px;
+    mask-position: -420px 0px;
+}
+
+
 /* UI Playerboards */
 
 .player_board_content .copen_hand_size_wrapper
