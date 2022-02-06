@@ -116,13 +116,13 @@
             <!-- END owned_ability_tile_area -->
         </div>
 
-        <div id="change_of_color_ui">
-            <!-- BEGIN change_of_color_option -->
-                <div class="copen_change_of_color_option copen_usable">
+        <div id="change_of_colors_ui">
+            <!-- BEGIN change_of_colors_option -->
+                <div class="copen_change_of_colors_option copen_usable">
                     <div class="copen_card"></div>
                     <div class="copen_new_color"></div>
                 </div>
-            <!-- END change_of_color_option -->
+            <!-- END change_of_colors_option -->
         </div>
 
 
@@ -177,7 +177,9 @@
 <script type="text/javascript">
 
 /****************************** JAVASCRIPT HTML TEMPLATES ******************************/
-var jstpl_card='<div id="card_${id}" class="copen_card copen_${color}_card"></div>';
+var jstpl_card= '<div id="card_${id}" class="copen_card copen_${color}_card">' +
+                    '<div class="copen_new_color copen_hidden"></div>' +
+                '</div>';
 var jstpl_polyomino='<div id="${color}-${squares}_${copy}" class="copen_polyomino copen_${color}_polyomino copen_${color}-${squares}" style="transform: rotateY(${flip}deg) rotateZ(${rotation}deg)"></div>';
 
 var jstpl_player_board = '<div class="copen_hand_size_wrapper">' +

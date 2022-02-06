@@ -89,6 +89,8 @@ function (dojo, declare) {
             };
 
             this.hasConstructionDiscounted = false;
+            this.changeOfColorsCardHandlers = []; // keep track of the click handles attached to the hand of cards (doing it this way since cards in hand change all the time)
+
 
         },
         
@@ -224,6 +226,11 @@ function (dojo, declare) {
                     this.hasConstructionDiscounted = true;
                     this.determineUsablePolyominoes();
                 }
+
+                if( abilityName == "change_of_colors")
+                {
+                    this.triggerChangeOfColorsAbility( this.gamedatas.change_of_colors.from_color, this.gamedatas.change_of_colors.to_color);
+                }
             }
 
 
@@ -236,6 +243,7 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
             dojo.query("#copen_wrapper #polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#copen_wrapper #polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
+            dojo.query("#copen_wrapper .copen_change_of_colors_option").connect('onclick', this, 'onSelectChangeOfColorsOption' );
 
             this.determineTopPolyominoInEveryStack();
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
@@ -246,12 +254,10 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #owned_player_area .copen_additional_card").connect( 'onclick', this, 'onActivateAbilityAdditionalCard');
             dojo.query("#copen_wrapper #owned_player_area .copen_both_actions").connect( 'onclick', this, 'onActivateAbilityBothActions');
             dojo.query("#copen_wrapper #owned_player_area .copen_construction_discount").connect( 'onclick', this, 'onActivateAbilityConstructionDiscount');
+            var query = dojo.query("#copen_wrapper #owned_player_area .copen_change_of_colors").connect( 'onclick', this, 'onActivateAbilityChangeOfColors');
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
-
-            // TESTING
-            dojo.query("#deck").connect("onclick", this, 'fadeInShadowBox');
 
 
             console.log( "Ending game setup" );
@@ -332,6 +338,7 @@ function (dojo, declare) {
             this.setAbilityAsUsable( "additional_card");
             this.setAbilityAsUsable( "both_actions");
             this.setAbilityAsUsable( "construction_discount");
+            this.setAbilityAsUsable( "change_of_colors");
 
         },
 
@@ -442,6 +449,7 @@ function (dojo, declare) {
                 this.determineUsablePolyominoes();
 
                 this.setAbilityAsUsable( "construction_discount");
+                this.setAbilityAsUsable( "change_of_colors");
             }
         },
 
@@ -622,6 +630,16 @@ function (dojo, declare) {
                 this.placeOnObject( card, "deck" ); // we use some visual illusion here.  The card starts on its final parent, but we snap it to the deck, then animate its slide back to its actual parent
                 this.slideToObject( card, `harbor_position_${cardData.location_arg}`, 500  ).play();
                 dojo.connect(card, "onclick", this, "onTakeHarborCard");
+        },
+
+        getColorNameOfCard: function( node )
+        {
+
+            for( var i = 0; i < this.cardColorOrder.length; i++ )
+            {
+                if( dojo.hasClass(node, this.cardColorOrder[i])) return this.cardColorOrder[i];
+            }
+
         },
 
         // we want to keep cards organized by color in hand
@@ -952,10 +970,10 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #polyomino_preview").style("display","none");
         },
 
-        fadeInShadowBox: function()
+        fadeInPolyominoPlacementUI: function()
         {
 
-            dojo.style("shadow_box", "opacity","0"); // note - don't use the (#) pound symbol for this function
+            dojo.style("shadow_box", "opacity","0"); 
             
             // set elements behind the shadow box
             dojo.query("#copen_wrapper #harbors").addClass("copen_behind_shadow_box");
@@ -978,7 +996,7 @@ function (dojo, declare) {
 
         },
 
-        fadeOutShadowBox: function()
+        fadeOutPolyominoPlacementUI: function()
         {
             dojo.query("#copen_wrapper .copen_behind_shadow_box").removeClass("copen_behind_shadow_box");
 
@@ -1142,6 +1160,96 @@ function (dojo, declare) {
             this.updatePageTitle();
         },
 
+        triggerChangeOfColorsAbility: function( fromColor, toColor)
+        {
+            console.log("triggerChangeOfColorsAbility");
+            console.log(fromColor);
+            console.log(toColor);
+
+            dojo.query(`#copen_wrapper #cards_in_hand .copen_${fromColor}_card .copen_new_color`)
+                .removeClass('copen_hidden')
+                .addClass(`copen_${toColor}_card`);
+        },
+
+        clearChangeOfColorsAbility: function()
+        {
+            for( var i = 0; i < this.cardColorOrder; i++ )
+            {
+                dojo.query(`#copen_wrapper #cards_in_hand .copen_new_color`).removeClass( this.cardColorOrder[i]);
+            }
+            dojo.query(`#copen_wrapper #cards_in_hand .copen_new_color`).addClass("copen_hidden");
+        },
+
+        fadeInHand: function()
+        {
+
+            dojo.style("shadow_box", "opacity","0"); 
+            
+            // set elements behind the shadow box
+            dojo.query("#copen_wrapper #harbors").addClass("copen_behind_shadow_box");
+            dojo.query("#copen_wrapper #deck_cards").addClass("copen_behind_shadow_box");
+            dojo.query("#copen_wrapper #harbor_cards").addClass("copen_behind_shadow_box");
+            dojo.query("#copen_wrapper #polyominoes").addClass("copen_behind_shadow_box");  
+            dojo.query("#copen_wrapper #opponent_playerboards").addClass("copen_behind_shadow_box");  
+            dojo.query(`#copen_wrapper #owned_player_area`).addClass("copen_behind_shadow_box");  
+
+            dojo.animateProperty({
+                node: "shadow_box",
+                duration: 500,
+                properties: 
+                {
+                    opacity: {start: 0, end: 0.5},
+                }
+            }).play();
+
+        },
+
+        showChangeOfColorsUI: function( selectedCard, baseColorName )
+        {
+
+            dojo.query("#copen_wrapper #change_of_colors_ui .copen_card").addClass(baseColorName);
+
+            console.log("showChangeOfColorsUI");
+
+            var queryIndex = 0;
+            var cardColorOptionQuery = dojo.query("#copen_wrapper .copen_change_of_colors_option");
+            for( var i = 0; i < this.cardColorOrder.length; i++ )
+            {
+                if( this.cardColorOrder[i] == baseColorName) continue; //skip the base color card.  i.e. - we won't show an option to change "green" into "green"
+            
+                var query = dojo.query(".copen_new_color", cardColorOptionQuery[queryIndex]).addClass(this.cardColorOrder[i]);
+
+                queryIndex += 1;
+            }
+
+            dojo.style("change_of_colors_ui","display","block");
+            this.placeOnObject( "change_of_colors_ui", selectedCard );
+            dojo.style("change_of_colors_ui","left", "75px");
+
+        },
+
+        fadeOutChangeOfColorsUI: function()
+        {
+            dojo.query("#copen_wrapper .copen_behind_shadow_box").removeClass("copen_behind_shadow_box");
+
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card_red").removeClass("copen_card_red");
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card_yellow").removeClass("copen_card_yellow");
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card_green").removeClass("copen_card_green");
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card_blue").removeClass("copen_card_blue");
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card_purple").removeClass("copen_card_purple");
+
+            dojo.query("#copen_wrapper #change_of_colors_ui").style("display","none");
+
+            dojo.animateProperty({
+                node: "shadow_box",
+                duration: 500,
+                properties: 
+                {
+                    opacity: {start: 0.5, end: 0},
+                }
+            }).play(); 
+        },
+
         ///////////////////////////////////////////////////
         //// Player's action
         
@@ -1213,7 +1321,7 @@ function (dojo, declare) {
             this.selectedPolyomino["flip"] = 0;
             this.selectedPolyomino.originalPosition = dojo.getMarginBox( event.currentTarget); // getMarginBox includes 'l' and 't' - the values for "left" and "top"
 
-            this.fadeInShadowBox(); // have to fade in the shadow box first - or the display:none css style won't allow the polyomino to slide to the target correctly
+            this.fadeInPolyominoPlacementUI(); // have to fade in the shadow box first - or the display:none css style won't allow the polyomino to slide to the target correctly
 
             this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
             this.slideToObject( this.selectedPolyomino.id, "polyomino_placement_target", 500 ).play();
@@ -1354,7 +1462,7 @@ function (dojo, declare) {
             dojo.query( `#copen_wrapper #${this.selectedPolyomino.id}`).connect("onclick",this,"onSelectPolyomino");
 
             this.selectedPolyomino = null;
-            this.fadeOutShadowBox();
+            this.fadeOutPolyominoPlacementUI();
             this.clearPreview();
 
             dojo.style("cancel_polyomino_placement","display","none");
@@ -1479,6 +1587,76 @@ function (dojo, declare) {
 
         },
 
+        onActivateAbilityChangeOfColors: function( event )
+        {
+            // SPECIAL CASE - Do something different if the ability is used
+            if( dojo.hasClass(event.currentTarget, "copen_used_ability")) return this.onResetUsedAbilities( event );
+
+            if( !this.checkAction('activateAbilityChangeOfColors')) return;
+            if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+
+            // CHANGE OF COLORS DOES SOME UI WORK BEFORE TALKING TO THE SERVER
+            this.fadeInHand();
+            dojo.addClass(event.currentTarget, "copen_activated");
+
+            this.gamedatas.gamestate.descriptionmyturn = _("Select a color from your hand.");
+            this.updatePageTitle();
+
+            // SET CARDS AS USABLE WITH A CLICK EVENT
+            dojo.query("#copen_wrapper #cards_in_hand .copen_card").addClass("copen_usable");
+            var cardsInHandQuery = dojo.query("#copen_wrapper #cards_in_hand .copen_card"); 
+
+            for( var i = 0; i < cardsInHandQuery.length; i++ )
+            {
+                // have to connect this a little differently, since we want to remove thse handlers later
+                var handler = dojo.connect( cardsInHandQuery[i], "onclick", this, "onSelectColorFromHandToChange");
+                this.changeOfColorsCardHandlers.push( handler ); 
+            }
+
+        },
+
+        onSelectColorFromHandToChange: function ( event )
+        {
+
+            if( !this.checkAction('activateAbilityChangeOfColors')) return;
+
+            var colorName = this.getColorNameOfCard( event.currentTarget );
+
+
+            var color = colorName.split("_")[1];
+            this.showChangeOfColorsUI( event.currentTarget, colorName );
+
+            // GIVE INSTRUCTIONS
+            this.gamedatas.gamestate.descriptionmyturn = _(`What treat ${color} cards as what color?`);
+            this.updatePageTitle();
+            
+            // CLEAN UP EFFECTS ON CARDS IN HAND
+            dojo.query("#copen_wrapper #cards_in_hand .copen_usable").removeClass("copen_usable");
+            dojo.forEach( this.changeOfColorsCardHandlers, dojo.disconnect);
+
+        },
+
+        onSelectChangeOfColorsOption: function ( event )
+        {
+
+            if( !this.checkAction('activateAbilityChangeOfColors')) return;
+
+            var fromColorName = this.getColorNameOfCard( dojo.query( ".copen_card", event.currentTarget)[0] );
+            var fromColor = fromColorName.split("_")[1];
+
+            var toColorName = this.getColorNameOfCard( dojo.query( ".copen_new_color", event.currentTarget)[0] );
+            var toColor = toColorName.split("_")[1];
+
+            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityChangeOfColors.html",
+            {
+                from_color: fromColor,
+                to_color: toColor,
+            }, this, function( result ){} ); 
+
+            this.fadeOutChangeOfColorsUI();
+
+        },
+
         onResetUsedAbilities: function( event )
         {
             if( !this.checkAction('resetUsedAbilities')) return;
@@ -1528,6 +1706,7 @@ function (dojo, declare) {
             dojo.subscribe( 'takeAbilityTile', this, 'notif_takeAbilityTile' );
 
             dojo.subscribe( 'activateAbility', this, 'notif_activateAbility' );
+            dojo.subscribe( 'activateAbilityChangeOfColors', this, 'notif_activateAbilityChangeOfColors' );
 
             dojo.subscribe( 'usedAbility', this, 'notif_usedAbility' );
 
@@ -1610,7 +1789,7 @@ function (dojo, declare) {
 
             if( this.player_id == notif.args.player_id)
             {
-              this.fadeOutShadowBox(); // NOTE: this needs to come after polyomino placement, or it messes up where the polyomino ends up
+              this.fadeOutPolyominoPlacementUI(); // NOTE: this needs to come after polyomino placement, or it messes up where the polyomino ends up
               this.playerboard = notif.args.playerboard;  
             } 
 
@@ -1653,7 +1832,7 @@ function (dojo, declare) {
             var node = dojo.query(`#copen_wrapper #copen_ability_slot_${notif.args.ability_name}_${notif.args.player_id} .copen_ability_tile`)[0];
             dojo.addClass( node, "copen_activated");
 
-            // SPECIAL CASEW FOR ANY CARDS
+            // SPECIAL CASE FOR ANY CARDS
             if( this.stateName == "takeAdjacentCard" && notif.args.ability_name == "any_cards") this.triggerAnyCardsAbility();
 
             // SPECIAL CASE FOR CONSTRUCTION DISCOUNT
@@ -1662,6 +1841,15 @@ function (dojo, declare) {
                 this.hasConstructionDiscounted = true;
                 this.determineUsablePolyominoes();
             }
+        },
+
+        notif_activateAbilityChangeOfColors: function(notif)
+        {
+
+            var node = dojo.query(`#copen_wrapper #copen_ability_slot_${notif.args.ability_name}_${notif.args.player_id} .copen_ability_tile`)[0];
+            dojo.addClass( node, "copen_activated");
+
+            this.triggerChangeOfColorsAbility(notif.args.from_color, notif.args.to_color);
         },
 
         notif_usedAbility: function(notif)

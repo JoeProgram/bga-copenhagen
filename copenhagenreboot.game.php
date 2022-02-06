@@ -51,6 +51,8 @@ class CopenhagenReboot extends Table
             "ability_activated_construction_discount" => 17,
             "ability_activated_change_of_colors" => 18,
             "ability_activated_both_actions" => 19,
+            "change_of_colors_from" => 20,
+            "change_of_colors_to" => 21,
             
             // VARIANTS
             //    "my_first_game_variant" => 100,
@@ -104,6 +106,8 @@ class CopenhagenReboot extends Table
         self::setGameStateValue( 'cards_taken_this_turn', 0 );
         self::setGameStateValue( 'drawn_cards', 0 );
         self::setGameStateValue( 'coat_of_arms_earned', 0 );
+        self::setGameStateValue( 'change_of_colors_from', -1 );
+        self::setGameStateValue( 'change_of_colors_to', -1 );
 
         // INITIALIZE GAME STATISTICS
         // (note: statistics used in this file must be defined in your stats.inc.php file)
@@ -211,7 +215,7 @@ class CopenhagenReboot extends Table
         {
             for( $i = 1; $i <= count($players); $i++)
             {
-                $sql .= "(NULL, '$special_ability_name', $i),";
+                //$sql .= "(NULL, '$special_ability_name', $i),";
             }
         }
 
@@ -221,6 +225,14 @@ class CopenhagenReboot extends Table
         foreach( $players as $player_id => $player )
         {
             $sql .= "($player_id, 'any_cards', $index),";
+            $index ++;
+        }
+
+        // ABILITY TESTING - GIVE PLAYERS ABILITY TILES AT START
+        $index = 1;
+        foreach( $players as $player_id => $player )
+        {
+            $sql .= "($player_id, 'change_of_colors', $index),";
             $index ++;
         }
 
@@ -283,8 +295,14 @@ class CopenhagenReboot extends Table
             if( self::getGameStateValue('ability_activated_any_cards') == 1 ) $result['activated_abilities'][] = "any_cards";
             if( self::getGameStateValue('ability_activated_additional_card') == 1 ) $result['activated_abilities'][] = "additional_card";
             if( self::getGameStateValue('ability_activated_construction_discount') == 1 ) $result['activated_abilities'][] = "construction_discount";
-            if( self::getGameStateValue('ability_activated_change_of_colors') == 1 ) $result['activated_abilities'][] = "change_of_colors";
             if( self::getGameStateValue('ability_activated_both_actions') == 1 ) $result['activated_abilities'][] = "both_actions";
+
+            if( self::getGameStateValue('ability_activated_change_of_colors') == 1 )
+            {
+                $result['activated_abilities'][] = "change_of_colors"; 
+                $result['change_of_colors']['from_color'] = $this->colors[self::getGameStateValue('change_of_colors_from')];
+                $result['change_of_colors']['to_color'] = $this->colors[self::getGameStateValue('change_of_colors_to')];
+            } 
 
         }
 
@@ -728,8 +746,6 @@ class CopenhagenReboot extends Table
 
     function notifyPlayerOfActivatedAbility( $ability_name, $player_id, $player_name)
     {
-
-
 
         $ability_log_name = $this->ability_log_names[$ability_name];
 
@@ -1234,7 +1250,7 @@ class CopenhagenReboot extends Table
 
     }
 
-        function activateAbilityConstructionDiscount()
+    function activateAbilityConstructionDiscount()
     {
 
         self::checkAction( 'activateAbilityConstructionDiscount' );
@@ -1250,7 +1266,44 @@ class CopenhagenReboot extends Table
 
         // NOTIFICATION
         $this->notifyPlayerOfActivatedAbility( "construction_discount", $player_id, $player_name);
+        
+    }
 
+    function activateAbilityChangeOfColors($from_color, $to_color)
+    {
+
+        self::checkAction( 'activateAbilityChangeOfColors' );
+
+        $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
+
+        // VALIDATION
+        $this->validateActivatedAbility( "change_of_colors", $player_id);
+
+        // UPDATE DATA
+        self::setGameStateValue( 'ability_activated_change_of_colors', 1 );
+
+        // HAVE SERVER SAVE COLORS
+        //   have to save them as integers
+        self::setGameStateValue( 'change_of_colors_from', array_search( $from_color, $this->colors) );
+        self::setGameStateValue( 'change_of_colors_to', array_search( $to_color, $this->colors) );
+
+        // NOTIFICATION
+       $ability_log_name = $this->ability_log_names['change_of_colors'];
+        self::notifyPlayer( 
+            $player_id,
+            "activateAbilityChangeOfColors", 
+            clienttranslate('${player_name} is using the ${ability_log_name} ability to change ${from_color} cards to ${to_color}.'),
+            array(
+                "player_name" => $player_name,
+                "ability_log_name" => $ability_log_name,
+                "from_color" => $from_color,
+                "to_color" => $to_color,
+
+                "player_id" => $player_id,
+                "ability_name" => 'change_of_colors',
+            )   
+        );
         
     }
 
@@ -1294,14 +1347,16 @@ class CopenhagenReboot extends Table
 
         $this->giveExtraTime($player_id);
 
-        // NEXT PLAYER'S TURN
+        // RESET ALL VALUES USED JUST WITHIN A TURN
         self::setGameStateValue( 'cards_taken_this_turn', 0 );
-
+        self::setGameStateValue( 'coat_of_arms_earned', 0 );
         self::setGameStateValue( 'ability_activated_any_cards', 0 );
         self::setGameStateValue( 'ability_activated_additional_card', 0 );
         self::setGameStateValue( 'ability_activated_construction_discount', 0 );
         self::setGameStateValue( 'ability_activated_change_of_colors', 0 );
         self::setGameStateValue( 'ability_activated_both_actions', 0 );
+        self::setGameStateValue( 'change_of_colors_from', -1 );
+        self::setGameStateValue( 'change_of_colors_to', -1 );
 
         $this->gamestate->nextState("playerTurn");
     }

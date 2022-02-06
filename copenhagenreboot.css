@@ -132,12 +132,12 @@
     background-image:  url('img/cards.png');
 }
 
-.copen_card.copen_red_card { background-position: 0px 0px; }
-.copen_card.copen_yellow_card { background-position: -70px 0px; }
-.copen_card.copen_green_card { background-position: -140px 0px; }
-.copen_card.copen_blue_card { background-position: -210px 0px; }
-.copen_card.copen_purple_card { background-position: -280px 0px; }
-.copen_card.copen_mermaid_card {  background-position: -350px 0px; }
+.copen_red_card { background-position: 0px 0px; }
+.copen_yellow_card { background-position: -70px 0px; }
+.copen_green_card { background-position: -140px 0px; }
+.copen_blue_card { background-position: -210px 0px; }
+.copen_purple_card { background-position: -280px 0px; }
+.copen_mermaid_card {  background-position: -350px 0px; }
 
 .copen_harbor_position
 {
@@ -831,7 +831,7 @@
 }
 
 
-#change_of_color_ui
+#change_of_colors_ui
 {
     display: none;
     width: 353px;
@@ -842,7 +842,7 @@
     top: 350px;
 }
 
-.copen_change_of_color_option
+.copen_change_of_colors_option
 {
     display:  inline-block;
     width: 66px;
@@ -860,7 +860,6 @@
     position: absolute;
 
     background-image:  url('img/cards.png');
-    background-position: -70px 0px;
 
     -webkit-mask-image: url('img/cards.png');
     mask-image: url('img/cards.png');
@@ -868,6 +867,11 @@
     mask-repeat: no-repeat;
     -webkit-mask-position: -420px 0px;
     mask-position: -420px 0px;
+}
+
+.copen_new_color.copen_hidden
+{
+    display:  none;
 }
 
 

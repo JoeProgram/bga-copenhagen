@@ -118,8 +118,8 @@
         }
 
         // BUILDS COLOR CHANGE OPTIONS
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "change_of_color_option");
-        for( $i = 0; $i < 4; $i++ ) $this->page->insert_block( "change_of_color_option", []);
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "change_of_colors_option");
+        for( $i = 0; $i < 4; $i++ ) $this->page->insert_block( "change_of_colors_option", []);
 
 
         /*

@@ -84,7 +84,8 @@ $machinestates = array(
             "activateAbilityAnyCards", 
             "activateAbilityAdditionalCard", 
             "activateAbilityBothActions", 
-            "activateAbilityConstructionDiscount" 
+            "activateAbilityConstructionDiscount",
+            "activateAbilityChangeOfColors",
         ),
         "transitions" => array(  "checkHandSize" => 4, "placePolyomino" => 7, "coatOfArms" => 8 )
     ), 
@@ -123,7 +124,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} may place a facade tile.'),
         "descriptionmyturn" => clienttranslate('${you} may place a facade tile.'),
         "type" => "activeplayer",
-        "possibleactions" => array( "placePolyomino", "endTurn", "activateAbilityConstructionDiscount"),
+        "possibleactions" => array( "placePolyomino", "endTurn", "activateAbilityConstructionDiscount", "activateAbilityChangeOfColors",),
         "transitions" => array(  "placePolyomino" => 7, "coatOfArms" => 8, "refillHarbor" => 50 )
     ), 
     

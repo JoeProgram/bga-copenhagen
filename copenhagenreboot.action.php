@@ -24,6 +24,7 @@
   
   class action_copenhagenreboot extends APP_GameAction
   { 
+
     // Constructor: please do not modify
    	public function __default()
   	{
@@ -135,6 +136,18 @@
     {
         self::setAjaxMode();  
         $this->game->activateAbilityConstructionDiscount();
+        self::ajaxResponse(); 
+    }
+
+    public function activateAbilityChangeOfColors()
+    {
+        self::setAjaxMode();  
+
+        $from_color = self::getArg( "from_color", AT_enum, true, null, $this->game->colors );
+        $to_color = self::getArg( "to_color", AT_enum, true, null, $this->game->colors );
+
+        $this->game->activateAbilityChangeOfColors( $from_color, $to_color );
+
         self::ajaxResponse(); 
     }
 
