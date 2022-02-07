@@ -249,13 +249,13 @@ function (dojo, declare) {
 
             // new system
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, this.selectPolyominoEventHandlerName); 
-            //dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, this.selectPolyominoEventHandlerName); 
-            //dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPositionPolyomino');
+            dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPositionPolyomino');
+            dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
 
             // old system
             //dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');  
             //dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPlacePolyomino');
-            //dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
+            
             //dojo.query("#copen_wrapper #owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
             
             dojo.query("#copen_wrapper #polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
@@ -579,8 +579,7 @@ function (dojo, declare) {
                 {
 
                 case 'playerTurn':
-                    this.addActionButton( 'cancel_polyomino_placement', _("Cancel"), "onCancelPolyominoPlacement", null, false, "red");
-                    dojo.style("cancel_polyomino_placement","display","none");
+                    this.createPositionPolyominoButtons();
                     break;
 
                 case 'takeCardsLastCall':
@@ -589,13 +588,12 @@ function (dojo, declare) {
 
                 case 'placePolyominoAfterTakingCards':
                     this.addActionButton( 'end_turn', _("End Turn"), "onEndTurn", null, false, "red");
-                    this.addActionButton( 'cancel_polyomino_placement', _("Cancel"), "onCancelPolyominoPlacement", null, false, "red");
-                    dojo.style("cancel_polyomino_placement","display","none");
+
+                    this.createPositionPolyominoButtons();
                     break;
 
                 case 'coatOfArms':
-                    this.addActionButton( 'cancel_polyomino_placement', _("Cancel"), "onCancelPolyominoPlacement", null, false, "red");
-                    dojo.style("cancel_polyomino_placement","display","none");
+                    this.createPositionPolyominoButtons();
                     break;
 
 
@@ -814,6 +812,26 @@ function (dojo, declare) {
                 if( cardsOfColor >= cost ) dojo.addClass( polyomino, "copen_usable");
                 else dojo.addClass(polyomino, "copen_unusable");
             });
+        },
+
+        createPositionPolyominoButtons: function()
+        {
+            this.addActionButton( 'cancel_polyomino_placement', _("Cancel"), "onCancelPolyominoPlacement", null, false, "red");
+            this.addActionButton( 'confirm_polyomino_placement', _("Confirm"), "onConfirmPolyominoPlacement", null, false, "blue");
+            dojo.style("cancel_polyomino_placement","display","none");
+            dojo.style("confirm_polyomino_placement","display","none");
+        },
+
+        showPositionPolyominoButtons: function()
+        {
+            dojo.style("cancel_polyomino_placement","display","inline");
+            dojo.style("confirm_polyomino_placement","display","inline");
+        },
+
+        hidePositionPolyominoButtons: function()
+        {
+            dojo.style("cancel_polyomino_placement","display","none");
+            dojo.style("confirm_polyomino_placement","display","none");
         },
 
         hasPolyominoOfColorOnBoard: function( color )
@@ -1520,7 +1538,7 @@ function (dojo, declare) {
             this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
             this.slideToObject( this.selectedPolyomino.id, "polyomino_placement_target", 500 ).play();
 
-            dojo.style("cancel_polyomino_placement","display","inline-block");
+            this.showPositionPolyominoButtons();
 
 
             // prepare polyomino preview for use
@@ -1553,16 +1571,16 @@ function (dojo, declare) {
             this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
             this.positionPolyomino( {x:0, y:0});
 
-            dojo.style("cancel_polyomino_placement","display","inline-block");
+            this.showPositionPolyominoButtons()
 
 
             // prepare polyomino preview for use
-            /*var polyomino = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
+            var polyomino = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
             dojo.style("polyomino_preview","background-position", dojo.getStyle(polyomino, "background-position"));
             dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
             dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
             dojo.style("polyomino_preview","transform",""); // reset the transform from whatever it was before
-            dojo.style("polyomino_preview","display","none"); // not ready to show yet - turn off*/
+            dojo.style("polyomino_preview","display","none"); // not ready to show yet - turn off
         },
 
         onRotatePolyomino: function( event )
@@ -1692,7 +1710,7 @@ function (dojo, declare) {
             this.fadeOutPolyominoPlacementUI();
             this.clearPreview();
 
-            dojo.style("cancel_polyomino_placement","display","none");
+            this.hidePositionPolyominoButtons()
         },
 
         onClearPreviewPolyomino: function( event )
@@ -1721,6 +1739,17 @@ function (dojo, declare) {
 
             // WE'LL NEED TO STORE THIS, IN CASE THE PLAYER NEEDS TO SELECT THEIR DISCARDS
             this.cellToPlacePolyomino = event.currentTarget.id;
+
+            this.requestPlacePolyomino();
+        },
+
+        onConfirmPolyominoPlacement: function( event )
+        {
+            dojo.stopEvent( event );
+
+            // CLIENT VALIDATION
+            if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
+            if( !this.checkAction('placePolyomino')) return;
 
             this.requestPlacePolyomino();
         },
