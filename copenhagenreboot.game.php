@@ -215,7 +215,7 @@ class CopenhagenReboot extends Table
         {
             for( $i = 1; $i <= count($players); $i++)
             {
-                //$sql .= "(NULL, '$special_ability_name', $i),";
+                $sql .= "(NULL, '$special_ability_name', $i),";
             }
         }
 
@@ -225,14 +225,6 @@ class CopenhagenReboot extends Table
         foreach( $players as $player_id => $player )
         {
             $sql .= "($player_id, 'any_cards', $index),";
-            $index ++;
-        }
-
-        // ABILITY TESTING - GIVE PLAYERS ABILITY TILES AT START
-        $index = 1;
-        foreach( $players as $player_id => $player )
-        {
-            $sql .= "($player_id, 'change_of_colors', $index),";
             $index ++;
         }
 
@@ -1531,20 +1523,9 @@ class CopenhagenReboot extends Table
     {
     	$statename = $state['name'];
     	
-        if ($state['type'] === "activeplayer") {
-            switch ($statename) {
-                default:
-                    $this->gamestate->nextState( "zombiePass" );
-                	break;
-            }
+        if ($state['type'] === "activeplayer"){
 
-            return;
-        }
-
-        if ($state['type'] === "multipleactiveplayer") {
-            // Make sure player is in a non blocking status for role turn
-            $this->gamestate->setPlayerNonMultiactive( $active_player, '' );
-            
+            $this->gamestate->nextState( "zombiePass" );
             return;
         }
 

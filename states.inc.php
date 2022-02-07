@@ -87,7 +87,7 @@ $machinestates = array(
             "activateAbilityConstructionDiscount",
             "activateAbilityChangeOfColors",
         ),
-        "transitions" => array(  "checkHandSize" => 4, "placePolyomino" => 7, "coatOfArms" => 8 )
+        "transitions" => array(  "checkHandSize" => 4, "placePolyomino" => 7, "coatOfArms" => 8, "zombiePass" => 50 )
     ), 
 
     5 => array(
@@ -97,7 +97,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must take another card next to the one you just took.'),
         "type" => "activeplayer",
         "possibleactions" => array( "takeCard", "activateAbilityAnyCards", "activateAbilityAdditionalCard", "activateAbilityBothActions" ),
-        "transitions" => array(  "checkHandSize" => 4 )
+        "transitions" => array(  "checkHandSize" => 4, "zombiePass" => 50 )
     ), 
 
     9 => array(
@@ -106,7 +106,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must take another card.'),
         "type" => "activeplayer",
         "possibleactions" => array( "takeCard", "activateAbilityBothActions"),
-        "transitions" => array(  "checkHandSize" => 4 )
+        "transitions" => array(  "checkHandSize" => 4, "zombiePass" => 50 )
     ), 
 
     10 => array(
@@ -115,7 +115,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} may use special ability tiles.'),
         "type" => "activeplayer",
         "possibleactions" => array( "activateAbilityAdditionalCard", "activateAbilityBothActions", "endTurn" ),
-        "transitions" => array(  "takeAdditionalCard" => 9, "placePolyominoAfterTakingCards" => 11,  "refillHarbor" => 50 )
+        "transitions" => array(  "takeAdditionalCard" => 9, "placePolyominoAfterTakingCards" => 11,  "refillHarbor" => 50, "zombiePass" => 50 )
     ), 
 
     11 => array(
@@ -125,7 +125,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} may place a facade tile.'),
         "type" => "activeplayer",
         "possibleactions" => array( "placePolyomino", "endTurn", "activateAbilityConstructionDiscount", "activateAbilityChangeOfColors",),
-        "transitions" => array(  "placePolyomino" => 7, "coatOfArms" => 8, "refillHarbor" => 50, )
+        "transitions" => array(  "placePolyomino" => 7, "coatOfArms" => 8, "refillHarbor" => 50, "zombiePass" => 50 )
     ), 
     
     4 => array(
@@ -157,7 +157,8 @@ $machinestates = array(
             "discardDownToMaxHandSize" => 6,
             "takeCardsLastCall" => 10,
             "placePolyominoAfterTakingCards" => 11,
-            "refillHarbor" => 50
+            "refillHarbor" => 50,
+            "zombiePass" => 50,
         )
     ), 
 
@@ -175,7 +176,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must place a special facade tile, take an ability tile, or flip over their used ability tiles.'),
         "type" => "activeplayer",
         "possibleactions" => array( "placePolyomino", "takeAbilityTile", "resetUsedAbilities" ),
-        "transitions" => array( "placePolyomino" => 7, "coatOfArms" => 8, "nextPlayer" => 2 ),
+        "transitions" => array( "placePolyomino" => 7, "coatOfArms" => 8, "nextPlayer" => 2, "zombiePass" => 50 ),
     ), 
 
     50 => array(

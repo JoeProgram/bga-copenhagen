@@ -342,7 +342,9 @@ function (dojo, declare) {
             this.setAbilityAsUsable( "additional_card");
             this.setAbilityAsUsable( "both_actions");
             this.setAbilityAsUsable( "construction_discount");
-            this.setAbilityAsUsable( "change_of_colors");
+            
+            if( this.getNumberOfCardsInHand() > 0) this.setAbilityAsUsable( "change_of_colors");
+            else this.setAbilityAsUnusable( "change_of_colors");
 
         },
 
@@ -453,7 +455,9 @@ function (dojo, declare) {
                 this.determineUsablePolyominoes();
 
                 this.setAbilityAsUsable( "construction_discount");
-                this.setAbilityAsUsable( "change_of_colors");
+
+                if( this.getNumberOfCardsInHand() > 0) this.setAbilityAsUsable( "change_of_colors");
+                else this.setAbilityAsUnusable( "change_of_colors");
             }
         },
 
@@ -673,6 +677,11 @@ function (dojo, declare) {
             return -1; // something went wrong - the card didn't have a color class
         },
 
+        getNumberOfCardsInHand: function()
+        {
+            return dojo.query("#copen_wrapper #cards_in_hand .copen_card").length;
+        },
+
         splayCardsInHand: function()
         {
             var cardsInHandNode = dojo.query("#copen_wrapper #cards_in_hand")[0]; 
@@ -712,7 +721,6 @@ function (dojo, declare) {
 
         hasMixOfBaseCardsAndChangedColorCards: function( color )
         {
-            
             var baseCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card .copen_new_color.copen_hidden`);
             var changedColorCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card .copen_new_color.copen_${color}_card`);
             
@@ -1282,6 +1290,11 @@ function (dojo, declare) {
             dojo.query(`#copen_wrapper #owned_player_area .copen_${abilityName}:not(.copen_used_ability)`).addClass("copen_usable");
         },
 
+        setAbilityAsUnusable: function (abilityName)
+        {
+            dojo.query(`#copen_wrapper #owned_player_area .copen_${abilityName}:not(.copen_used_ability)`).addClass("copen_unusable");
+        },
+
         deactivateUsedAbility: function( usedAbility, playerId)
         {
             dojo.query(`#copen_wrapper #copen_ability_slot_${usedAbility}_${playerId} .copen_${usedAbility}`)
@@ -1734,8 +1747,11 @@ function (dojo, declare) {
             // SPECIAL CASE - Do something different if the ability is used
             if( dojo.hasClass(event.currentTarget, "copen_used_ability")) return this.onResetUsedAbilities( event );
 
+            // VALIDATION
             if( !this.checkAction('activateAbilityChangeOfColors')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+            if( dojo.query("#copen_wrapper #cards_in_hand .copen_card").length == 0 ) return; // can't use if you have no cards in hand
+            
 
             // CHANGE OF COLORS DOES SOME UI WORK BEFORE TALKING TO THE SERVER
             this.fadeInHand();
