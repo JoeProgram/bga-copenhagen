@@ -110,11 +110,8 @@ class CopenhagenReboot extends Table
         self::setGameStateValue( 'change_of_colors_to', -1 );
 
         // INITIALIZE GAME STATISTICS
-        // (note: statistics used in this file must be defined in your stats.inc.php file)
-        //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
-        //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
         self::initStat( 'table', "how_game_ended", 0 );
-
+        self::initStat( 'player', "coat_of_arms_earned", 0 );
 
         // SETUP DECK
         $cards_per_color = 14;

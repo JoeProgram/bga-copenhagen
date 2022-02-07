@@ -60,13 +60,12 @@ $stats_type = array(
 
     // TODO 
     //  GAME TURNS
-    //  GAME ENDED BY POINTS
     
     // Statistics existing for each player
     "player" => array(
 
-        "turns_number" => array("id"=> 10,
-                    "name" => totranslate("Number of turns"),
+        "coat_of_arms_earned" => array("id"=> 10,
+                    "name" => totranslate("Coat of Arms Earned"),
                     "type" => "int" ),
     ),
 
