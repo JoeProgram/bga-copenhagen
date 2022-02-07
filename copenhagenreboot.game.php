@@ -1500,7 +1500,7 @@ class CopenhagenReboot extends Table
         $playerboard = $this->getPlayerboard( $player_id );
 
         for( $x = 0; $x < $this->board_width; $x++) $points += ( $this->getColumnPoints($x, $playerboard));
-        for( $y = 0; $y < $this->board_width; $y++) $points += ( $this->getRowPoints($y, $playerboard));
+        for( $y = 0; $y < $this->board_height; $y++) $points += ( $this->getRowPoints($y, $playerboard));
 
         self::DbQuery( "UPDATE player SET player_score=$points WHERE player_id=$player_id;" );
 
