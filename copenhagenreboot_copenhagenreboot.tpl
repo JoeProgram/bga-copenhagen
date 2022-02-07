@@ -106,7 +106,7 @@
                 
             </div>
             <!-- BEGIN owned_ability_tile_area -->
-            <div class="copen_ability_tile_area">
+            <div id="ability_tile_area_{ID}" class="copen_ability_tile_area">
                 <div id="copen_ability_slot_any_cards_{ID}" class="copen_ability_slot copen_ability_slot_any_cards"></div>
                 <div id="copen_ability_slot_additional_card_{ID}" class="copen_ability_slot copen_ability_slot_additional_card"></div>
                 <div id="copen_ability_slot_construction_discount_{ID}" class="copen_ability_slot copen_ability_slot_construction_discount"></div>
@@ -146,7 +146,7 @@
                         </div>
                     </div>
 
-                    <div class="copen_ability_tile_area">
+                    <div id="ability_tile_area_{ID}" class="copen_ability_tile_area">
                         <div id="copen_ability_slot_any_cards_{ID}"  class="copen_ability_slot copen_ability_slot_any_cards"></div>
                         <div id="copen_ability_slot_additional_card_{ID}"  class="copen_ability_slot copen_ability_slot_additional_card"></div>
                         <div id="copen_ability_slot_construction_discount_{ID}"  class="copen_ability_slot copen_ability_slot_construction_discount"></div>

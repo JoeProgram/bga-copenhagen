@@ -2022,11 +2022,7 @@ function (dojo, declare) {
 
         notif_resetUsedAbilities: function(notif)
         {
-            if( notif.args.player_id == this.player_id)
-            {
-                dojo.query(`#copen_wrapper #owned_player_area .copen_used_ability`).removeClass("copen_used_ability");    
-            }
-
+            dojo.query(`#copen_wrapper #ability_tile_area_${notif.args.player_id} .copen_used_ability`).removeClass("copen_used_ability");    
         },
 
 
