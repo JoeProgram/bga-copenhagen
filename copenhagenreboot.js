@@ -1199,8 +1199,8 @@ function (dojo, declare) {
 
             // CLIENT VALIDATION - CHECK FOR A VALID POSITION
             var validity = this.isValidPlacementPosition( gridCells );
-            if( validity ) dojo.removeClass( this.selectedPolyomino.id, "copen_unusable");
-            else dojo.addClass( this.selectedPolyomino.id, "copen_unusable");
+            if( validity ) dojo.removeClass( this.selectedPolyomino.id, "copen_invalid_placement");
+            else dojo.addClass( this.selectedPolyomino.id, "copen_invalid_placement");
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
             var polyominoNode = dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`)[0];
@@ -1698,6 +1698,7 @@ function (dojo, declare) {
             var stackId = this.getStackIdFromPolyominoId( this.selectedPolyomino.id ); 
 
             dojo.style(this.selectedPolyomino.id, "transform", "rotateY(0deg) rotateZ(0deg)");
+            dojo.removeClass( this.selectedPolyomino.id, "copen_invalid_placement"); // in case it was cancelled while in an invalid position
 
             this.attachToNewParent( this.selectedPolyomino["id"], stackId);
             this.slideToObjectPos( this.selectedPolyomino["id"], stackId, this.selectedPolyomino.originalPosition.l, this.selectedPolyomino.originalPosition.t, 500 ).play();

@@ -191,6 +191,11 @@
     perspective: 1000px;
 }
 
+.copen_polyomino.copen_invalid_placement
+{
+    border: 5px solid red;
+}
+
 .copen_log_polyomino
 {
     display: inline-block;
