@@ -787,47 +787,51 @@
 #polyomino_placement_buttons
 {
     display:  block;
+    width: 176px;
+    height: 41px;
     position:  absolute;
-    left:  0px;
-    top:  0px;
+    left:  507px;
+    top:  374px;
+    text-align: left;
+
 }
 
 #polyomino_rotate_button
 {
-    display:  block;
-    position: absolute;
-    left:  348px;
-    top: 286px;
-    width: 55px;
-    height: 55px;
+    display:  inline-block;
+    position: relative;
+    left:  0px;
+    top: 0px;
+    width: 38px;
+    height: 41px;
     background-image: url('img/polyomino_buttons.png');
-    background-position: 0px 0px;
+    background-position-x: 0px;
 
     cursor: pointer;
 }
 
 #polyomino_rotate_button:active
 {
-    background-position: 0px -57px
+    background-position-y: -45px;
 }
 
 #polyomino_flip_button
 {
-    display: block;
-    position: absolute;
-    left:  413px;
-    top: 286px;
-    width: 55px;
-    height: 55px;
+    display: inline-block;
+    position: relative;
+    left:  0px;
+    top: 0px;
+    width: 38px;
+    height: 41px;
     background-image: url('img/polyomino_buttons.png');
-    background-position: -55px 0px;
+    background-position-x: -40px;
 
     cursor: pointer;
 }
 
 #polyomino_flip_button:active
 {
-    background-position: -55px -57px
+    background-position-y: -45px;
 }
 
 

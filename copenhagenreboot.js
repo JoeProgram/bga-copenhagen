@@ -1632,6 +1632,14 @@ function (dojo, declare) {
             this.clearPreview();
         },
 
+        onPositionPolyomino: function( event )
+        {
+            if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
+            if( !this.checkAction('placePolyomino')) return;
+
+            this.cellToPlacePolyomino = event.currentTarget.id;
+        },
+
         onPlacePolyomino: function( event )
         {
             dojo.stopEvent( event );

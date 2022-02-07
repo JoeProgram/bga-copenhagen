@@ -116,6 +116,14 @@
             <!-- END owned_ability_tile_area -->
         </div>
 
+        <div id="polyomino_placement">
+            <div id="polyomino_placement_target"></div>
+            <div id="polyomino_placement_buttons">
+                <div id="polyomino_rotate_button" class="copen_usable"></div>
+                <div id="polyomino_flip_button" class="copen_usable"></div>
+            </div>
+        </div>
+
         <div id="change_of_colors_ui">
             <!-- BEGIN change_of_colors_option -->
                 <div class="copen_change_of_colors_option copen_usable">
@@ -161,15 +169,6 @@
     </div>
 
     <div id="shadow_box"></div>
-    <div id="polyomino_placement">
-        <div id="polyomino_placement_target"></div>
-        <div id="polyomino_placement_buttons">
-            <div id="polyomino_rotate_button"></div>
-            <div id="polyomino_flip_button"></div>
-        </div>
-    </div>
-
-
 
 </div>
 
