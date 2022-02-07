@@ -951,6 +951,9 @@ class CopenhagenReboot extends Table
     function placePolyomino( $color, $squares, $copy, $x, $y, $flip, $rotation, $discards )
     {
 
+        self::warn("placePolyomino");
+        self::warn( json_encode($discards));
+
         self::checkAction( 'placePolyomino' );
 
         $player_id = self::getActivePlayerId();
@@ -1022,13 +1025,14 @@ class CopenhagenReboot extends Table
             if( count($valid_cards) < $cost )  throw new feException( self::_("You don't have enough cards to place that facade tile in that spot."));
 
             // (OPTIONAL) CHECK DISCARDS ARE VALID
-            if( count($discards) > 0)
+            $manual_discard_count = count($discards); 
+            if( $manual_discard_count > 0)
             {
                 // MAKE SURE THE DISCARDS MATCH THE COST
-                self::warn("discards is ". count($discards) . "     ");
-                self::warn("cost is ". $cost . "     ");
+                if( $manual_discard_count != $cost )  throw new feException( self::_("You are trying to discard the wrong number of cards."));
 
-                if( count($discards) != $cost )  throw new feException( self::_("You are trying to discard the wrong number of cards."));
+                // MAKE SURE EACH NUMBER IS UNIQUE - NO DUPLICATES
+                if( $manual_discard_count != count(array_unique( $discards )))  throw new feException( self::_("You can't discard the same card twice."));
 
                 // MAKE SURE EACH DISCARDED CARD IS VALID
                 foreach( $discards as $discard ) if( !array_key_exists( $discard, $valid_cards)) throw new feException( self::_("You are trying to discard an invalid card to play that facade tile."));

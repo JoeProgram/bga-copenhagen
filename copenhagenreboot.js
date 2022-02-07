@@ -1652,9 +1652,10 @@ function (dojo, declare) {
 
             dojo.addClass(event.currentTarget, "copen_activated");
 
-            if( !this.cardsToDiscard.includes(event.currentTarget.id))
+            var card_id = event.currentTarget.id.split("_")[1];
+            if( !this.cardsToDiscard.includes( card_id ))
             {
-                this.cardsToDiscard.push( event.currentTarget.id.split("_")[1]);
+                this.cardsToDiscard.push( card_id );
                 this.requestPlacePolyomino();
             }
             
