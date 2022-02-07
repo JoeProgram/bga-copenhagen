@@ -52,23 +52,15 @@ $stats_type = array(
     // Statistics global to table
     "table" => array(
 
-        "turns_number" => array("id"=> 10,
-                    "name" => totranslate("Number of turns"),
+        "how_game_ended" => array("id"=> 11,
+                    "name" => totranslate("How did the game end?"),
                     "type" => "int" ),
 
-/*
-        Examples:
-
-
-        "table_teststat1" => array(   "id"=> 10,
-                                "name" => totranslate("table test stat 1"), 
-                                "type" => "int" ),
-                                
-        "table_teststat2" => array(   "id"=> 11,
-                                "name" => totranslate("table test stat 2"), 
-                                "type" => "float" )
-*/  
     ),
+
+    // TODO 
+    //  GAME TURNS
+    //  GAME ENDED BY POINTS
     
     // Statistics existing for each player
     "player" => array(
@@ -76,20 +68,25 @@ $stats_type = array(
         "turns_number" => array("id"=> 10,
                     "name" => totranslate("Number of turns"),
                     "type" => "int" ),
-    
-/*
-        Examples:    
-        
-        
-        "player_teststat1" => array(   "id"=> 10,
-                                "name" => totranslate("player test stat 1"), 
-                                "type" => "int" ),
-                                
-        "player_teststat2" => array(   "id"=> 11,
-                                "name" => totranslate("player test stat 2"), 
-                                "type" => "float" )
+    ),
 
-*/    
-    )
+    // TODO
+    //  CARDS DRAWN
+    //  CARDS OVERDRAWN
+    //  POLYOMINOES PLACED
+    //  SQUARES COVERED
+    //  COAT OF ARMS EARNED
+    //  ABILITY TILES USED
+    //  POINTS FROM COLUMNS
+    //  POINTS FROM ROWS  
+
+
+    "value_labels" => array(
+        11 => array( 
+            1 => totranslate("By points"),
+            2 => totranslate("By End of Game card"),
+        ),
+
+    ),
 
 );

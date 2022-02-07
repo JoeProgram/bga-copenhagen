@@ -113,6 +113,7 @@ class CopenhagenReboot extends Table
         // (note: statistics used in this file must be defined in your stats.inc.php file)
         //self::initStat( 'table', 'table_teststat1', 0 );    // Init a table statistics
         //self::initStat( 'player', 'player_teststat1', 0 );  // Init a player statistics (for all players)
+        self::initStat( 'table', "how_game_ended", 0 );
 
 
         // SETUP DECK
@@ -649,7 +650,9 @@ class CopenhagenReboot extends Table
             else if( $playerboard[$x][$y]["fill"] == "brickwork") $windows_only = false;
         }
 
-        return $windows_only ? 2 : 1;
+        $points = $windows_only ? 2 : 1;
+        self::warn( "Column $y was worth $points");
+        return $points;
     }
 
     function isRowComplete( $y, $playerboard )
@@ -669,7 +672,9 @@ class CopenhagenReboot extends Table
             else if( $playerboard[$x][$y]["fill"] == "brickwork") $windows_only = false;
         }
 
-        return $windows_only ? 4 : 2;
+        $points = $windows_only ? 4 : 2;
+        self::warn( "Column $x was worth $points");
+        return $points;
     }
 
     function calculateTieBreaker()
@@ -1152,7 +1157,7 @@ class CopenhagenReboot extends Table
 
 
         if( $coat_of_arms_earned > 0 ) $this->gamestate->nextState( "coatOfArms" );
-        else $this->gamestate->nextState( "placePolyomino" );
+        else $this->gamestate->nextState( "calculateScore" );
 
     }
 
@@ -1197,7 +1202,7 @@ class CopenhagenReboot extends Table
         self::setGameStateValue( 'coat_of_arms_earned', $coat_of_arms_earned );
 
         if( $coat_of_arms_earned > 0 ) $this->gamestate->nextState( "coatOfArms" );
-        else $this->gamestate->nextState( "nextPlayer" );
+        else $this->gamestate->nextState( "calculateScore" );
 
     }
 
@@ -1226,7 +1231,7 @@ class CopenhagenReboot extends Table
         self::setGameStateValue( 'coat_of_arms_earned', $coat_of_arms_earned );
 
         if( $coat_of_arms_earned > 0 ) $this->gamestate->nextState( "coatOfArms" );
-        else $this->gamestate->nextState( "nextPlayer" );
+        else $this->gamestate->nextState( "calculateScore" );
     }
 
 
@@ -1471,9 +1476,15 @@ class CopenhagenReboot extends Table
         {
             // END GAME IF WE DRAW THE MERMAID CARD
             $this->calculateTieBreaker();
+
+            self::setStat( 2, "how_game_ended" );
+
             $this->gamestate->nextState("endGame"); 
         } 
-        else $this->gamestate->nextState("nextPlayer");
+        else
+        {
+            $this->gamestate->nextState("nextPlayer");
+        } 
     }
 
     function stCalculateScore()
@@ -1498,8 +1509,16 @@ class CopenhagenReboot extends Table
             )   
         );
 
-        if( $points < $this->end_of_game_points ) $this->gamestate->nextState("refillHarbor");
-        else $this->gamestate->nextState("endGame"); 
+        // CHECK IF THEY CROSSED THE ENDGAME SCORE THRESHOLD
+        if( $points < $this->end_of_game_points )
+        {
+            $this->gamestate->nextState("refillHarbor");
+        }
+        else
+        { 
+            self::setStat( 1, "how_game_ended" );
+            $this->gamestate->nextState("endGame"); 
+        }
     }
 
 //////////////////////////////////////////////////////////////////////////////
