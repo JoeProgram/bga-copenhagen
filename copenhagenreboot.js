@@ -79,6 +79,8 @@ function (dojo, declare) {
             };
 
             this.selectedPolyomino = null;
+            this.selectPolyominoEventHandlerName = "onSelectPolyominoNew";
+
 
             this.abilityEventHandlers = {
                 "any_cards":"onActivateAbilityAnyCards",
@@ -241,17 +243,25 @@ function (dojo, declare) {
             // TOOLTIPS
             this.updateSpecialAbilityTooltips();
             
+            this.determineTopPolyominoInEveryStack();
+
             // CONNECT INTERACTIVE ELEMENTS
-            dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPlacePolyomino');
-            dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
-            dojo.query("#copen_wrapper #owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
+
+            // new system
+            dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, this.selectPolyominoEventHandlerName); 
+            //dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, this.selectPolyominoEventHandlerName); 
+            //dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPositionPolyomino');
+
+            // old system
+            //dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');  
+            //dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPlacePolyomino');
+            //dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
+            //dojo.query("#copen_wrapper #owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
+            
             dojo.query("#copen_wrapper #polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#copen_wrapper #polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
             dojo.query("#copen_wrapper .copen_change_of_colors_option").connect('onclick', this, 'onSelectChangeOfColorsOption' );
-
-            this.determineTopPolyominoInEveryStack();
-            dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');            
-
+          
             dojo.query("#copen_wrapper .copen_ability_tile_stack .copen_ability_tile:last-child").connect( 'onclick', this, 'onTakeAbilityTile');
 
             dojo.query("#copen_wrapper #owned_player_area .copen_any_cards").connect( 'onclick', this, 'onActivateAbilityAnyCards');
@@ -1160,6 +1170,31 @@ function (dojo, declare) {
             dojo.forEach( this.discardHandlers, dojo.disconnect);
         },
 
+        positionPolyomino: function( coordinates, playerId )
+        {
+
+            console.log( "positionPolyomino");
+
+            var color = this.getPolyominoColorFromId( this.selectedPolyomino.id );
+            var adjustedCoordinates = this.getAdjustedCoordinates( this.selectedPolyomino["shape"], coordinates);
+            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , adjustedCoordinates );
+
+            // CLIENT VALIDATION - CHECK FOR A VALID POSITION
+            var validity = this.isValidPlacementPosition( gridCells );
+            if( validity ) dojo.removeClass( this.selectedPolyomino.id, "copen_unusable");
+            else dojo.addClass( this.selectedPolyomino.id, "copen_unusable");
+
+            // DETERMINE HTML PLACEMENT FOR POLYOMINO
+            var polyominoNode = dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`)[0];
+            var htmlPlacement = this.determineHtmlPlacementForPolyominoAtCells( polyominoNode, gridCells );
+
+            var minGridCell = this.getMinGridCell( gridCells );
+            var minGridCellNode = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_${minGridCell.x}_${minGridCell.y}`)[0];
+
+            this.slideToObjectPos( this.selectedPolyomino.id, minGridCellNode.id, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ).play();
+
+        },
+
         placePolyomino: function( polyominoData )
         {
 
@@ -1497,6 +1532,39 @@ function (dojo, declare) {
             dojo.style("polyomino_preview","display","none"); // not ready to show yet - turn off
         },
 
+        onSelectPolyominoNew: function( event )
+        {
+
+            console.log("onSelectPolyominoNew");
+
+            if( !dojo.hasClass(event.currentTarget, "copen_usable")) return; // make sure we can afford this polyomino before selecting it
+
+            this.selectedPolyomino = {};
+
+            this.selectedPolyomino["id"] = event.currentTarget.id;
+            this.selectedPolyomino["name"] = this.selectedPolyomino["id"].split("_")[0];
+            this.selectedPolyomino["shape"] = this.getCopyOfShape(this.selectedPolyomino["name"]);
+            this.selectedPolyomino["rotation"] = 0;
+            this.selectedPolyomino["flip"] = 0;
+            this.selectedPolyomino.originalPosition = dojo.getMarginBox( event.currentTarget); // getMarginBox includes 'l' and 't' - the values for "left" and "top"
+
+            this.fadeInPolyominoPlacementUI(); // have to fade in the shadow box first - or the display:none css style won't allow the polyomino to slide to the target correctly
+
+            this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
+            this.positionPolyomino( {x:0, y:0});
+
+            dojo.style("cancel_polyomino_placement","display","inline-block");
+
+
+            // prepare polyomino preview for use
+            /*var polyomino = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
+            dojo.style("polyomino_preview","background-position", dojo.getStyle(polyomino, "background-position"));
+            dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
+            dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
+            dojo.style("polyomino_preview","transform",""); // reset the transform from whatever it was before
+            dojo.style("polyomino_preview","display","none"); // not ready to show yet - turn off*/
+        },
+
         onRotatePolyomino: function( event )
         {
 
@@ -1618,7 +1686,7 @@ function (dojo, declare) {
 
             // RECONNECT THE CLICK
             //   I tried connecting with dojo.connect() directly, but couldn't get it to work.             
-            dojo.query( `#copen_wrapper #${this.selectedPolyomino.id}`).connect("onclick",this,"onSelectPolyomino");
+            dojo.query( `#copen_wrapper #${this.selectedPolyomino.id}`).connect("onclick",this,this.selectPolyominoEventHandlerName);
 
             this.selectedPolyomino = null;
             this.fadeOutPolyominoPlacementUI();
@@ -1638,6 +1706,9 @@ function (dojo, declare) {
             if( !this.checkAction('placePolyomino')) return;
 
             this.cellToPlacePolyomino = event.currentTarget.id;
+
+            var coordinates = this.getCoordinatesFromId( event.currentTarget.id);
+            this.positionPolyomino( coordinates);
         },
 
         onPlacePolyomino: function( event )
@@ -1955,7 +2026,7 @@ function (dojo, declare) {
             // handle the new top of stack
             var stackId = this.getStackIdFromPolyominoId( polyominoId );
             var newTopOfStack = this.determineTopPolyominoInStack( stackId );         
-            if( newTopOfStack != null ) dojo.connect( newTopOfStack, "onclick", this, "onSelectPolyomino" );
+            if( newTopOfStack != null ) dojo.connect( newTopOfStack, "onclick", this, this.selectPolyominoEventHandlerName );
 
             if( this.player_id == notif.args.player_id)
             {
