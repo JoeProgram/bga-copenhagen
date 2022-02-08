@@ -1682,7 +1682,12 @@ function (dojo, declare) {
         {
             console.log("onDragStartPolyomino");
 
+
+
             this.selectPolyomino( event.currentTarget);
+            dojo.style( event.currentTarget, "z-index", 20 );
+
+            //dojo.style("polyomino_placement","display","block");
 
             this.dragPositionLastFrame = {x: event.clientX, y: event.clientY};
         },
@@ -1703,6 +1708,15 @@ function (dojo, declare) {
         onDragEndPolyomino: function( event )
         {
             console.log("onDragEndPolyomino");
+
+            this.fadeInPolyominoPlacementUI();
+            this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
+
+            dojo.query(`#${this.selectedPolyomino.id}`).connect("ondragstart", this, "onDragStartPolyomino");
+            dojo.query(`#${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
+            dojo.query(`#${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
+
+            this.dropPolyominoOnBoard();
         },
 
         onRotatePolyomino: function( event )
