@@ -1129,6 +1129,9 @@ function (dojo, declare) {
         requestPlacePolyomino: function()
         {
             var color = this.getPolyominoColorFromId( this.selectedPolyomino.id );
+            console.log("requestPlacePolyomino");
+            console.log( this.cellToPlacePolyomino );
+
             var coordinates = this.getCoordinatesFromId( this.cellToPlacePolyomino );
             var adjustedCoordinates = this.getAdjustedCoordinates( this.selectedPolyomino["shape"], coordinates);
             var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , adjustedCoordinates );
@@ -1214,6 +1217,117 @@ function (dojo, declare) {
 
             this.slideToObjectPos( this.selectedPolyomino.id, minGridCellNode.id, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ).play();
 
+        },
+
+        dropPolyominoOnBoard: function()
+        {
+
+            try{
+
+
+                // FIRST, SCOOT POLYOMINO TO BE FULLY ON BOARD (IF NEEDED)
+                var boardCellsNode = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cells`)[0];
+                var polyominoNode = dojo.query(`#${this.selectedPolyomino.id}`)[0];
+
+                boardCellsNodePosition = dojo.position( boardCellsNode, true );
+                polyominoNodePosition = dojo.position( polyominoNode, true);
+
+                // SCOOT LEFT OR RIGHT
+                if( polyominoNodePosition.x < boardCellsNodePosition.x )
+                {
+                    var currentLeft = dojo.getStyle( polyominoNode, "left"); // grabs left as a number - so no need to parse it
+                    var distance = boardCellsNodePosition.x - polyominoNodePosition.x;
+                    var newLeft = currentLeft + distance;
+                    dojo.style( polyominoNode, "left", newLeft + "px");
+                }
+                else if( polyominoNodePosition.x + polyominoNodePosition.w > boardCellsNodePosition.x + boardCellsNodePosition.w)
+                {
+                    var currentLeft = dojo.getStyle( polyominoNode, "left"); // grabs left as a number - so no need to parse it
+                    var distance = (boardCellsNodePosition.x + boardCellsNodePosition.w) - (polyominoNodePosition.x + polyominoNodePosition.w);
+                    var newLeft = currentLeft + distance;
+                    dojo.style( polyominoNode, "left", newLeft + "px");
+                }
+
+                // SCOOT UP OR DOWN
+                if( polyominoNodePosition.y < boardCellsNodePosition.y )
+                {
+                    var currentTop = dojo.getStyle( polyominoNode, "top");
+                    var distance = boardCellsNodePosition.y - polyominoNodePosition.y;
+                    var newTop = currentTop + distance;
+                    dojo.style( polyominoNode, "top", newTop + "px");
+                }
+                else if( polyominoNodePosition.y + polyominoNodePosition.h > boardCellsNodePosition.y + boardCellsNodePosition.h)
+                {
+                    var currentTop = dojo.getStyle( polyominoNode, "top");
+                    var distance = (boardCellsNodePosition.y + boardCellsNodePosition.h) - (polyominoNodePosition.y + polyominoNodePosition.h);
+                    var newTop = currentTop + distance;
+                    dojo.style( polyominoNode, "top", newTop + "px");
+                }
+
+                // FIND CELL CLOSEST TO THE POLYOMINO'S MIN HTML COORDINATE
+                polyominoNodePosition = dojo.position( polyominoNode, true); // refresh the position after any scooting
+                
+                var originCell = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_0_0`)[0];
+
+                // LOOP THROUGH ALL COLUMNS TO SEE WHICH IS CLOSEST
+                var minXIndex = 0;
+                var minXDistance = Math.abs(polyominoNodePosition.x - dojo.position(originCell, true).x);
+
+                for( var x = 1; x < this.boardWidth; x++)
+                {
+                    var cell = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_${x}_0`)[0];
+                    var distance = Math.abs(polyominoNodePosition.x - dojo.position(cell, true).x);
+
+                    if( distance < minXDistance )
+                    {
+                        minXIndex = x;
+                        minXDistance = distance;
+                    }
+                }
+
+                // LOOP THROUGH ALL ROWS TO SEE WHICH IS CLOSEST
+                var minYIndex = 0;
+                var minYDistance = Math.abs( this.getYBottom(polyominoNode) - this.getYBottom(originCell) );
+
+                for( var y = 1; y < this.boardHeight; y++)
+                {
+                    var cell = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_0_${y}`)[0];
+                    var distance = Math.abs( this.getYBottom(polyominoNode) - this.getYBottom(cell) );
+
+                    if( distance < minYDistance )
+                    {
+                        minYIndex = y;
+                        minYDistance = distance;
+                    }
+                }
+
+                // ADJUST TO THE ORIGIN
+                //  We have two placement systems:  the bottom corner of the html block
+                //  and the bottom-left corner of the shape.
+                //  We need to offset by the bottom-left corner of the shape
+                var bounds = this.getPolyominoBounds( this.selectedPolyomino.shape );
+                minXIndex -= bounds.min.x; 
+
+                // WE'VE IDENTIFIED THE CELL TO POSITION THE POLYOMINO AT
+                this.cellToPlacePolyomino = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_${minXIndex}_${minYIndex}`)[0].id;
+                this.positionPolyomino( {x:minXIndex, y:minYIndex});
+
+
+            } catch (error) {
+              console.error(error);
+              // expected output: ReferenceError: nonExistentFunction is not defined
+              // Note - error messages will vary depending on browser
+            }
+
+        },
+
+        // RETURNS BOTTOM Y POSITION OF NODE
+        // I'm used to thinking as going up the screen as positive and down as negative, with origins at the bottom left corner.
+        // But it's reversed in HTML.
+        getYBottom: function( node )
+        {
+            var position = dojo.position( node, true );
+            return position.y + position.h;
         },
 
         placePolyomino: function( polyominoData )
@@ -1578,11 +1692,7 @@ function (dojo, declare) {
                     dojo.style(this.node, 'transform', 'rotateY(' + flip + 'deg) rotateZ(' + parseFloat(values.propertyTransform.replace("px", "")) + 'deg)' );
                 },
                 onEnd: function() {
-                    console.log( "on End Rotate");
-                    var coordinates = game.getCoordinatesFromId( game.cellToPlacePolyomino );
-                    console.log( "on End Rotate1");
-                    game.positionPolyomino( coordinates );
-                    console.log( "on End Rotate 2");
+                    game.dropPolyominoOnBoard();
                 }
             });
             animation.play();
@@ -1612,6 +1722,7 @@ function (dojo, declare) {
 
             var endingFlipValue = (this.selectedPolyomino["flip"] + 180) % 360;
 
+            var game = this;
             var animation = dojo.animateProperty({
                 node: polyominoNode,
                 duration: 500,
@@ -1622,7 +1733,7 @@ function (dojo, declare) {
                     dojo.style(this.node, 'transform', 'rotateY(' + parseFloat(values.propertyTransform.replace("px", "")) + 'deg) rotateZ(' + rotation + 'deg)');
                 },
                 onEnd: function() {
-                   this.positionPolyomino( this.cellToPlacePolyomino );
+                    game.dropPolyominoOnBoard();
                 },                
             });
             animation.play();
