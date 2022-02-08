@@ -28,6 +28,14 @@
     position:  relative;
 }
 
+.copen_button_disabled
+{
+    color: #afafaf !important;
+    background:  #6a6a6a !important;
+    border: 1px solid #9b9b9b !important;
+    cursor:  default !important;
+}
+
 #top_chunk
 {
     vertical-align: text-top;
@@ -191,10 +199,7 @@
     perspective: 1000px;
 }
 
-.copen_polyomino.copen_invalid_placement
-{
-    border: 5px solid red;
-}
+
 
 .copen_log_polyomino
 {
@@ -787,6 +792,16 @@
 #polyomino_placement .copen_polyomino
 {
     filter:  drop-shadow(0.35rem 0.35rem 0.4rem rgba(0,0,0,0.5));
+}
+
+#polyomino_placement .copen_polyomino.copen_invalid_placement
+{
+    filter: 
+            drop-shadow(3px 0px 0px red)
+            drop-shadow(-3px 0px 0px red)
+            drop-shadow(0px 3px 0px red)
+            drop-shadow(0px -3px 0px red)                     
+            drop-shadow(0.35rem 0.35rem 0.4rem rgba(0,0,0,0.5));
 }
 
 #polyomino_placement_buttons

@@ -79,7 +79,7 @@ function (dojo, declare) {
             };
 
             this.selectedPolyomino = null;
-            this.selectPolyominoEventHandlerName = "onSelectPolyominoNew";
+            this.selectPolyominoEventHandlerName = "onSelectPolyomino";
 
 
             this.abilityEventHandlers = {
@@ -251,12 +251,7 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, this.selectPolyominoEventHandlerName); 
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPositionPolyomino');
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
-
-            // old system
-            //dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, 'onSelectPolyomino');  
-            //dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPlacePolyomino');
-            
-            //dojo.query("#copen_wrapper #owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');
+            dojo.query("#copen_wrapper #owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');            
             
             dojo.query("#copen_wrapper #polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#copen_wrapper #polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
@@ -1188,7 +1183,7 @@ function (dojo, declare) {
             dojo.forEach( this.discardHandlers, dojo.disconnect);
         },
 
-        positionPolyomino: function( coordinates, playerId )
+        positionPolyomino: function( coordinates )
         {
 
             console.log( "positionPolyomino");
@@ -1199,8 +1194,16 @@ function (dojo, declare) {
 
             // CLIENT VALIDATION - CHECK FOR A VALID POSITION
             var validity = this.isValidPlacementPosition( gridCells );
-            if( validity ) dojo.removeClass( this.selectedPolyomino.id, "copen_invalid_placement");
-            else dojo.addClass( this.selectedPolyomino.id, "copen_invalid_placement");
+            if( validity )
+            {
+                dojo.removeClass( this.selectedPolyomino.id, "copen_invalid_placement");  
+                dojo.removeClass( "confirm_polyomino_placement", "copen_button_disabled");
+            } 
+            else
+            {
+                dojo.addClass( this.selectedPolyomino.id, "copen_invalid_placement");
+                dojo.addClass( "confirm_polyomino_placement", "copen_button_disabled");
+            } 
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
             var polyominoNode = dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`)[0];
@@ -1522,37 +1525,6 @@ function (dojo, declare) {
         onSelectPolyomino: function( event )
         {
 
-            if( !dojo.hasClass(event.currentTarget, "copen_usable")) return; // make sure we can afford this polyomino before selecting it
-
-            this.selectedPolyomino = {};
-
-            this.selectedPolyomino["id"] = event.currentTarget.id;
-            this.selectedPolyomino["name"] = this.selectedPolyomino["id"].split("_")[0];
-            this.selectedPolyomino["shape"] = this.getCopyOfShape(this.selectedPolyomino["name"]);
-            this.selectedPolyomino["rotation"] = 0;
-            this.selectedPolyomino["flip"] = 0;
-            this.selectedPolyomino.originalPosition = dojo.getMarginBox( event.currentTarget); // getMarginBox includes 'l' and 't' - the values for "left" and "top"
-
-            this.fadeInPolyominoPlacementUI(); // have to fade in the shadow box first - or the display:none css style won't allow the polyomino to slide to the target correctly
-
-            this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
-            this.slideToObject( this.selectedPolyomino.id, "polyomino_placement_target", 500 ).play();
-
-            this.showPositionPolyominoButtons();
-
-
-            // prepare polyomino preview for use
-            var polyomino = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
-            dojo.style("polyomino_preview","background-position", dojo.getStyle(polyomino, "background-position"));
-            dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
-            dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
-            dojo.style("polyomino_preview","transform",""); // reset the transform from whatever it was before
-            dojo.style("polyomino_preview","display","none"); // not ready to show yet - turn off
-        },
-
-        onSelectPolyominoNew: function( event )
-        {
-
             console.log("onSelectPolyominoNew");
 
             if( !dojo.hasClass(event.currentTarget, "copen_usable")) return; // make sure we can afford this polyomino before selecting it
@@ -1595,6 +1567,7 @@ function (dojo, declare) {
             var rotationDegrees = flip == 0 ? 90 : -90; // if flipped, we need to rotate the other way so that the shape still rotates clockwise
 
             // CODE SNIPPET FROM: https://forum.boardgamearena.com/viewtopic.php?t=15158
+            var game = this;
             var animation = dojo.animateProperty({
                 node: polyominoNode,
                 duration: 500,
@@ -1603,6 +1576,13 @@ function (dojo, declare) {
                 },
                 onAnimate: function (values) {
                     dojo.style(this.node, 'transform', 'rotateY(' + flip + 'deg) rotateZ(' + parseFloat(values.propertyTransform.replace("px", "")) + 'deg)' );
+                },
+                onEnd: function() {
+                    console.log( "on End Rotate");
+                    var coordinates = game.getCoordinatesFromId( game.cellToPlacePolyomino );
+                    console.log( "on End Rotate1");
+                    game.positionPolyomino( coordinates );
+                    console.log( "on End Rotate 2");
                 }
             });
             animation.play();
@@ -1640,7 +1620,10 @@ function (dojo, declare) {
                 },
                 onAnimate: function (values) {
                     dojo.style(this.node, 'transform', 'rotateY(' + parseFloat(values.propertyTransform.replace("px", "")) + 'deg) rotateZ(' + rotation + 'deg)');
-                }
+                },
+                onEnd: function() {
+                   this.positionPolyomino( this.cellToPlacePolyomino );
+                },                
             });
             animation.play();
 
@@ -1730,26 +1713,13 @@ function (dojo, declare) {
             this.positionPolyomino( coordinates);
         },
 
-        onPlacePolyomino: function( event )
-        {
-            dojo.stopEvent( event );
-
-            // CLIENT VALIDATION
-            if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
-            if( !this.checkAction('placePolyomino')) return;
-
-            // WE'LL NEED TO STORE THIS, IN CASE THE PLAYER NEEDS TO SELECT THEIR DISCARDS
-            this.cellToPlacePolyomino = event.currentTarget.id;
-
-            this.requestPlacePolyomino();
-        },
-
         onConfirmPolyominoPlacement: function( event )
         {
             dojo.stopEvent( event );
 
             // CLIENT VALIDATION
             if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
+            if( dojo.hasClass(event.currentTarget, "copen_button_disabled")) return;
             if( !this.checkAction('placePolyomino')) return;
 
             this.requestPlacePolyomino();
