@@ -1658,6 +1658,7 @@ function (dojo, declare) {
         {
 
             if( !dojo.hasClass(event.currentTarget, "copen_usable")) return; // make sure we can afford this polyomino before selecting it
+            if( !this.checkAction('placePolyomino')) return;
 
             this.selectPolyomino( event.currentTarget);
 
@@ -1666,7 +1667,7 @@ function (dojo, declare) {
             this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
             this.positionPolyomino( {x:0, y:0});
 
-            this.showPositionPolyominoButtons()
+            this.showPositionPolyominoButtons();
 
 
             // prepare polyomino preview for use
@@ -1682,18 +1683,22 @@ function (dojo, declare) {
         {
             console.log("onDragStartPolyomino");
 
+            if( !dojo.hasClass(event.currentTarget, "copen_usable")) return;
 
-
-            this.selectPolyomino( event.currentTarget);
             dojo.style( event.currentTarget, "z-index", 20 );
-
-            //dojo.style("polyomino_placement","display","block");
+            this.selectPolyomino( event.currentTarget );
 
             this.dragPositionLastFrame = {x: event.clientX, y: event.clientY};
         },
 
         onDragPolyomino: function( event )
-        {
+        { 
+
+            // WE SEEM TO GET A ON_DRAG ALSO ON THE LAST FRAME
+            //  when I would expect we'd only get a dragend event
+            //  it zero's out the cilentX and clientY - so we shouldn't use those values
+            if( event.clientX == 0 && event.clientY == 0) return;
+
             var movementX = event.clientX - this.dragPositionLastFrame.x;
             var movementY = event.clientY - this.dragPositionLastFrame.y;
 
@@ -1707,15 +1712,23 @@ function (dojo, declare) {
 
         onDragEndPolyomino: function( event )
         {
+
+            dojo.stopEvent( event );
+
             console.log("onDragEndPolyomino");
 
-            this.fadeInPolyominoPlacementUI();
+            console.log( this.selectedPolyomino );
+
+            dojo.style("polyomino_placement","display","block");
             this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
 
-            dojo.query(`#${this.selectedPolyomino.id}`).connect("ondragstart", this, "onDragStartPolyomino");
-            dojo.query(`#${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
-            dojo.query(`#${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragstart", this, "onDragStartPolyomino");            
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
 
+            this.fadeInPolyominoPlacementUI();
+            this.showPositionPolyominoButtons();
+            
             this.dropPolyominoOnBoard();
         },
 
@@ -1847,9 +1860,13 @@ function (dojo, declare) {
             this.attachToNewParent( this.selectedPolyomino["id"], stackId);
             this.slideToObjectPos( this.selectedPolyomino["id"], stackId, this.selectedPolyomino.originalPosition.l, this.selectedPolyomino.originalPosition.t, 500 ).play();
 
-            // RECONNECT THE CLICK
+            // RECONNECT THE EVENTS
             //   I tried connecting with dojo.connect() directly, but couldn't get it to work.             
-            dojo.query( `#copen_wrapper #${this.selectedPolyomino.id}`).connect("onclick",this,this.selectPolyominoEventHandlerName);
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("onclick",this,this.selectPolyominoEventHandlerName);
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragstart", this, "onDragStartPolyomino");            
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
+
 
             this.selectedPolyomino = null;
             this.fadeOutPolyominoPlacementUI();
