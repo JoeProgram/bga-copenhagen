@@ -1686,8 +1686,9 @@ function (dojo, declare) {
 
             console.log("onDragStartPolyomino");
 
-            if( !dojo.hasClass(event.currentTarget, "copen_usable")) return;
             if( !this.checkAction('placePolyomino')) return;
+            if( !dojo.hasClass(event.currentTarget, "copen_usable")) return;
+            
 
             dojo.style( event.currentTarget, "z-index", 20 );
 
@@ -1704,7 +1705,6 @@ function (dojo, declare) {
         onDragPolyomino: function( event )
         { 
 
-            if( !this.checkAction('placePolyomino'), false ) return;
             if( this.selectedPolyomino == null ) return;
 
 
@@ -1729,7 +1729,6 @@ function (dojo, declare) {
 
             dojo.stopEvent( event );
 
-            if( !this.checkAction('placePolyomino'), false ) return;
             if( this.selectedPolyomino == null ) return;
 
 
