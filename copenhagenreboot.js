@@ -272,11 +272,6 @@ function (dojo, declare) {
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
-            // TESTING
-            var testPiece = dojo.query("#yellow-4_2")[0];
-            var node = dojo.place("<div class='copen_polyomino_square copen_gap'></div>", testPiece);
-            
-
             console.log( "Ending game setup" );
 
         },    
@@ -1066,8 +1061,9 @@ function (dojo, declare) {
             dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
             dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
 
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id} .copen_gap`).connect("onmouseover", this, "onGapMouseOver");
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id} .copen_gap`).connect("onclick", this, "onGapClick");             
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("onmousemove", this, "onPolyominoMouseMovePassThrough");
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("onclick", this, "onPolyominoClickPassThrough");    
+
         },
 
         fadeInPolyominoPlacementUI: function()
@@ -1114,12 +1110,8 @@ function (dojo, declare) {
                 return null;
             }
 
-            console.log( coordinate );
-
             var x = Math.floor((coordinate.x - position.x) / this.cellMeasurement);
             var y = this.boardHeight - Math.floor((coordinate.y - position.y) / this.cellMeasurement) - 1; // have to do -1 or get an off-by-one error (1 -> 9) instead of (0 -> 8)
-
-            console.log( `x ${x} y ${y}`);
 
             return dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_${x}_${y}`)[0];
         },
@@ -1878,14 +1870,11 @@ function (dojo, declare) {
 
             if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
 
-            console.log( event );
-
             // Sometimes I make my own mouse event and call this function
             //  I couldn't figure out how to define currentTarget, so instead I store it in 'customTarget'
             var targetId = "";
             if( event.currentTarget != null ) targetId = event.currentTarget.id;
             else if( event.customTarget != null ) targetId = event.customTarget.id;
-            
 
             var coordinates = this.getCoordinatesFromId( targetId );
             var adjustedCoordinates = this.getAdjustedCoordinates( this.selectedPolyomino["shape"], coordinates);
@@ -1916,17 +1905,36 @@ function (dojo, declare) {
 
         },
 
-        onGapMouseOver: function( event )
+        onPolyominoMouseMovePassThrough: function( event )
         {
-
             var cellNode = this.getCellNodeAtPageCoordinate( {x:event.pageX, y:event.pageY});
             
+            // WE'RE NOT GUARANTEED TO GET A CELL NODE
+            // if the mouse moves outside that region of the screen
+            if( cellNode == null ) return;
+
             var passThroughEvent = new MouseEvent("onmouseover");
             passThroughEvent.customTarget = cellNode;
 
             this.onPreviewPlacePolyomino( passThroughEvent );        
 
         },
+
+        onPolyominoClickPassThrough: function( event )
+        {
+            var cellNode = this.getCellNodeAtPageCoordinate( {x:event.pageX, y:event.pageY});
+            
+            // WE'RE NOT GUARANTEED TO GET A CELL NODE
+            // if the mouse moves outside that region of the screen
+            if( cellNode == null ) return;
+
+            var passThroughEvent = new MouseEvent("onclick");
+            passThroughEvent.customTarget = cellNode;
+
+            this.onPositionPolyomino( passThroughEvent );        
+
+        },            
+
 
         onCancelPolyominoPlacement: function( event )
         {
@@ -1967,15 +1975,17 @@ function (dojo, declare) {
             if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
             if( !this.checkAction('placePolyomino')) return;
 
-            this.cellToPlacePolyomino = event.currentTarget.id;
 
-            var coordinates = this.getCoordinatesFromId( event.currentTarget.id);
+            // Sometimes I make my own mouse event and call this function
+            //  I couldn't figure out how to define currentTarget, so instead I store it in 'customTarget'
+            var targetId = "";
+            if( event.currentTarget != null ) targetId = event.currentTarget.id;
+            else if( event.customTarget != null ) targetId = event.customTarget.id
+
+            this.cellToPlacePolyomino = targetId;
+
+            var coordinates = this.getCoordinatesFromId( targetId );
             this.positionPolyomino( coordinates);
-        },
-
-        onGapClick: function( event )
-        {
-            console.log("onGapClick");
         },
 
         onConfirmPolyominoPlacement: function( event )
