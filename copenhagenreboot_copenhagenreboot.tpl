@@ -179,7 +179,7 @@
 var jstpl_card= '<div id="card_${id}" class="copen_card copen_${color}_card">' +
                     '<div class="copen_new_color copen_hidden"></div>' +
                 '</div>';
-var jstpl_polyomino='<div id="${color}-${squares}_${copy}" class="copen_polyomino copen_${color}_polyomino copen_${color}-${squares}" style="transform: rotateY(${flip}deg) rotateZ(${rotation}deg)"></div>';
+var jstpl_polyomino='<div id="${color}-${squares}_${copy}" draggable="true" class="copen_polyomino copen_${color}_polyomino copen_${color}-${squares}" style="transform: rotateY(${flip}deg) rotateZ(${rotation}deg)"></div>';
 
 var jstpl_player_board = '<div class="copen_hand_size_wrapper">' +
                             '<div class="copen_hand_size_card">' +

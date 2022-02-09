@@ -236,7 +236,7 @@ function (dojo, declare) {
                 if( abilityName == "change_of_colors")
                 {
                     this.triggerChangeOfColorsAbility( this.gamedatas.change_of_colors.from_color, this.gamedatas.change_of_colors.to_color);
-                    this.col
+                    //this.col
                 }
             }
 
@@ -1681,18 +1681,32 @@ function (dojo, declare) {
 
         onDragStartPolyomino: function( event )
         {
+            // disable the normal ghosting image by moving its position outside the window
+            event.dataTransfer.setDragImage(event.target, window.outerWidth, window.outerHeight);
+
             console.log("onDragStartPolyomino");
 
             if( !dojo.hasClass(event.currentTarget, "copen_usable")) return;
+            if( !this.checkAction('placePolyomino')) return;
 
             dojo.style( event.currentTarget, "z-index", 20 );
-            this.selectPolyomino( event.currentTarget );
 
+            // IF WE HAVEN'T SELECTED THE POLYOMINO, DO IT NOW
+            //  if we have selected it, no need to do it again
+            if( this.selectedPolyomino == null )
+            {
+                this.selectPolyomino( event.currentTarget );
+            }
+            
             this.dragPositionLastFrame = {x: event.clientX, y: event.clientY};
         },
 
         onDragPolyomino: function( event )
         { 
+
+            if( !this.checkAction('placePolyomino'), false ) return;
+            if( this.selectedPolyomino == null ) return;
+
 
             // WE SEEM TO GET A ON_DRAG ALSO ON THE LAST FRAME
             //  when I would expect we'd only get a dragend event
@@ -1715,19 +1729,24 @@ function (dojo, declare) {
 
             dojo.stopEvent( event );
 
-            console.log("onDragEndPolyomino");
+            if( !this.checkAction('placePolyomino'), false ) return;
+            if( this.selectedPolyomino == null ) return;
 
-            console.log( this.selectedPolyomino );
 
-            dojo.style("polyomino_placement","display","block");
-            this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
+            // IF WE START WITH DRAG, WE DON'T TURN ON PLACEMENT UI IMMEDIATELY.
+            //   do it now, if it hasn't been done
+            if( dojo.getStyle("polyomino_placement", "display") == "none")
+            {
+                dojo.style("polyomino_placement","display","block");
+                this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
 
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragstart", this, "onDragStartPolyomino");            
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
+                dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragstart", this, "onDragStartPolyomino");            
+                dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
+                dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
 
-            this.fadeInPolyominoPlacementUI();
-            this.showPositionPolyominoButtons();
+                this.fadeInPolyominoPlacementUI();
+                this.showPositionPolyominoButtons();
+            }
             
             this.dropPolyominoOnBoard();
         },
