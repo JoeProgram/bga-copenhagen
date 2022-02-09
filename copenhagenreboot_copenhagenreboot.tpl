@@ -201,6 +201,8 @@ var jstpl_ability_tile= '<div id="${ability_name}-${copy}" class="copen_ability_
  
 var jstpl_log_ability_tile = '<div class="copen_log_ability_tile copen_log_ability_tile_${log_ability_tile}"></div>';
 
+var jstpl_overlap = '<div id="${id}" class="copen_overlap"></div>';
+
 </script>  
 
 {OVERALL_GAME_FOOTER}

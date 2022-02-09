@@ -199,22 +199,11 @@
     perspective: 1000px;
 }
 
-.copen_polyomino_square
-{
-    display: block;
-    position: absolute;
-    width: 34px;
-    height: 34px;
-    opacity: 0.8;
-}
-
 .copen_log_polyomino
 {
     display: inline-block;
     background-image: url('img/polyominoes.png');
 }
-
-
 
 .copen_purple-2  
 {
@@ -525,7 +514,6 @@
     position: absolute;
     width: 34px;
     height: 34px;
-    /*background-color: black; opacity: 0.25;*/
     z-index: 2;
 }
 
@@ -801,6 +789,7 @@
 #polyomino_placement .copen_polyomino
 {
     filter:  drop-shadow(0.35rem 0.35rem 0.4rem rgba(0,0,0,0.5));
+    z-index: 20;
 }
 
 #polyomino_placement .copen_polyomino.copen_invalid_placement
@@ -811,6 +800,16 @@
             drop-shadow(0px 3px 0px red)
             drop-shadow(0px -3px 0px red)                     
             drop-shadow(0.35rem 0.35rem 0.4rem rgba(0,0,0,0.5));
+}
+
+#polyomino_placement .copen_polyomino .copen_overlap
+{
+    display:  block;
+    width:  34px;
+    height:  34px;
+    position:  absolute;
+    background-color:  red;
+    opacity: 0.5;
 }
 
 #polyomino_placement_buttons
