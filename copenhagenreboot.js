@@ -2370,7 +2370,13 @@ function (dojo, declare) {
             // handle the new top of stack
             var stackId = this.getStackIdFromPolyominoId( polyominoId );
             var newTopOfStack = this.determineTopPolyominoInStack( stackId );         
-            if( newTopOfStack != null ) dojo.connect( newTopOfStack, "onclick", this, this.selectPolyominoEventHandlerName );
+            if( newTopOfStack != null )
+            {
+                dojo.connect( newTopOfStack, "onclick", this, this.selectPolyominoEventHandlerName );
+                dojo.connect( newTopOfStack, "ondragstart", this, "onDragStartPolyomino" );
+                dojo.connect( newTopOfStack, "ondrag", this, "onDragPolyomino" );
+                dojo.connect( newTopOfStack, "ondragend", this, "onDragEndPolyomino" );
+            }
 
             if( this.player_id == notif.args.player_id)
             {
