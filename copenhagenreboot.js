@@ -961,27 +961,20 @@ function (dojo, declare) {
             {
                 if( !this.isCellEmpty( gridCells[i] ))
                 {
-                    /*
-                    console.log( "Not empty at ");
-                    console.log( gridCells[i] );
-                    console.log( "shape at index is");
-                    console.log( this.selectedPolyomino.shape[i]);*/
-
-                    var overlap = dojo.place( this.format_block('jstpl_overlap',{
-                        id: `overlap_${i}`,
-                    }), this.selectedPolyomino.id);
-
-                    cellNode = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_${gridCells[i].x}_${gridCells[i].y}`)[0];
-                    console.log("place overlap");
-                    console.log( overlap.id );
-                    console.log( cellNode.id );
-
-                    this.placeOnObject( overlap.id, cellNode.id);
+                    console.log( "showing overlap of " + i );
+                    console.log( this.selectedPolyomino.overlaps[i]);
+                    dojo.style(this.selectedPolyomino.overlaps[i],"display","block");
                 }
             }
         },
 
-        clearOverlap: function()
+        hideOverlap: function()
+        {
+            console.log( "hiding overlap");
+            dojo.query("#copen_wrapper .copen_overlap").style("display","none");
+        },
+
+        removeOverlap: function()
         {
             dojo.query("#copen_wrapper .copen_overlap").forEach( dojo.destroy );
         },
@@ -1189,6 +1182,7 @@ function (dojo, declare) {
             this.selectedPolyomino.rotation = 0;
             this.selectedPolyomino.flip = 0;
             this.selectedPolyomino.originalPosition = dojo.getMarginBox( event.currentTarget); // getMarginBox includes 'l' and 't' - the values for "left" and "top"
+            this.selectedPolyomino.overlaps = [];
 
             // prepare polyomino preview for use
             var polyomino = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
@@ -1197,6 +1191,39 @@ function (dojo, declare) {
             dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
             dojo.style("polyomino_preview","transform",""); // reset the transform from whatever it was before
             dojo.style("polyomino_preview","display","none"); // not ready to show yet - turn off
+
+            // create squares we'll use to show overlap   
+            var bounds = this.getPolyominoBounds( this.selectedPolyomino.shape );
+            var shape_height = bounds.max.y + 1;
+
+            for( var i = 0; i < this.selectedPolyomino.shape.length ; i++ )
+            {
+
+                var overlap = dojo.place( this.format_block('jstpl_overlap',{
+                    id: `overlap_${i}`,
+                }), this.selectedPolyomino.id);
+
+                // transform from shape coordinates into HTML space
+                var x = this.selectedPolyomino.shape[i].x;
+                var y = this.selectedPolyomino.shape[i].y;
+
+                x = x - bounds.min.x;
+                y = shape_height - y - 1;
+
+                x *= this.cellMeasurement;
+                y *= this.cellMeasurement;
+
+                dojo.style( overlap, "left", x + "px");
+                dojo.style( overlap, "top", y + "px");
+
+                this.selectedPolyomino.overlaps.push( overlap.id );
+
+            }
+
+                console.log( "created overlaps");
+                console.log( this.selectedPolyomino.overlaps );
+
+            
 
         },
 
@@ -1236,7 +1263,6 @@ function (dojo, declare) {
             //  if that's the case, redirect them to choose which cards to discard
             if( this.changeColorsFromTo != null)
             {
-
                 var cardsOfColor = this.countColoredCardsInHand( color );
                 var cost = this.getCostOfShapeAtPosition( gridCells, color);
 
@@ -1280,7 +1306,7 @@ function (dojo, declare) {
         {
 
             // CLEAR UP ANY OVERLAP FROM LAST POSITION
-            this.clearOverlap();
+            this.hideOverlap();
 
             var color = this.getPolyominoColorFromId( this.selectedPolyomino.id );
             var adjustedCoordinates = this.getAdjustedCoordinates( this.selectedPolyomino["shape"], coordinates);
@@ -1297,6 +1323,7 @@ function (dojo, declare) {
             {
                 dojo.addClass( this.selectedPolyomino.id, "copen_invalid_placement");
                 dojo.addClass( "confirm_polyomino_placement", "copen_button_disabled");
+                this.showOverlap( gridCells );
             } 
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
@@ -1306,14 +1333,8 @@ function (dojo, declare) {
             var minGridCell = this.getMinGridCell( gridCells );
             var minGridCellNode = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_${minGridCell.x}_${minGridCell.y}`)[0];
 
-            console.log(             this.slideToObjectPos( this.selectedPolyomino.id, minGridCellNode.id, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ));
 
-            var animation = this.slideToObjectPos( this.selectedPolyomino.id, minGridCellNode.id, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 );
-            var game = this;
-            dojo.connect( animation, "onEnd", function(){
-                console.log( "OnEnd");
-                game.showOverlap( gridCells )
-            }); // this is how you chain in an onEnd function 
+            var animation = this.slideToObjectPos( this.selectedPolyomino.id, minGridCellNode.id, htmlPlacement.htmlX, htmlPlacement.htmlY, 250 );
             animation.play();
 
         },
@@ -1441,9 +1462,12 @@ function (dojo, declare) {
         placePolyomino: function( polyominoData )
         {
 
+            this.removeOverlap();
+
             var polyominoNodeId = `${polyominoData.color}-${polyominoData.squares}_${polyominoData.copy}`;
             var polyominoNode = dojo.query(`#copen_wrapper #${polyominoNodeId}`)[0];
             dojo.removeClass(polyominoNode, "copen_top_of_stack");
+            dojo.style( polyominoNode, "z-index", 1);
 
             var boardCellNode = dojo.query(`#copen_wrapper #player_${polyominoData.owner}_playerboard .copen_board_cell_${polyominoData.x}_${polyominoData.y}`)[0];
 
@@ -1769,6 +1793,9 @@ function (dojo, declare) {
             if( !this.checkAction('placePolyomino')) return;
             if( !dojo.hasClass(event.currentTarget, "copen_usable")) return;
             
+            console.log( "drag start currentTarget");
+            console.log( event.currentTarget );
+
             dojo.style( event.currentTarget, "z-index", 20 );
 
             // IF WE HAVEN'T SELECTED THE POLYOMINO, DO IT NOW
@@ -1778,7 +1805,7 @@ function (dojo, declare) {
                 this.selectPolyomino( event.currentTarget );
             }
 
-            this.clearOverlap();
+            this.hideOverlap();
             
             this.dragPositionLastFrame = {x: event.clientX, y: event.clientY};
         },
@@ -1999,10 +2026,11 @@ function (dojo, declare) {
             dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
             dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
 
-
+            this.removeOverlap();
             this.selectedPolyomino = null;
             this.fadeOutPolyominoPlacementUI();
             this.clearPreview();
+
 
             this.hidePositionPolyominoButtons()
         },

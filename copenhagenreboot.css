@@ -804,7 +804,7 @@
 
 #polyomino_placement .copen_polyomino .copen_overlap
 {
-    display:  block;
+    display:  none;
     width:  34px;
     height:  34px;
     position:  absolute;
