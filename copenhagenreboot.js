@@ -35,6 +35,7 @@ function (dojo, declare) {
             this.boardHeight = 9;
             this.playerboard = [];
 
+            this.cellMeasurement = 34;
             this.cardWidth = 66;
             this.cardSplayDistance = 20;
             this.maxHandSize = 7;
@@ -236,7 +237,6 @@ function (dojo, declare) {
                 if( abilityName == "change_of_colors")
                 {
                     this.triggerChangeOfColorsAbility( this.gamedatas.change_of_colors.from_color, this.gamedatas.change_of_colors.to_color);
-                    //this.col
                 }
             }
 
@@ -272,6 +272,10 @@ function (dojo, declare) {
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
+            // TESTING
+            var testPiece = dojo.query("#yellow-4_2")[0];
+            var node = dojo.place("<div class='copen_polyomino_square copen_gap'></div>", testPiece);
+            
 
             console.log( "Ending game setup" );
 
@@ -1052,6 +1056,20 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #polyomino_preview").style("display","none");
         },
 
+        // ATTACH THE POLYOMINO TO THE PLACEMENT LAYER - DESTROYING THE OLD ONE
+        //   hooks up the new one with the events it needs
+        putPolyominoOnPlacementLayer: function()
+        {
+            this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
+
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragstart", this, "onDragStartPolyomino");            
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
+
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id} .copen_gap`).connect("onmouseover", this, "onGapMouseOver");
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id} .copen_gap`).connect("onclick", this, "onGapClick");             
+        },
+
         fadeInPolyominoPlacementUI: function()
         {
 
@@ -1077,6 +1095,33 @@ function (dojo, declare) {
                 }
             }).play();
 
+        },
+
+        // GIVEN COORDINATES OF THE HTML PAGE, GET THE CELL UNDER THOSE COORDINATES
+        getCellNodeAtPageCoordinate: function( coordinate )
+        {
+            var boardCellsNode = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cells`)[0];
+            var position = dojo.position( boardCellsNode, true );
+
+            // MAKE SURE COORDINATE IS WITHIN GRID CELLS NODE, OTHERWISE ITS INVALID
+            if( 
+                coordinate.x < position.x 
+                || coordinate.x > position.x + position.w
+                || coordinate.y < position.y
+                || coordinate.y > position.y + position.h
+            )
+            {
+                return null;
+            }
+
+            console.log( coordinate );
+
+            var x = Math.floor((coordinate.x - position.x) / this.cellMeasurement);
+            var y = this.boardHeight - Math.floor((coordinate.y - position.y) / this.cellMeasurement) - 1; // have to do -1 or get an off-by-one error (1 -> 9) instead of (0 -> 8)
+
+            console.log( `x ${x} y ${y}`);
+
+            return dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_${x}_${y}`)[0];
         },
 
         showSelectDiscardUI: function( color, cost )
@@ -1121,6 +1166,14 @@ function (dojo, declare) {
             this.selectedPolyomino["rotation"] = 0;
             this.selectedPolyomino["flip"] = 0;
             this.selectedPolyomino.originalPosition = dojo.getMarginBox( event.currentTarget); // getMarginBox includes 'l' and 't' - the values for "left" and "top"
+
+            // prepare polyomino preview for use
+            var polyomino = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
+            dojo.style("polyomino_preview","background-position", dojo.getStyle(polyomino, "background-position"));
+            dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
+            dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
+            dojo.style("polyomino_preview","transform",""); // reset the transform from whatever it was before
+            dojo.style("polyomino_preview","display","none"); // not ready to show yet - turn off
         },
 
         fadeOutPolyominoPlacementUI: function()
@@ -1664,19 +1717,13 @@ function (dojo, declare) {
 
             this.fadeInPolyominoPlacementUI(); // have to fade in the shadow box first - or the display:none css style won't allow the polyomino to slide to the target correctly
 
-            this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
+            this.putPolyominoOnPlacementLayer();            
             this.positionPolyomino( {x:0, y:0});
 
             this.showPositionPolyominoButtons();
 
 
-            // prepare polyomino preview for use
-            var polyomino = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
-            dojo.style("polyomino_preview","background-position", dojo.getStyle(polyomino, "background-position"));
-            dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
-            dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
-            dojo.style("polyomino_preview","transform",""); // reset the transform from whatever it was before
-            dojo.style("polyomino_preview","display","none"); // not ready to show yet - turn off
+
         },
 
         onDragStartPolyomino: function( event )
@@ -1737,11 +1784,7 @@ function (dojo, declare) {
             if( dojo.getStyle("polyomino_placement", "display") == "none")
             {
                 dojo.style("polyomino_placement","display","block");
-                this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
-
-                dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragstart", this, "onDragStartPolyomino");            
-                dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
-                dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
+                this.putPolyominoOnPlacementLayer();
 
                 this.fadeInPolyominoPlacementUI();
                 this.showPositionPolyominoButtons();
@@ -1835,7 +1878,16 @@ function (dojo, declare) {
 
             if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
 
-            var coordinates = this.getCoordinatesFromId( event.currentTarget.id);
+            console.log( event );
+
+            // Sometimes I make my own mouse event and call this function
+            //  I couldn't figure out how to define currentTarget, so instead I store it in 'customTarget'
+            var targetId = "";
+            if( event.currentTarget != null ) targetId = event.currentTarget.id;
+            else if( event.customTarget != null ) targetId = event.customTarget.id;
+            
+
+            var coordinates = this.getCoordinatesFromId( targetId );
             var adjustedCoordinates = this.getAdjustedCoordinates( this.selectedPolyomino["shape"], coordinates);
             var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , adjustedCoordinates );
             var validity = this.isValidPlacementPosition( gridCells );
@@ -1861,6 +1913,18 @@ function (dojo, declare) {
 
             }
 
+
+        },
+
+        onGapMouseOver: function( event )
+        {
+
+            var cellNode = this.getCellNodeAtPageCoordinate( {x:event.pageX, y:event.pageY});
+            
+            var passThroughEvent = new MouseEvent("onmouseover");
+            passThroughEvent.customTarget = cellNode;
+
+            this.onPreviewPlacePolyomino( passThroughEvent );        
 
         },
 
@@ -1907,6 +1971,11 @@ function (dojo, declare) {
 
             var coordinates = this.getCoordinatesFromId( event.currentTarget.id);
             this.positionPolyomino( coordinates);
+        },
+
+        onGapClick: function( event )
+        {
+            console.log("onGapClick");
         },
 
         onConfirmPolyominoPlacement: function( event )

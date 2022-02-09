@@ -199,6 +199,14 @@
     perspective: 1000px;
 }
 
+.copen_polyomino_square
+{
+    display: block;
+    position: absolute;
+    width: 34px;
+    height: 34px;
+    opacity: 0.8;
+}
 
 
 .copen_log_polyomino
@@ -509,6 +517,8 @@
 {
     z-index: 1; /* Make sure the clickable cells are always in front of place polyominoes */
 }
+
+
 
 .copen_board_cell
 {
