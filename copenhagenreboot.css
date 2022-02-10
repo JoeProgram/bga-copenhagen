@@ -61,7 +61,6 @@
     left: 31px;
     height: 7px;
     width: 462px;
-    font-size: 0px; /* used to ignore whitespace, keep HTML readable */
 
 }
 
@@ -73,7 +72,6 @@
     height: 6px;
     background-image:  url('img/harbor.png');
     background-repeat: no-repeat;
-
 }
 
 #harbor_0{ left:0px; }
@@ -93,11 +91,32 @@
 
 #deck
 {
-    position: absolute;
+    display: block;
     width: 28px;
-    height: 41px;  
+    height: 41px;
+
+    position: absolute;  
     background-image: url('img/tiny_cards.png');
     background-position: 0px 0px;
+    text-align: center;
+}
+
+#cards_remaining
+{
+    position: absolute;
+    text-align: center;
+    color:  white;
+    font-weight: bold;
+   
+    width: 60px;
+    height: 60px;
+
+    left:  -50%;
+    z-index:  40;
+    margin-top: 10px; 
+    opacity: 0;
+
+    text-shadow: 2px 2px #888888;
 }
 
 #small_mermaid_card

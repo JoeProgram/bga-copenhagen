@@ -28,7 +28,9 @@
 
 
         <div id="deck_cards">
-            <div id="deck"></div>
+            <div id="deck">
+                <div id="cards_remaining" ><div>10</div> </div>
+            </div>
             <div id="small_mermaid_card"></div>
         </div>
 

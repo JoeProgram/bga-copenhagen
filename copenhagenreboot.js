@@ -38,6 +38,7 @@ function (dojo, declare) {
             this.cellMeasurement = 34;
             this.cardWidth = 66;
             this.cardSplayDistance = 20;
+            this.cardsRemainingWarningThreshold = 14;
             this.maxHandSize = 7;
             this.maxHandSizeDiscardHandlers = []; // keep track of the events we attach to cards to allow the player to discard - since we'll want to disconnect them afterwards
 
@@ -271,6 +272,7 @@ function (dojo, declare) {
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
+
 
             console.log( "Ending game setup" );
 
@@ -626,6 +628,21 @@ function (dojo, declare) {
             if( numberCardsInDeck == 0 ) dojo.style("deck","display","none");
             else dojo.style("deck","display","block");
             this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in deck"), "");
+
+            if( 
+                !this.isSmallMermaidCardVisible()
+                && numberCardsInDeck <= this.cardsRemainingWarningThreshold
+            )
+            {
+                this.announceCardsRemainingInDeck( numberCardsInDeck );
+            }
+        },
+
+        isSmallMermaidCardVisible: function()
+        {
+            var query = dojo.query("#copen_wrapper #small_mermaid_card");
+            if( query.length == 0 ) return false;
+            return dojo.getStyle(query[0], "display") != "none";
         },
 
         // REAPPLY TOOLTIPS TO SPECIAL ABILITIES
@@ -738,6 +755,49 @@ function (dojo, declare) {
             return dojo.query("#copen_wrapper #cards_in_hand .copen_card").length > this.maxHandSize;
         },
 
+        announceCardsRemainingInDeck: function( cardsRemaining )
+        {
+
+            var cardsRemainingNode = dojo.query("#copen_wrapper #cards_remaining")[0];
+
+            // MAKE SURE IT'S CHANGED
+            if(parseInt(cardsRemainingNode.innerText) == cardsRemaining) return;            
+
+            cardsRemainingNode.innerText = cardsRemaining;
+
+            // RESET VALUES FROM PREVIOUS ANIMATION (IF ANY)
+            dojo.style(cardsRemainingNode, "opacity", "");
+            dojo.style(cardsRemainingNode, "font-size", "");
+            dojo.style(cardsRemainingNode, "margin-top", "");
+
+            // ANIMATION
+            var animation = dojo.animateProperty({
+                node: cardsRemainingNode,
+                properties: {
+                    opacity: 1,
+                    duration: 1000,
+                    fontSize: {end: 40, units: "pt"}, // note you use camelCase, and not dashes
+                    marginTop: {end: -10, units: "px"}
+                },
+                onEnd: function(){
+                    try{
+                        console.log(" 2nd animation playing");
+                        dojo.animateProperty({
+                            delay: 250,
+                            node: cardsRemainingNode,
+                            properties: {
+                                opacity: 0,
+                            }
+                        }).play();
+                    } catch (error) {
+                        // bubble up errors that otherwise would be silent
+                        console.error(error);
+                    }
+                }
+            })
+            animation.play();
+
+        },
 
         determineTopPolyominoInEveryStack: function()
         {
