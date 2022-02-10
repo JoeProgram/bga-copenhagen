@@ -25,7 +25,7 @@ define([
 function (dojo, declare) {
     return declare("bgagame.copenhagenreboot", ebg.core.gamegui, {
         constructor: function(){
-            console.log('copenhagenreboot constructor');
+            // console.log('copenhagenreboot constructor');
               
             // Here, you can init the global variables of your user interface
             // Example:
@@ -117,10 +117,10 @@ function (dojo, declare) {
         
         setup: function( gamedatas )
         {
-            console.log( "Starting game setup" );
+            //console.log( "Starting game setup" );
 
             // DEBUG - see all game data in console
-            console.log( gamedatas);
+            // console.log( gamedatas);
 
             // DECK
             this.updateDeckDisplay(gamedatas.cards_in_deck);
@@ -274,7 +274,7 @@ function (dojo, declare) {
             this.setupNotifications();
 
 
-            console.log( "Ending game setup" );
+            //console.log( "Ending game setup" );
 
         },    
 
@@ -286,12 +286,12 @@ function (dojo, declare) {
         //
         onEnteringState: function( stateName, args )
         {
-            console.log( 'Entering state: '+stateName );
+            //DEBUG
+            //console.log( 'Entering state: '+stateName );
+            //console.log( args );
             
             this.stateName = stateName;
 
-            //DEBUG
-            console.log( args );
 
             switch( stateName )
             {
@@ -519,10 +519,8 @@ function (dojo, declare) {
         //
         onLeavingState: function( stateName )
         {
-            console.log( 'Leaving state: '+stateName );
+            //console.log( 'Leaving state: '+stateName );
             
-
-
             switch( stateName )
             {
             
@@ -571,7 +569,7 @@ function (dojo, declare) {
         //        
         onUpdateActionButtons: function( stateName, args )
         {
-            console.log( 'onUpdateActionButtons: '+stateName );
+            //console.log( 'onUpdateActionButtons: '+stateName );
                       
             if( this.isCurrentPlayerActive() )
             {            
@@ -781,7 +779,6 @@ function (dojo, declare) {
                 },
                 onEnd: function(){
                     try{
-                        console.log(" 2nd animation playing");
                         dojo.animateProperty({
                             delay: 250,
                             node: cardsRemainingNode,
@@ -1032,8 +1029,6 @@ function (dojo, declare) {
             {
                 if( !this.isCellEmpty( gridCells[i] ))
                 {
-                    console.log( "showing overlap of " + i );
-                    console.log( this.selectedPolyomino.overlaps[i]);
                     dojo.style(this.selectedPolyomino.overlaps[i],"display","block");
                 }
             }
@@ -1041,7 +1036,6 @@ function (dojo, declare) {
 
         hideOverlap: function()
         {
-            console.log( "hiding overlap");
             dojo.query("#copen_wrapper .copen_overlap").style("display","none");
         },
 
@@ -1291,11 +1285,6 @@ function (dojo, declare) {
                 this.selectedPolyomino.overlaps.push( overlap.id );
 
             }
-
-                console.log( "created overlaps");
-                console.log( this.selectedPolyomino.overlaps );
-
-            
 
         },
 
@@ -1870,9 +1859,6 @@ function (dojo, declare) {
 
             if( !this.checkAction('placePolyomino')) return;
             if( !dojo.hasClass(event.currentTarget, "copen_usable")) return;
-            
-            console.log( "drag start currentTarget");
-            console.log( event.currentTarget );
 
             dojo.style( event.currentTarget, "z-index", 20 );
 

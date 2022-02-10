@@ -525,9 +525,6 @@ class CopenhagenReboot extends Table
         for( $i = 0; $i < count($polyominoShape); $i++)
         {
 
-            self::warn("flipPolyominoShape");
-            self::warn( json_encode($polyominoShape[$i]));
-
             $polyominoShape[$i] = array( 
                 "x" => -$polyominoShape[$i]["x"], 
                 "y" => $polyominoShape[$i]["y"],
@@ -591,9 +588,6 @@ class CopenhagenReboot extends Table
         foreach($shape as $grid_cell )
         {
 
-            self::warn("getGridCellsForPolyominoAtCoordinates");
-            self::warn( json_encode($shape));
-
             $results[] = array(
                 "x" => $grid_cell["x"] + $x,
                 "y" => $grid_cell["y"] + $y,
@@ -654,7 +648,6 @@ class CopenhagenReboot extends Table
         }
 
         $points = $windows_only ? 2 : 1;
-        self::warn( "Column $y was worth $points");
         return $points;
     }
 
@@ -676,7 +669,6 @@ class CopenhagenReboot extends Table
         }
 
         $points = $windows_only ? 4 : 2;
-        self::warn( "Column $x was worth $points");
         return $points;
     }
 
@@ -759,8 +751,6 @@ class CopenhagenReboot extends Table
 
     function validateActivatedAbility( $ability_name, $player_id)
     {
-        self::warn("validateActivatedAbility");
-        self::warn("SELECT * FROM ability_tile WHERE ability_name = '$ability_name' AND owner = $player_id AND used = 0;");
 
         $ability_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = '$ability_name' AND owner = $player_id AND used = 0;");
         if( $ability_tile == null ) throw new feException( self::_("You can't activate that special ability."));
