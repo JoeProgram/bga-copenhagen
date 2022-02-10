@@ -2,7 +2,7 @@
 /**
  *------
  * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
- * CopenhagenReboot implementation : © <Your name here> <Your email address here>
+ * Copenhagen implementation : © <Joe France> <josephfrance@gmail.com>
  *
  * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
@@ -1360,6 +1360,7 @@ function (dojo, declare) {
             // SEND SERVER REQUEST
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/placePolyomino.html",
             {
+                lock: true, 
                 color: this.getPolyominoColorFromId( this.selectedPolyomino.id) ,
                 squares: this.getPolyominoSquaresFromId( this.selectedPolyomino.id),
                 copy:this.getPolyominoCopyFromId( this.selectedPolyomino.id),
@@ -1820,6 +1821,7 @@ function (dojo, declare) {
 
                 this.ajaxcall( endPoint,
                 {
+                    lock: true, 
                     card_id:event.currentTarget.id.split("_")[1],
                 }, this, function( result ){} ); 
             }
@@ -1836,6 +1838,7 @@ function (dojo, declare) {
 
                 this.ajaxcall( "/copenhagenreboot/copenhagenreboot/discardDownToMaxHandSize.html",
                 {
+                    lock: true, 
                     card_id:event.currentTarget.id.split("_")[1],
                 }, this, function( result ){} ); 
             }
@@ -2177,6 +2180,7 @@ function (dojo, declare) {
 
                 this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeAbilityTile.html",
                 {
+                    lock: true, 
                     ability_name: ability_name,
                     copy: copy,
                 }, this, function( result ){} ); 
@@ -2193,6 +2197,7 @@ function (dojo, declare) {
 
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityAnyCards.html",
             {
+                lock: true, 
             }, this, function( result ){} ); 
 
         },
@@ -2207,6 +2212,7 @@ function (dojo, declare) {
 
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityAdditionalCard.html",
             {
+                lock: true, 
             }, this, function( result ){} ); 
 
         },
@@ -2221,6 +2227,7 @@ function (dojo, declare) {
 
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityBothActions.html",
             {
+                lock: true, 
             }, this, function( result ){} ); 
 
         },
@@ -2235,6 +2242,7 @@ function (dojo, declare) {
 
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityConstructionDiscount.html",
             {
+                lock: true, 
             }, this, function( result ){} ); 
 
         },
@@ -2305,6 +2313,7 @@ function (dojo, declare) {
 
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityChangeOfColors.html",
             {
+                lock: true, 
                 from_color: fromColor,
                 to_color: toColor,
             }, this, function( result ){} ); 
@@ -2323,6 +2332,7 @@ function (dojo, declare) {
 
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/resetUsedAbilities.html",
             {
+                lock: true, 
             }, this, function( result ){} ); 
         },
 
@@ -2333,6 +2343,7 @@ function (dojo, declare) {
 
             this.ajaxcall( "/copenhagenreboot/copenhagenreboot/endTurn.html",
             {
+                lock: true, 
             }, this, function( result ){} ); 
 
         },
