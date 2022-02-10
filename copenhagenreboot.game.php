@@ -110,8 +110,14 @@ class CopenhagenReboot extends Table
         self::setGameStateValue( 'change_of_colors_to', -1 );
 
         // INITIALIZE GAME STATISTICS
+        self::initStat( 'table', "turns", 0 );
         self::initStat( 'table', "how_game_ended", 0 );
         self::initStat( 'player', "coat_of_arms_earned", 0 );
+        self::initStat( 'player', "ability_tiles_used", 0 );
+        self::initStat( 'player', "squares_covered", 0 );
+        self::initStat( 'player', "cards_drawn", 0 );
+        self::initStat( 'player', "cards_discarded_too_many", 0 );
+        self::initStat( 'player', "facade_tiles_placed", 0 );
 
         // SETUP DECK
         $cards_per_color = 14;
@@ -709,6 +715,8 @@ class CopenhagenReboot extends Table
 
         $drawn_cards = self::getGameStateValue( "drawn_cards" );
         self::setGameStateValue( 'drawn_cards', $drawn_cards + 1 );  
+
+        self::incStat( 1, "cards_drawn", $player_id );
     }
 
     function getCardsOfColorInHand( $color )
@@ -861,13 +869,12 @@ class CopenhagenReboot extends Table
 
 
         // USE UP ANY USED ABILITIES
-        $used_abilities = [];
         if( $is_using_ability_any_cards )
         {
             self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'any_cards' AND owner = $player_id");
-            $used_abilities[] = "any_cards";
+            $this->notifyPlayersOfUsedAbilities( ['any_cards'], $player_id, $player_name );
+            self::incStat( 1, "ability_tiles_used", $player_id );
         } 
-        if( count($used_abilities) > 0) $this->notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name );
 
         $this->notifyPlayersOfTakenCard( $card_id, $card["type"], $player_id, $player_name );
 
@@ -897,11 +904,11 @@ class CopenhagenReboot extends Table
 
 
         // USE UP ANY USED ABILITIES
-        $used_abilities = ["additional_card"];
-        self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'additional_card' AND owner = $player_id");    
+        self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'additional_card' AND owner = $player_id"); 
+        $this->notifyPlayersOfUsedAbilities( ["additional_card"], $player_id, $player_name );
+        self::incStat( 1, "ability_tiles_used", $player_id );   
 
-
-        $this->notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name );
+        
         $this->notifyPlayersOfTakenCard( $card_id, $card["type"], $player_id, $player_name );
 
         $this->gamestate->nextState( "checkHandSize");
@@ -926,6 +933,7 @@ class CopenhagenReboot extends Table
 
         // DISCARD THE CARD
         $this->cards->moveCard( $card_id, "discard");
+        self::incStat(1, "cards_discarded_too_many", $player_id );
 
         // NOTIFY
         //   Cards are discarded face up, so it's okay to notify all players of the specific card discarded
@@ -947,9 +955,6 @@ class CopenhagenReboot extends Table
 
     function placePolyomino( $color, $squares, $copy, $x, $y, $flip, $rotation, $discards )
     {
-
-        self::warn("placePolyomino");
-        self::warn( json_encode($discards));
 
         self::checkAction( 'placePolyomino' );
 
@@ -1048,6 +1053,7 @@ class CopenhagenReboot extends Table
 
         $sql = "UPDATE polyomino SET owner = $player_id, x = $min_grid_cell_x, y = $min_grid_cell_y, flip = $flip, rotation = $rotation WHERE color = '$color' AND squares = $squares AND copy = $copy";
         self::DbQuery(  $sql );
+        self::incStat( 1, "facade_tiles_placed", $player_id );
 
         // UPDATE BOARD CELLS
         foreach( $grid_cells as $grid_cell ) 
@@ -1056,7 +1062,7 @@ class CopenhagenReboot extends Table
             $sql = "UPDATE board_cell SET color = '$color', fill = '$fill' WHERE owner = $player_id AND x = $grid_cell[x] AND y = $grid_cell[y] ;";
             self::DbQuery(  $sql );
         }
-
+        self::incStat( count($grid_cells), "squares_covered", $player_id );
 
         // GET NEW, UPDATED COPY OF PLAYERBOARD
         $playerboard = $this->getPlayerboard( $player_id );
@@ -1069,7 +1075,11 @@ class CopenhagenReboot extends Table
         {
             $x = $grid_cell["x"];
             $y = $grid_cell["y"];
-            if( in_array( "$x-$y", $this->coat_of_arms_board_cells )) $coat_of_arms_earned += 1;
+            if( in_array( "$x-$y", $this->coat_of_arms_board_cells ))
+            { 
+                $coat_of_arms_earned += 1;
+                self::incStat( 1, "coat_of_arms_earned", $player_id );
+            }
         }
 
         // ADD COAT OF ARMS FOR EACH COMPLETED COAT OF ARMS ROW
@@ -1083,6 +1093,7 @@ class CopenhagenReboot extends Table
             ) 
             {
                 $coat_of_arms_earned += 1;
+                self::incStat( 1, "coat_of_arms_earned", $player_id );
             }
             
         } 
@@ -1122,12 +1133,14 @@ class CopenhagenReboot extends Table
         {
             self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'construction_discount' AND owner = $player_id"); 
             $this->notifyPlayersOfUsedAbilities( ["construction_discount"], $player_id, $player_name);
+            self::incStat( 1, "ability_tiles_used", $player_id );
         }
 
         if( self::getGameStateValue("ability_activated_change_of_colors") == 1)
         {
             self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'change_of_colors' AND owner = $player_id"); 
             $this->notifyPlayersOfUsedAbilities( ["change_of_colors"], $player_id, $player_name);
+            self::incStat( 1, "ability_tiles_used", $player_id );
         }
 
         // NOTIFY CLIENTS
@@ -1406,6 +1419,8 @@ class CopenhagenReboot extends Table
         self::setGameStateValue( 'change_of_colors_from', -1 );
         self::setGameStateValue( 'change_of_colors_to', -1 );
 
+        self::incStat( 1, "turns");
+
         $this->gamestate->nextState("playerTurn");
     }
 
@@ -1439,6 +1454,7 @@ class CopenhagenReboot extends Table
         $used_abilities = ["both_actions"];
         self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'both_actions' AND owner = $player_id"); 
         $this->notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name );
+        self::incStat( 1, "ability_tiles_used", $player_id );
     }
 
 

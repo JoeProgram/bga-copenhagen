@@ -49,35 +49,45 @@
 
 $stats_type = array(
 
+    // NEXT ID: 18
+
     // Statistics global to table
     "table" => array(
 
+        "turns" => array("id"=> 17,
+            "name" => totranslate("Number of turns"),
+            "type" => "int" ),
         "how_game_ended" => array("id"=> 11,
-                    "name" => totranslate("How did the game end?"),
-                    "type" => "int" ),
+            "name" => totranslate("How did the game end?"),
+            "type" => "int" ),
 
     ),
-
-    // TODO 
-    //  GAME TURNS
     
     // Statistics existing for each player
     "player" => array(
 
+        "cards_drawn" => array("id"=> 14,
+            "name" => totranslate("Cards drawn"),
+            "type" => "int" ),
+        "cards_discarded_too_many" => array("id"=> 15,
+            "name" => totranslate("Cards discarded from having too many in your hand"),
+            "type" => "int" ),
+        "facade_tiles_placed" => array("id"=> 16,
+            "name" => totranslate("Facade tiles placed"),
+            "type" => "int" ),
+        "squares_covered" => array("id"=> 13,
+            "name" => totranslate("Squares covered"),
+            "type" => "int" ),
         "coat_of_arms_earned" => array("id"=> 10,
-                    "name" => totranslate("Coat of Arms Earned"),
-                    "type" => "int" ),
-    ),
+            "name" => totranslate("Coat of arms earned"),
+            "type" => "int" ),
+        "ability_tiles_used" => array("id"=> 12,
+            "name" => totranslate("Ability tiles used"),
+            "type" => "int" ),
 
-    // TODO
-    //  CARDS DRAWN
-    //  CARDS OVERDRAWN
-    //  POLYOMINOES PLACED
-    //  SQUARES COVERED
-    //  COAT OF ARMS EARNED
-    //  ABILITY TILES USED
-    //  POINTS FROM COLUMNS
-    //  POINTS FROM ROWS  
+
+
+    ),
 
 
     "value_labels" => array(

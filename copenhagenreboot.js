@@ -1305,6 +1305,9 @@ function (dojo, declare) {
         positionPolyomino: function( coordinates )
         {
 
+            // SET NODE WE'RE POSITIONING POLYOMINO AT
+            this.cellToPlacePolyomino = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_${coordinates.x}_${coordinates.y}`)[0].id;
+
             // CLEAR UP ANY OVERLAP FROM LAST POSITION
             this.hideOverlap();
 
@@ -1420,7 +1423,6 @@ function (dojo, declare) {
                 minXIndex -= bounds.min.x; 
 
                 // WE'VE IDENTIFIED THE CELL TO POSITION THE POLYOMINO AT
-                this.cellToPlacePolyomino = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_${minXIndex}_${minYIndex}`)[0].id;
                 this.positionPolyomino( {x:minXIndex, y:minYIndex});
 
 
@@ -2051,8 +2053,6 @@ function (dojo, declare) {
             var targetId = "";
             if( event.currentTarget != null ) targetId = event.currentTarget.id;
             else if( event.customTarget != null ) targetId = event.customTarget.id
-
-            this.cellToPlacePolyomino = targetId;
 
             var coordinates = this.getCoordinatesFromId( targetId );
             this.positionPolyomino( coordinates);
