@@ -824,12 +824,23 @@ function (dojo, declare) {
         {
             dojo.style("cancel_polyomino_placement","display","inline");
             dojo.style("confirm_polyomino_placement","display","inline");
+
+            // IF PRESENT, HIDE END TURN BUTTON WHILE POLYOMINO IS BEING PLACED
+            //  if the player is doing "both actions" - there's a chance they won't be able to play any polyominos
+            //  so we need an 'end turn' button
+            //  but I found myself tempted to press it as a "submit" button - even though it's red
+            //  so let's hide it while a polyomino is up, so the player has to cancel it before ending their turn
+            var query = dojo.query("#end_turn");
+            if( query.length > 0 ) dojo.style(query[0], "display", "none");
         },
 
         hidePositionPolyominoButtons: function()
         {
             dojo.style("cancel_polyomino_placement","display","none");
             dojo.style("confirm_polyomino_placement","display","none");
+
+            var query = dojo.query("#end_turn");
+            if( query.length > 0 ) dojo.style(query[0], "display", "inline-block");
         },
 
         hasPolyominoOfColorOnBoard: function( color )
@@ -1693,11 +1704,11 @@ function (dojo, declare) {
         {
             dojo.query("#copen_wrapper .copen_behind_shadow_box").removeClass("copen_behind_shadow_box");
 
-            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card_red").removeClass("copen_card_red");
-            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card_yellow").removeClass("copen_card_yellow");
-            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card_green").removeClass("copen_card_green");
-            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card_blue").removeClass("copen_card_blue");
-            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card_purple").removeClass("copen_card_purple");
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_red_card").removeClass("copen_red_card");
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_yellow_card").removeClass("copen_yellow_card");
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_green_card").removeClass("copen_green_card");
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_blue_card").removeClass("copen_blue_card");
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_purple_card").removeClass("copen_purple_card");
 
             dojo.query("#copen_wrapper #change_of_colors_ui").style("display","none");
 
