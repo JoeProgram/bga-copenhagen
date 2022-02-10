@@ -1112,6 +1112,7 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #harbor_cards").addClass("copen_behind_shadow_box");
             dojo.query("#copen_wrapper #polyominoes").addClass("copen_behind_shadow_box");  
             dojo.query("#copen_wrapper #opponent_playerboards").addClass("copen_behind_shadow_box");  
+            dojo.query("#copen_wrapper #ability_tile_stacks").addClass("copen_behind_shadow_box");  
 
             dojo.query("#copen_wrapper #polyomino_placement").style("display","block");
             dojo.query("#copen_wrapper #polyomino_placement_buttons").style("display","block"); // sometimes we turn this off seperately from its parent - so make sure it's back on too
@@ -1665,7 +1666,8 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #harbor_cards").addClass("copen_behind_shadow_box");
             dojo.query("#copen_wrapper #polyominoes").addClass("copen_behind_shadow_box");  
             dojo.query("#copen_wrapper #opponent_playerboards").addClass("copen_behind_shadow_box");  
-            dojo.query(`#copen_wrapper #owned_player_area`).addClass("copen_behind_shadow_box");  
+            dojo.query(`#copen_wrapper #owned_player_area`).addClass("copen_behind_shadow_box"); 
+            dojo.query("#copen_wrapper #ability_tile_stacks").addClass("copen_behind_shadow_box"); 
 
             dojo.animateProperty({
                 node: "shadow_box",
