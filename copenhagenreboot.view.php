@@ -41,10 +41,20 @@
         //  We then use that when building the templates for the playerboards.
         global $g_user;
         $current_player_id = $g_user->get_id();
+
+        // CREATE THE ARRAY OF PLAYERS
+        //  It's going to be a little different if the current player is a spectator
         $relative_player_sequence = array();
-        $relative_player_sequence[0] = $current_player_id;
-        $prev_player = $current_player_id;
-        for( $i = 1; $i < $players_nbr; $i++ ) 
+        $starting_index = 0;
+        $prev_player = $this->game->getNextPlayerTable()[0];
+
+        if( !$this->game->isSpectator()){
+            $relative_player_sequence[0] = $current_player_id;
+            $starting_index = 1;
+            $prev_player = $current_player_id;
+        }
+        
+        for( $i = $starting_index; $i < $players_nbr; $i++ ) 
         {
             $relative_player_sequence[$i] = $this->game->getPlayerAfter($prev_player);
             $prev_player = $relative_player_sequence[$i];
@@ -53,10 +63,16 @@
         // BUILD PLAYERBOARDS
         $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "opponent_board_cell"); // Nested bock must be declared first
         $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "opponent_playerboard");
-        for($i = 1; $i < $players_nbr; $i++ )
+        for($i = $starting_index; $i < $players_nbr; $i++ )
         {
 
+            $this->game->warn( "RELATIVE PLAYER SEQUENCE");
+            $this->game->warn( json_encode($relative_player_sequence));
+
             $player_id = $relative_player_sequence[$i];
+
+            $this->game->warn( "TEST WARNING" . $player_id . "      ");
+
             $player = $players[$player_id];
 
             // RESET THE BOARD CELLS FROM PREVIOUS CALL, THEN BUILD THEM OUT FOR NEW PLAYER
@@ -79,29 +95,31 @@
             ));
         }
 
-        // DROP NAME ID
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned");
-        $this->page->insert_block( "owned", array(
-            'ID' => $current_player_id,
-        ));
+        if( !$this->game->isSpectator()){
+            // DROP NAME ID
+            $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned");
+            $this->page->insert_block( "owned", array(
+                'ID' => $current_player_id,
+            ));
 
-        // DROP NAME ID - ABILITY AREA
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned_ability_tile_area");
-        $this->page->insert_block( "owned_ability_tile_area", array(
-            'ID' => $current_player_id,
-        ));
+            // DROP NAME ID - ABILITY AREA
+            $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned_ability_tile_area");
+            $this->page->insert_block( "owned_ability_tile_area", array(
+                'ID' => $current_player_id,
+            ));
 
-        // BUILDS CELLS OF PLAYERBOARD
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "board_cell");
+            // BUILDS CELLS OF PLAYERBOARD
+            $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "board_cell");
 
-        for( $x = 0; $x < $this->game->board_width; $x++ )
-        {
-            for( $y = 0; $y < $this->game->board_height ; $y++)
+            for( $x = 0; $x < $this->game->board_width; $x++ )
             {
-                $this->page->insert_block( "board_cell", array(
-                    'X' => $x,
-                    'Y' => $y,
-                ));
+                for( $y = 0; $y < $this->game->board_height ; $y++)
+                {
+                    $this->page->insert_block( "board_cell", array(
+                        'X' => $x,
+                        'Y' => $y,
+                    ));
+                }
             }
         }
 

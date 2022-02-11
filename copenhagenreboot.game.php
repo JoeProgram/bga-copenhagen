@@ -690,10 +690,10 @@ class CopenhagenReboot extends Table
     {
         // MAKE SURE CARD EXISTS
         $card = $this->cards->getCard( $card_id );
-        if($card == NULL ) throw new feException( self::_("That card does not exist.")); 
+        if($card == NULL ) throw new feException( self::_("That card does not exist")); 
 
         // MAKE SURE CARD IS IN HARBOR
-        if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor."));
+        if( $card['location'] != 'harbor') throw new feException( self::_("That card is not in the harbor"));
 
         return $card;
     }
@@ -738,7 +738,7 @@ class CopenhagenReboot extends Table
     {
         self::notifyAllPlayers( 
             "takeCard", 
-            clienttranslate('${player_name} takes a ${color} card.'),
+            clienttranslate('${player_name} takes a ${color} card'),
             array(
                 "card_id" => $card_id,
                 "player_id" => $player_id,
@@ -753,11 +753,12 @@ class CopenhagenReboot extends Table
     {
 
         $ability_tile = self::getObjectFromDB( "SELECT * FROM ability_tile WHERE ability_name = '$ability_name' AND owner = $player_id AND used = 0;");
-        if( $ability_tile == null ) throw new feException( self::_("You can't activate that special ability."));
+        if( $ability_tile == null ) throw new feException( self::_("You can't activate that special ability"));
 
         $activated = self::getGameStateValue( "ability_activated_" . $ability_name );
-        if( $activated == 1 ) throw new feException( self::_("You've already activated that special ability."));
+        if( $activated == 1 ) throw new feException( self::_("You've already activated that special ability"));
     }
+
 
     function notifyPlayerOfActivatedAbility( $ability_name, $player_id, $player_name)
     {
@@ -767,7 +768,7 @@ class CopenhagenReboot extends Table
         self::notifyPlayer( 
             $player_id,
             "activateAbility", 
-            clienttranslate('${player_name} is using the ${ability_log_name} ability.'),
+            clienttranslate('${player_name} activates the ${ability_log_name} ability'),
             array(
                 "player_name" => $player_name,
                 "ability_log_name" => $ability_log_name,
@@ -785,7 +786,7 @@ class CopenhagenReboot extends Table
         {
             self::notifyAllPlayers(
                 "usedAbility",
-                clienttranslate('${player_name} used ${log_ability_tile}'),
+                clienttranslate('${player_name} uses ${log_ability_tile}'),
                 array(
                     "player_id" => $player_id,
                     "player_name" => $player_name,
@@ -817,7 +818,7 @@ class CopenhagenReboot extends Table
 
         // CAN'T HAVE TAKEN ANY CARDS THIS TURN
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
-        if ($cards_taken_this_turn != 0 ) throw new feException( self::_("You've already taken your first card this turn."));
+        if ($cards_taken_this_turn != 0 ) throw new feException( self::_("You've already taken your first card this turn"));
 
         $card = $this->getValidatedHarborCard( $card_id );
 
@@ -840,18 +841,18 @@ class CopenhagenReboot extends Table
 
         // MUST HAVE TAKEN 1 CARD ALREADY
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
-        if ($cards_taken_this_turn != 1 ) throw new feException( self::_("You're trying to take your second card before your first."));
+        if ($cards_taken_this_turn != 1 ) throw new feException( self::_("You're trying to take your second card before your first"));
 
         // MAKE SURE WE ONLY HAVE 1 EMPTY HARBOR
         $empty_harbors = $this->getEmptyHarbors();
-        if( count($empty_harbors) > 1 ) throw new feException( self::_("You have more than one empty harbor."));
+        if( count($empty_harbors) > 1 ) throw new feException( self::_("You have more than one empty harbor"));
 
         // TODO- MAKE SURE CARD IS BESIDE EMPTY HARBOR SLOT
         $is_using_ability_any_cards = self::getGameStateValue("ability_activated_any_cards");
         if( !$is_using_ability_any_cards )
         {
             $adjacent_card_ids = $this->getCardIdsAdjacentToEmptyHarbor(); 
-            if( !in_array( $card_id, $adjacent_card_ids)) throw new feException( self::_("You have to take an adjacent card."));
+            if( !in_array( $card_id, $adjacent_card_ids)) throw new feException( self::_("You have to take an adjacent card"));
         }
 
         // UPDATE DATA
@@ -883,10 +884,10 @@ class CopenhagenReboot extends Table
 
         // MUST HAVE TAKEN 2 CARDS ALREADY
         $cards_taken_this_turn = self::getGameStateValue( "cards_taken_this_turn" );
-        if ($cards_taken_this_turn != 2 ) throw new feException( self::_("You're trying to take your third card before your second."));
+        if ($cards_taken_this_turn != 2 ) throw new feException( self::_("You're trying to take your third card before your second"));
 
         // MUST BE USING ADDITIONAL CARD ABILITY
-        if( self::getGameStateValue("ability_activated_additional_card") == 0 ) throw new feException( self::_("You must be using the Additional Card ability to take a third card."));
+        if( self::getGameStateValue("ability_activated_additional_card") == 0 ) throw new feException( self::_("You must be using the Additional Card ability to take a third card"));
         
 
         // UPDATE DATA
@@ -915,11 +916,11 @@ class CopenhagenReboot extends Table
         if($card == NULL ) throw new feException( self::_("That card does not exist."));
 
         // MAKE SURE CARD IS IN PLAYER'S HAND
-        if( $card['location'] != 'hand' && $card['location_arg'] == $player_id) throw new feException( self::_("That card is not in your hand."));
+        if( $card['location'] != 'hand' && $card['location_arg'] == $player_id) throw new feException( self::_("That card is not in your hand"));
 
         // MAKE SURE WE'RE ACTUALLY OVER THE HAND LIMIT
         $cardsInHand = $this->cards->countCardInLocation( "hand", $player_id);
-        if( $cardsInHand <= $this->max_hand_size ) throw new feException( self::_("You are not over the hand limit size."));
+        if( $cardsInHand <= $this->max_hand_size ) throw new feException( self::_("You are not over the hand limit size"));
 
         // DISCARD THE CARD
         $this->cards->moveCard( $card_id, "discard");
@@ -929,7 +930,7 @@ class CopenhagenReboot extends Table
         //   Cards are discarded face up, so it's okay to notify all players of the specific card discarded
         self::notifyAllPlayers( 
             "discardDownToMaxHandSize", 
-            clienttranslate('${player_name} discards a ${color} card.'),
+            clienttranslate('${player_name} discards a ${color} card'),
             array(
                 "player_id" => $player_id,
                 "player_name" => self::getActivePlayerName(),
@@ -952,23 +953,23 @@ class CopenhagenReboot extends Table
         $player_name = self::getActivePlayerName();
 
         // BASIC INPUT VALIDATION
-        if( !in_array($color, $this->polyomino_colors, true)) throw new feException( self::_("The provided color isn't valid."));
-        if( $squares < 1 || $squares > 5 ) throw new feException( self::_("The provided shape isn't valid."));
-        if( $copy < 1 || $copy > 12 ) throw new feException( self::_("The provided copy name isn't valid."));
-        if( $x < 0 || $x >= $this->board_width ) throw new feException( self::_("The provided position isn't valid."));
-        if( $y < 0 || $y >= $this->board_height ) throw new feException( self::_("The provided position isn't valid."));
-        if( $flip != 0 && $flip != 180 ) throw new feException( self::_("The provided flip isn't valid."));
-        if( $rotation != 0 && $rotation != 90 && $rotation != 180 && $rotation != 270) throw new feException( self::_("The provided rotation isn't valid."));
+        if( !in_array($color, $this->polyomino_colors, true)) throw new feException( self::_("The provided color isn't valid"));
+        if( $squares < 1 || $squares > 5 ) throw new feException( self::_("The provided shape isn't valid"));
+        if( $copy < 1 || $copy > 12 ) throw new feException( self::_("The provided copy name isn't valid"));
+        if( $x < 0 || $x >= $this->board_width ) throw new feException( self::_("The provided position isn't valid"));
+        if( $y < 0 || $y >= $this->board_height ) throw new feException( self::_("The provided position isn't valid"));
+        if( $flip != 0 && $flip != 180 ) throw new feException( self::_("The provided flip isn't valid"));
+        if( $rotation != 0 && $rotation != 90 && $rotation != 180 && $rotation != 270) throw new feException( self::_("The provided rotation isn't valid"));
 
         // GET THE POLYOMINO
         $sql = "SELECT * FROM polyomino WHERE color = '$color' AND squares = $squares AND copy = $copy;"; 
         $polyomino = self::getObjectFromDB( $sql );
 
         // CHECK THAT IT EXISTS
-        if( $polyomino == NULL ) throw new feException( self::_("This facade tile does not exist."));
+        if( $polyomino == NULL ) throw new feException( self::_("This facade tile does not exist"));
 
         // CHECK THAT POLYOMINO IS UNOWNED
-        if( $polyomino["owner"] != NULL ) throw new feException( self::_("This facade tile is already owned."));
+        if( $polyomino["owner"] != NULL ) throw new feException( self::_("This facade tile is already owned"));
 
         $transformed_shape = $this->getTransformedShape( $color, $squares, $flip, $rotation);
 
@@ -986,7 +987,7 @@ class CopenhagenReboot extends Table
                 || $grid_cell["y"] >= $this->board_height
             )
             {
-                throw new feException( self::_("That placement would put the facade tile off your board."));
+                throw new feException( self::_("That placement would put the facade tile off your board"));
             }
         }
 
@@ -995,12 +996,12 @@ class CopenhagenReboot extends Table
         {
             if( $playerboard[$grid_cell["x"]][$grid_cell["y"]]["fill"] != NULL )
             {
-                throw new feException( self::_("That placement would overlap one of your other facade tiles."));
+                throw new feException( self::_("That placement would overlap one of your other facade tiles"));
             }
         }
 
         // CHECK THAT POLYOMINO IS GROUNDED
-        if( !$this->isGroundedPosition($grid_cells, $playerboard)) throw new feException( self::_("The polyomino must sit on the bottom of the facade, or on another facade tile."));
+        if( !$this->isGroundedPosition($grid_cells, $playerboard)) throw new feException( self::_("The polyomino must sit on the bottom of the facade, or on another facade tile"));
 
         // CHECK PLAYER CAN AFFORD POLYOMINO
         if( $color == "white")
@@ -1014,20 +1015,20 @@ class CopenhagenReboot extends Table
             if( self::getGameStateValue("ability_activated_construction_discount") == 1 ) $cost -= 1;
 
             $valid_cards = $this->getCardsOfColorInHand( $color );
-            if( count($valid_cards) < $cost )  throw new feException( self::_("You don't have enough cards to place that facade tile in that spot."));
+            if( count($valid_cards) < $cost )  throw new feException( self::_("You don't have enough cards to place that facade tile in that spot"));
 
             // (OPTIONAL) CHECK DISCARDS ARE VALID
             $manual_discard_count = count($discards); 
             if( $manual_discard_count > 0)
             {
                 // MAKE SURE THE DISCARDS MATCH THE COST
-                if( $manual_discard_count != $cost )  throw new feException( self::_("You are trying to discard the wrong number of cards."));
+                if( $manual_discard_count != $cost )  throw new feException( self::_("You are trying to discard the wrong number of cards"));
 
                 // MAKE SURE EACH NUMBER IS UNIQUE - NO DUPLICATES
-                if( $manual_discard_count != count(array_unique( $discards )))  throw new feException( self::_("You can't discard the same card twice."));
+                if( $manual_discard_count != count(array_unique( $discards )))  throw new feException( self::_("You can't discard the same card twice"));
 
                 // MAKE SURE EACH DISCARDED CARD IS VALID
-                foreach( $discards as $discard ) if( !array_key_exists( $discard, $valid_cards)) throw new feException( self::_("You are trying to discard an invalid card to play that facade tile."));
+                foreach( $discards as $discard ) if( !array_key_exists( $discard, $valid_cards)) throw new feException( self::_("You are trying to discard an invalid card to play that facade tile"));
             }
         }
 
@@ -1114,9 +1115,8 @@ class CopenhagenReboot extends Table
         $discarded_card_count = count($discard_ids);
 
         // DIFFERENT MESSAGES FOR NORMAL AND WHITE TILES
-        $notifyPlayerMessage = clienttranslate('${player_name} discarded ${discarded_card_count} cards and placed ${log_polyomino}.');
-        if( $discarded_card_count == 1) $notifyPlayerMessage = clienttranslate('${player_name} discarded ${discarded_card_count} card and placed ${log_polyomino}.');
-        else if( $color == "white") $notifyPlayerMessage = clienttranslate('${player_name} placed ${log_polyomino}.');
+        $notifyPlayerMessage = clienttranslate('${player_name} discards ${discarded_card_count} card(s) and places ${log_polyomino}');
+        if( $color == "white") $notifyPlayerMessage = clienttranslate('${player_name} places ${log_polyomino}');
         
         // USE UP ANY ACTIVATED ABILITIES
         if( self::getGameStateValue("ability_activated_construction_discount") == 1)
@@ -1175,22 +1175,22 @@ class CopenhagenReboot extends Table
         // MAKE SURE IT EXISTS
         $sql = "SELECT owner FROM ability_tile WHERE ability_name = '$ability_name' AND copy = $copy;";  
         $ability_tile = self::getObjectFromDB( $sql );
-        if( $ability_tile == null ) throw new feException( self::_("That ability tile doesn't exist."));
+        if( $ability_tile == null ) throw new feException( self::_("That ability tile doesn't exist"));
 
         // MAKE SURE ITS UNOWNED
-        if( $ability_tile["owner"] != null ) throw new feException( self::_("That ability tile has already been taken by a player."));
+        if( $ability_tile["owner"] != null ) throw new feException( self::_("That ability tile has already been taken by a player"));
 
         // MAKE SURE YOU DON'T ALREADY HAVE ONE
         $sql = "SELECT id FROM ability_tile WHERE ability_name = '$ability_name' AND owner = $player_id;";
         $already_owned_tile = self::getObjectFromDB( $sql );
-        if( $already_owned_tile != null ) throw new feException( self::_("You already own a special ability tile with that ability."));
+        if( $already_owned_tile != null ) throw new feException( self::_("You already own a special ability tile with that ability"));
 
         $sql = "UPDATE ability_tile SET owner = $player_id WHERE ability_name = '$ability_name' AND copy = $copy;";
         self::DbQuery( $sql );
 
         self::notifyAllPlayers( 
             "takeAbilityTile", 
-            clienttranslate('${player_name} took an ability tile'),
+            clienttranslate('${player_name} takes an ability tile'),
             array(
                 "player_name" => self::getActivePlayerName(),
                 "player_id" => $player_id,
@@ -1222,7 +1222,7 @@ class CopenhagenReboot extends Table
 
         self::notifyAllPlayers( 
             "resetUsedAbilities", 
-            clienttranslate('${player_name} flipped over their used ability tiles.'),
+            clienttranslate('${player_name} flips over their used ability tiles'),
             array(
                 "player_name" => $player_name,
                 "player_id" => $player_id,
@@ -1344,7 +1344,7 @@ class CopenhagenReboot extends Table
         self::notifyPlayer( 
             $player_id,
             "activateAbilityChangeOfColors", 
-            clienttranslate('${player_name} is using the ${ability_log_name} ability to change ${from_color} cards to ${to_color}.'),
+            clienttranslate('${player_name} is using the ${ability_log_name} ability to change ${from_color} cards to ${to_color}'),
             array(
                 "player_name" => $player_name,
                 "ability_log_name" => $ability_log_name,
