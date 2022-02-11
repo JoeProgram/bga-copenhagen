@@ -91,7 +91,7 @@ $gameinfos = array(
 'complexity' => 2,    
 
 // Luck of the game, from 0 (absolutely no luck in this game) to 5 (totally luck driven)
-'luck' => 3,    
+'luck' => 2,    
 
 // Strategy of the game, from 0 (no strategy can be setup) to 5 (totally based on strategy)
 'strategy' => 3,    
@@ -129,7 +129,7 @@ $gameinfos = array(
     //  default: null (ie: no limit, the game interface is as big as the player's screen allows it).
     //  maximum possible value: unlimited
     //  minimum possible value: 740
-    'max' => null
+    'max' => 1437
 ),
 
 'enable_3d' => false,
@@ -139,7 +139,24 @@ $gameinfos = array(
 // Each paragraph must be wrapped with totranslate() for translation and should not contain html (plain text without formatting).
 // A good length for this text is between 100 and 150 words (about 6 to 9 lines on a standard display)
 'presentation' => array(
-//    totranslate("This wonderful game is about geometric shapes!"),
+    totranslate("„Nyhavn“ (New Harbor) is famous for its houses with colorful gables
+built along the waterside. The players face the challenge of constructing new facades in a way that fits perfectly in with this picturesque
+harbor scenery."),
+    totranslate("The goal of the game is to be the first player to score 12 or more
+points, or to have the most points when the End of Game card is
+revealed."),
+    totranslate("Players will collect cards of different colors from the display, which
+they can use to purchase facade tiles of the same color in different
+shapes and sizes."),
+    totranslate("Players will use these tiles to construct the facade of their house
+little by little. Each time a floor (row) is completed they will score
+1 point, and 2 points for finishing a section of the house (column).
+However, these points are doubled if the row or column is made
+entirely of windows."),
+    totranslate("When players cover one of the coats of arms, or finish a floor with
+a coat of arms, they will gain a special ability which will help them
+reach their goal faster.")
+
 //    totranslate("It was awarded best triangle game of the year in 2005 and nominated for the Spiel des Jahres."),
 //    ...
 ),
