@@ -32,6 +32,11 @@
 
         /*********** Place your code below:  ************/
 
+        // TELL THE INTERFACE WHETHER WE'RE SPECTATING OR NOT
+        $this->tpl['SPECTATOR'] = "";
+        if( $this->game->isSpectator()) $this->tpl['SPECTATOR'] = "copen_spectator";
+
+
         // PUT THE PLAYERS IN RELATIVE TURN ORDER, WITH CURRENT PLAYER FIRST
         //  We want the order of the opponent boards to match the order of the players listed in the UI
         //  which means it needs to be customized to each player/
@@ -65,14 +70,7 @@
         $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "opponent_playerboard");
         for($i = $starting_index; $i < $players_nbr; $i++ )
         {
-
-            $this->game->warn( "RELATIVE PLAYER SEQUENCE");
-            $this->game->warn( json_encode($relative_player_sequence));
-
             $player_id = $relative_player_sequence[$i];
-
-            $this->game->warn( "TEST WARNING" . $player_id . "      ");
-
             $player = $players[$player_id];
 
             // RESET THE BOARD CELLS FROM PREVIOUS CALL, THEN BUILD THEM OUT FOR NEW PLAYER
@@ -95,31 +93,32 @@
             ));
         }
 
-        if( !$this->game->isSpectator()){
-            // DROP NAME ID
-            $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned");
-            $this->page->insert_block( "owned", array(
-                'ID' => $current_player_id,
-            ));
+        $this->game->warn(" BUILDING PERSONAL BOARD     ");
+        $this->game->warn(" IS SPECTATOR?" . $this->game->isSpectator());
 
-            // DROP NAME ID - ABILITY AREA
-            $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned_ability_tile_area");
-            $this->page->insert_block( "owned_ability_tile_area", array(
-                'ID' => $current_player_id,
-            ));
+        // DROP NAME ID
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned");
+        $this->page->insert_block( "owned", array(
+            'ID' => $current_player_id,
+        ));
 
-            // BUILDS CELLS OF PLAYERBOARD
-            $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "board_cell");
+        // DROP NAME ID - ABILITY AREA
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned_ability_tile_area");
+        $this->page->insert_block( "owned_ability_tile_area", array(
+            'ID' => $current_player_id,
+        ));
 
-            for( $x = 0; $x < $this->game->board_width; $x++ )
+        // BUILDS CELLS OF PLAYERBOARD
+        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "board_cell");
+
+        for( $x = 0; $x < $this->game->board_width; $x++ )
+        {
+            for( $y = 0; $y < $this->game->board_height ; $y++)
             {
-                for( $y = 0; $y < $this->game->board_height ; $y++)
-                {
-                    $this->page->insert_block( "board_cell", array(
-                        'X' => $x,
-                        'Y' => $y,
-                    ));
-                }
+                $this->page->insert_block( "board_cell", array(
+                    'X' => $x,
+                    'Y' => $y,
+                ));
             }
         }
 

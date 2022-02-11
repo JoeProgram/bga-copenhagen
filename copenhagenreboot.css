@@ -45,6 +45,11 @@
     height: 550px;
 }
 
+#top_chunk.copen_spectator
+{
+    width: 500px; 
+}
+
 #bottom_chunk
 {
     vertical-align: text-top;
@@ -53,6 +58,8 @@
     height: 500px;
     min-width: 250px;
 }
+
+
 
 #harbors
 {
@@ -216,6 +223,17 @@
     background-image: url('img/polyominoes.png');
     position: absolute;
     perspective: 1000px;
+}
+
+.copen_polyomino.copen_usable
+{
+    cursor: move; /* fallback if grab cursor is unsupported */
+    cursor: grab;
+}
+
+.copen_polyomino.copen_usable:active
+{
+    cursor: grabbing;
 }
 
 .copen_log_polyomino
@@ -616,6 +634,11 @@
     position: absolute;
     top: 0px;
     left: 496px;
+}
+
+#owned_player_area.copen_spectator
+{
+    display: none !important;
 }
 
 #opponent_playerboards

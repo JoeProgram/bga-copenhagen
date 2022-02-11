@@ -12,7 +12,7 @@
 
 <div id="copen_wrapper">
 
-    <div id="top_chunk">
+    <div id="top_chunk" class="{SPECTATOR}">
 
         
         <div id="harbors">
@@ -91,7 +91,7 @@
             <div id="hand_bottom_card_target"></div>
             <div id="cards_in_hand"></div>
         </div>
-        <div id="owned_player_area" class="copen_player_area">
+        <div id="owned_player_area" class="copen_player_area {SPECTATOR}">
 
             <!-- BEGIN owned -->
             <div id="player_{ID}_playerboard" class="copen_playerboard">
