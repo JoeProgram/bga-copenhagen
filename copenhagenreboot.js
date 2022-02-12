@@ -1883,12 +1883,19 @@ function (dojo, declare) {
 
         onDragOver: function( event )
         {
+            
+            // MAKES CURSOR DIFFERENT
+            //  If you don't include this, the cursor ends up looking like a "no" - a circle with a line through it
+            dojo.stopEvent( event ); 
+            event.dataTransfer.dropEffect = "move"; // I would love to use the "grabbing" hand - but I'm not sure how to keep it up - if that's even possible
+
             var adjustedClientXY = this.adjustPositionBasedOnZoom( event.clientX, event.clientY);
             this.dragClient = { x: adjustedClientXY.x, y: adjustedClientXY.y };
         },
 
         onDragStartPolyomino: function( event )
         {
+            dojo.query("html").addClass("draggable-cursor");
 
             var target = event.currentTarget ?? event.customTarget;
 

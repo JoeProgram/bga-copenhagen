@@ -233,9 +233,14 @@
     touch-action:  none;
 }
 
-.copen_polyomino.copen_usable:active
+/*
+I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
+  but when you start dragging, the dropEffect takes over
+  I don't know if there's a way to turn that off.
+*/
+.copen_polyomino.copen_usable:active:hover /* Do both active and hover to cause the cursor to change on click */
 {
-    cursor: grabbing;
+    cursor: grabbing ;
 }
 
 .copen_log_polyomino
