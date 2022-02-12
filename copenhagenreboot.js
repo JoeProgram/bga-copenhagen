@@ -18,7 +18,8 @@
 
 
 define([
-    "dojo","dojo/_base/declare",
+    "dojo",
+    "dojo/_base/declare",
     "ebg/core/gamegui",
     "ebg/counter"
 ],
@@ -255,8 +256,11 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper").connect( 'ondragover', this, 'onDragOver');
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, this.selectPolyominoEventHandlerName); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ondragstart', this, "onDragStartPolyomino"); 
+            dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ontouchstart', this, "onTouchStartPolyomino"); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ondrag', this, "onDragPolyomino"); 
+            dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ontouchmove', this, "onTouchMovePolyomino"); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ondragend', this, "onDragEndPolyomino"); 
+            dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ontouchend', this, "onTouchEndPolyomino"); 
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPositionPolyomino');
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');            
@@ -1149,14 +1153,22 @@ function (dojo, declare) {
         {
             this.attachToNewParent( this.selectedPolyomino.id, "polyomino_placement");
 
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragstart", this, "onDragStartPolyomino");            
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
+            this.connectDraggingEventsToPolyomino( dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`)[0] );
 
             dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("onmousemove", this, "onPolyominoMouseMovePassThrough");
             dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("onmouseout", this, "onPolyominoMouseOutPassThrough");
             dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("onclick", this, "onPolyominoClickPassThrough");    
 
+        },
+
+        connectDraggingEventsToPolyomino: function( polyominoNode )
+        {
+            dojo.connect( polyominoNode, "ondragstart", this, "onDragStartPolyomino");
+            dojo.connect( polyominoNode, "ontouchstart", this, "onTouchStartPolyomino"); 
+            dojo.connect( polyominoNode, "ondrag", this, "onDragPolyomino");
+            dojo.connect( polyominoNode, "ontouchmove", this, "onTouchMovePolyomino");
+            dojo.connect( polyominoNode, "ondragend", this, "onDragEndPolyomino");
+            dojo.connect( polyominoNode, "ontouchend", this, "onTouchEndPolyomino");
         },
 
         fadeInPolyominoPlacementUI: function()
@@ -1865,19 +1877,21 @@ function (dojo, declare) {
         onDragStartPolyomino: function( event )
         {
 
+            var target = event.currentTarget ?? event.customTarget;
+
             // disable the normal ghosting image by moving its position outside the window
-            event.dataTransfer.setDragImage(event.target, window.outerWidth, window.outerHeight);
+            if( event.currentTarget != null ) event.dataTransfer.setDragImage(target, window.outerWidth, window.outerHeight);
 
             if( !this.checkAction('placePolyomino')) return;
-            if( !dojo.hasClass(event.currentTarget, "copen_usable")) return;
+            if( !dojo.hasClass(target, "copen_usable")) return;
 
-            dojo.style( event.currentTarget, "z-index", 20 );
+            dojo.style( target, "z-index", 20 );
 
             // IF WE HAVEN'T SELECTED THE POLYOMINO, DO IT NOW
             //  if we have selected it, no need to do it again
             if( this.selectedPolyomino == null )
             {
-                this.selectPolyomino( event.currentTarget );
+                this.selectPolyomino( target );
             }
 
             this.hideOverlap();
@@ -1885,11 +1899,31 @@ function (dojo, declare) {
             this.dragPositionLastFrame = {x: event.clientX, y: event.clientY};
         },
 
+        onTouchStartPolyomino: function( event )
+        {
+
+            // FAKE AN EVENT
+            //  I tried all sorts of things to send an event along
+            //  I tried event.currentTarget.dispatchEvent, which never caused the event code to fire
+            //  I tried dojo.emit - but I don't know whether that's supported, or how to include it
+            //  so we're just going to go with calling the other function directly, and adding some extra parameters to check
+            //  would love to know how to do this properly.
+            var syntheticEvent = new MouseEvent("ondragstart", {
+                clientX: event.clientX,
+                clientY: event.clientY,
+            });
+
+            syntheticEvent.customTarget = event.currentTarget;
+            this.onDragStartPolyomino( syntheticEvent );
+
+        },
+
         onDragPolyomino: function( event )
         { 
 
             if( this.selectedPolyomino == null ) return;
 
+  
 
             // NOTE:
             //  Apparently, there's been a 13+ year discussion about the clientX and clientY values for ondrag in firefox (https://bugzilla.mozilla.org/show_bug.cgi?id=505521#c80)
@@ -1908,14 +1942,23 @@ function (dojo, declare) {
             this.dragPositionLastFrame = {x:this.dragClient.x, y: this.dragClient.y};
         },
 
+        onTouchMovePolyomino: function( event )
+        {
+
+            var syntheticEvent = new MouseEvent("ondrag");
+
+            this.dragClient = { x: event.clientX, y:event.clientY };
+
+            this.onDragPolyomino( syntheticEvent );
+        },
+
         onDragEndPolyomino: function( event )
         {
 
             dojo.stopEvent( event );
-
             if( this.selectedPolyomino == null ) return;
 
-
+            
             // IF WE START WITH DRAG, WE DON'T TURN ON PLACEMENT UI IMMEDIATELY.
             //   do it now, if it hasn't been done
             if( dojo.getStyle("polyomino_placement", "display") == "none")
@@ -1929,6 +1972,14 @@ function (dojo, declare) {
             
             this.dropPolyominoOnBoard();
         },
+
+        onTouchEndPolyomino: function( event )
+        {
+            var syntheticEvent = new MouseEvent("ondragend");
+
+            this.onDragEndPolyomino( syntheticEvent );
+        },
+
 
         onRotatePolyomino: function( event )
         {
@@ -2110,11 +2161,8 @@ function (dojo, declare) {
             this.slideToObjectPos( this.selectedPolyomino["id"], stackId, this.selectedPolyomino.originalPosition.l, this.selectedPolyomino.originalPosition.t, 500 ).play();
 
             // RECONNECT THE EVENTS
-            //   I tried connecting with dojo.connect() directly, but couldn't get it to work.             
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("onclick",this,this.selectPolyominoEventHandlerName);
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragstart", this, "onDragStartPolyomino");            
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondrag", this, "onDragPolyomino");
-            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
+            var polyominoNode = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
+            this.connectDraggingEventsToPolyomino( polyominoNode );
 
             this.removeOverlap();
             this.selectedPolyomino = null;
@@ -2469,9 +2517,7 @@ function (dojo, declare) {
             if( newTopOfStack != null )
             {
                 dojo.connect( newTopOfStack, "onclick", this, this.selectPolyominoEventHandlerName );
-                dojo.connect( newTopOfStack, "ondragstart", this, "onDragStartPolyomino" );
-                dojo.connect( newTopOfStack, "ondrag", this, "onDragPolyomino" );
-                dojo.connect( newTopOfStack, "ondragend", this, "onDragEndPolyomino" );
+                this.connectDraggingEventsToPolyomino( newTopOfStack );
             }
 
             if( this.player_id == notif.args.player_id)

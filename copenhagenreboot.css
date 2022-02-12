@@ -229,6 +229,8 @@
 {
     cursor: move; /* fallback if grab cursor is unsupported */
     cursor: grab;
+
+    touch-action:  none;
 }
 
 .copen_polyomino.copen_usable:active
@@ -832,6 +834,8 @@
 {
     filter:  drop-shadow(0.35rem 0.35rem 0.4rem rgba(0,0,0,0.5));
     z-index: 20;
+
+    touch-action:  none;
 }
 
 #polyomino_placement .copen_polyomino.copen_invalid_placement
