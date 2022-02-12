@@ -93,9 +93,6 @@
             ));
         }
 
-        $this->game->warn(" BUILDING PERSONAL BOARD     ");
-        $this->game->warn(" IS SPECTATOR?" . $this->game->isSpectator());
-
         // DROP NAME ID
         $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned");
         $this->page->insert_block( "owned", array(

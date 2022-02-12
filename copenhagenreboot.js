@@ -83,7 +83,9 @@ function (dojo, declare) {
             this.selectedPolyomino = null;
             this.selectPolyominoEventHandlerName = "onSelectPolyomino";
 
+            this.dragClient = {x:0, y:0 };
             this.dragPositionLastFrame = {x:0, y:0};
+
 
             this.abilityEventHandlers = {
                 "any_cards":"onActivateAbilityAnyCards",
@@ -250,6 +252,7 @@ function (dojo, declare) {
             // CONNECT INTERACTIVE ELEMENTS
 
             // new system
+            dojo.query("#copen_wrapper").connect( 'ondragover', this, 'onDragOver');
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, this.selectPolyominoEventHandlerName); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ondragstart', this, "onDragStartPolyomino"); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ondrag', this, "onDragPolyomino"); 
@@ -1852,13 +1855,17 @@ function (dojo, declare) {
 
         },
 
+        onDragOver: function( event )
+        {
+            this.dragClient = { x: event.clientX, y: event.clientY };
+
+        },
+
         onDragStartPolyomino: function( event )
         {
+
             // disable the normal ghosting image by moving its position outside the window
             event.dataTransfer.setDragImage(event.target, window.outerWidth, window.outerHeight);
-
-            // display the correct cursor
-            //event.target.style.cursor = "grabbing";
 
             if( !this.checkAction('placePolyomino')) return;
             if( !dojo.hasClass(event.currentTarget, "copen_usable")) return;
@@ -1882,22 +1889,22 @@ function (dojo, declare) {
 
             if( this.selectedPolyomino == null ) return;
 
-            //aevent.target.style.cursor = "grabbing";
 
-            // WE SEEM TO GET A ON_DRAG ALSO ON THE LAST FRAME
-            //  when I would expect we'd only get a dragend event
-            //  it zero's out the cilentX and clientY - so we shouldn't use those values
-            if( event.clientX == 0 && event.clientY == 0) return;
+            // NOTE:
+            //  Apparently, there's been a 13+ year discussion about the clientX and clientY values for ondrag in firefox (https://bugzilla.mozilla.org/show_bug.cgi?id=505521#c80)
+            //  Currently, they always return 0 - so this event doesn't have much useful information
+            //  We take the standard fix, which is to use the ondragover event to capture the mouse position, store it, and reuse it here
+            if( this.dragClient.x == 0 && this.dragClient.y == 0) return;
 
-            var movementX = event.clientX - this.dragPositionLastFrame.x;
-            var movementY = event.clientY - this.dragPositionLastFrame.y;
+            var movementX = this.dragClient.x - this.dragPositionLastFrame.x;
+            var movementY = this.dragClient.y - this.dragPositionLastFrame.y;
 
             var polyominoNode = dojo.query(`#${ this.selectedPolyomino.id}`)[0];
 
             this.adjustPositionHorizontally( polyominoNode, movementX );
             this.adjustPositionVertically( polyominoNode, movementY );
 
-            this.dragPositionLastFrame = {x:event.clientX, y: event.clientY};
+            this.dragPositionLastFrame = {x:this.dragClient.x, y: this.dragClient.y};
         },
 
         onDragEndPolyomino: function( event )
