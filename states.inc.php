@@ -125,7 +125,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} may place a facade tile'),
         "type" => "activeplayer",
         "possibleactions" => array( "placePolyomino", "endTurn", "activateAbilityConstructionDiscount", "activateAbilityChangeOfColors",),
-        "transitions" => array(  "calculateScore" => 7, "coatOfArms" => 8, "refillHarbor" => 50, "zombiePass" => 50 )
+        "transitions" => array(  "calculateScore" => 7, "refillHarbor" => 50, "zombiePass" => 50 )
     ), 
     
     4 => array(
@@ -167,7 +167,7 @@ $machinestates = array(
         "description" => "",
         "type" => "game",
         "action" => "stCalculateScore",
-        "transitions" => array(  "refillHarbor" => 50, "endGame" => 99 )
+        "transitions" => array(  "coatOfArms" => 8, "refillHarbor" => 50, "endGame" => 99 )
     ), 
 
     8 => array(

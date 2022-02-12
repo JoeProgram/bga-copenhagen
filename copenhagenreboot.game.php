@@ -1160,8 +1160,7 @@ class CopenhagenReboot extends Table
         );
 
 
-        if( $coat_of_arms_earned > 0 ) $this->gamestate->nextState( "coatOfArms" );
-        else $this->gamestate->nextState( "calculateScore" );
+        $this->gamestate->nextState( "calculateScore" );
 
     }
 
@@ -1517,14 +1516,18 @@ class CopenhagenReboot extends Table
         );
 
         // CHECK IF THEY CROSSED THE ENDGAME SCORE THRESHOLD
-        if( $points < $this->end_of_game_points )
+        if( $points >= $this->end_of_game_points )
         {
-            $this->gamestate->nextState("refillHarbor");
-        }
-        else
-        { 
             self::setStat( 1, "how_game_ended" );
             $this->gamestate->nextState("endGame"); 
+        }
+        else if( self::getGameStateValue( 'coat_of_arms_earned' ) > 0 )
+        { 
+            $this->gamestate->nextState("coatOfArms"); 
+        }
+        else
+        {
+             $this->gamestate->nextState("refillHarbor");
         }
     }
 
