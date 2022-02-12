@@ -1171,6 +1171,17 @@ function (dojo, declare) {
             dojo.connect( polyominoNode, "ontouchend", this, "onTouchEndPolyomino");
         },
 
+        // THE ZOOM MESSES WITH EVENT'S CLIENTX AND CLIENTY
+        //  when the user is on a mobile device, or shrinks their browser
+        //  bga throws in a "zoom" css modifier
+        //  this messes with the clientX and clientY data
+        //  but you can get accurate numbers by just dividing out zoom again
+        adjustPositionBasedOnZoom: function( x, y )
+        {
+            var zoom = dojo.getStyle("page-content","zoom");
+            return {x: x/zoom, y:y/zoom};
+        },
+
         fadeInPolyominoPlacementUI: function()
         {
 
@@ -1518,6 +1529,7 @@ function (dojo, declare) {
             var currentLeft = dojo.getStyle( node, "left");
             var newLeft = currentLeft + amount;
             dojo.style( node, "left", newLeft + "px");
+
         },
 
         adjustPositionVertically( node, amount )
@@ -1527,6 +1539,7 @@ function (dojo, declare) {
             var currentTop = dojo.getStyle( node, "top");
             var newTop = currentTop + amount;
             dojo.style( node, "top", newTop + "px");
+
         },
 
 
@@ -1870,8 +1883,8 @@ function (dojo, declare) {
 
         onDragOver: function( event )
         {
-            this.dragClient = { x: event.clientX, y: event.clientY };
-
+            var adjustedClientXY = this.adjustPositionBasedOnZoom( event.clientX, event.clientY);
+            this.dragClient = { x: adjustedClientXY.x, y: adjustedClientXY.y };
         },
 
         onDragStartPolyomino: function( event )
@@ -1880,6 +1893,7 @@ function (dojo, declare) {
             var target = event.currentTarget ?? event.customTarget;
 
             // disable the normal ghosting image by moving its position outside the window
+            //  ignore for touchscreens
             if( event.currentTarget != null ) event.dataTransfer.setDragImage(target, window.outerWidth, window.outerHeight);
 
             if( !this.checkAction('placePolyomino')) return;
@@ -1896,7 +1910,9 @@ function (dojo, declare) {
 
             this.hideOverlap();
             
-            this.dragPositionLastFrame = {x: event.clientX, y: event.clientY};
+
+            var adjustedClientXY = this.adjustPositionBasedOnZoom( event.clientX, event.clientY);
+            this.dragPositionLastFrame = {x: adjustedClientXY.x, y:adjustedClientXY.y};
         },
 
         onTouchStartPolyomino: function( event )
@@ -1922,8 +1938,6 @@ function (dojo, declare) {
         { 
 
             if( this.selectedPolyomino == null ) return;
-
-  
 
             // NOTE:
             //  Apparently, there's been a 13+ year discussion about the clientX and clientY values for ondrag in firefox (https://bugzilla.mozilla.org/show_bug.cgi?id=505521#c80)
