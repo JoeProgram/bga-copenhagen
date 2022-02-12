@@ -1154,6 +1154,7 @@ function (dojo, declare) {
             dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("ondragend", this, "onDragEndPolyomino");
 
             dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("onmousemove", this, "onPolyominoMouseMovePassThrough");
+            dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("onmouseout", this, "onPolyominoMouseOutPassThrough");
             dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`).connect("onclick", this, "onPolyominoClickPassThrough");    
 
         },
@@ -2055,12 +2056,26 @@ function (dojo, declare) {
             
             // WE'RE NOT GUARANTEED TO GET A CELL NODE
             // if the mouse moves outside that region of the screen
-            if( cellNode == null ) return;
+            if( cellNode == null )
+            {
+                this.clearPreview();
+                return;
+            }
 
             var passThroughEvent = new MouseEvent("onmouseover");
             passThroughEvent.customTarget = cellNode;
 
             this.onPreviewPlacePolyomino( passThroughEvent );        
+
+        },
+
+        onPolyominoMouseOutPassThrough: function( event )
+        {
+            var cellNode = this.getCellNodeAtPageCoordinate( {x:event.pageX, y:event.pageY});
+            
+            // WE'RE NOT GUARANTEED TO GET A CELL NODE
+            // if the mouse is outside all cell nodes, hide the preview
+            if( cellNode == null ) this.clearPreview();;     
 
         },
 
