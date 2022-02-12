@@ -37,7 +37,7 @@ function (dojo, declare) {
 
             this.cellMeasurement = 34;
             this.cardWidth = 66;
-            this.cardSplayDistance = 20;
+            this.cardSplayDistance = 24;
             this.cardsRemainingWarningThreshold = 14;
             this.maxHandSize = 7;
             this.maxHandSizeDiscardHandlers = []; // keep track of the events we attach to cards to allow the player to discard - since we'll want to disconnect them afterwards
@@ -1857,6 +1857,9 @@ function (dojo, declare) {
             // disable the normal ghosting image by moving its position outside the window
             event.dataTransfer.setDragImage(event.target, window.outerWidth, window.outerHeight);
 
+            // display the correct cursor
+            //event.target.style.cursor = "grabbing";
+
             if( !this.checkAction('placePolyomino')) return;
             if( !dojo.hasClass(event.currentTarget, "copen_usable")) return;
 
@@ -1879,6 +1882,7 @@ function (dojo, declare) {
 
             if( this.selectedPolyomino == null ) return;
 
+            //aevent.target.style.cursor = "grabbing";
 
             // WE SEEM TO GET A ON_DRAG ALSO ON THE LAST FRAME
             //  when I would expect we'd only get a dragend event
