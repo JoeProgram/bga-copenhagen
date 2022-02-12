@@ -1179,6 +1179,9 @@ function (dojo, declare) {
         adjustPositionBasedOnZoom: function( x, y )
         {
             var zoom = dojo.getStyle("page-content","zoom");
+
+            console.log( dojo );
+
             return {x: x/zoom, y:y/zoom};
         },
 
@@ -1968,7 +1971,8 @@ function (dojo, declare) {
 
             var syntheticEvent = new MouseEvent("ondrag");
 
-            this.dragClient = { x: event.clientX, y:event.clientY };
+            var adjustedClientXY = this.adjustPositionBasedOnZoom( event.clientX, event.clientY);
+            this.dragClient = { x: adjustedClientXY.x, y: adjustedClientXY.y };
 
             this.onDragPolyomino( syntheticEvent );
         },
