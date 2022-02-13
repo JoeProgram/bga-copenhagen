@@ -511,7 +511,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 #hand.copen_over_max_hand_size
 {
     filter:  drop-shadow(0px 0px 5px red);
-    curosr:  pointer;
+    cursor:  pointer;
 }
 
 #cards_in_hand
@@ -522,6 +522,14 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     width: 100%;
     height: 100%;
 }
+
+#cards_in_hand .copen_card
+{
+    transition-property: opacity, left, top, transform;
+    transition-duration: 500ms;
+    transition-timing-function: ease;
+}
+
 
 #hand_bottom_card_target
 {

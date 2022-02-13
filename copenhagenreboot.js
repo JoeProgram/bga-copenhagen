@@ -103,6 +103,8 @@ function (dojo, declare) {
             this.cellToPlacePolyomino = null;
             this.discardHandlers = []; // keep track of click handles attached to cards in hand when choosing which cards to discard
 
+            this.discardAnimationTime = 500;
+
         },
         
         /*
@@ -399,7 +401,6 @@ function (dojo, declare) {
             {
                 dojo.removeClass("hand","copen_over_max_hand_size");
                 dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
-                this.splayCardsInHand();
             }
         },
 
@@ -719,11 +720,11 @@ function (dojo, declare) {
 
             var lastCard = cardsInHand[ cardsInHand.length - 1];
             var lastCardTop = dojo.position( lastCard ).y;
-            this.slideToObject(lastCard, "hand_bottom_card_target").play();
+            this.placeOnObject(lastCard, "hand_bottom_card_target");
 
             for( var i = 0; i < cardsInHand.length; i++)
             {
-                this.slideToObjectPos( cardsInHand[i], "hand_bottom_card_target", 0, -this.cardSplayDistance * (cardsInHand.length - 1 - i) ).play();
+                this.placeOnObjectPos( cardsInHand[i], "hand_bottom_card_target", 0, -this.cardSplayDistance * (cardsInHand.length - 1 - i) );
             }
 
         },
@@ -758,6 +759,19 @@ function (dojo, declare) {
         hasTooManyCardsInHand: function()
         {
             return dojo.query("#copen_wrapper #cards_in_hand .copen_card").length > this.maxHandSize;
+        },
+
+        animateDiscard: function( card )
+        {
+            dojo.setStyle( card, "opacity" , 0);
+            dojo.setStyle( card, "left" , "-50px");
+            dojo.setStyle( card, "transform" , "rotateZ( -60deg)");
+
+            var game = this;
+            setTimeout( function(){
+                dojo.destroy( card );
+                game.splayCardsInHand();
+            }, 500);
         },
 
         announceCardsRemainingInDeck: function( cardsRemaining )
@@ -2500,8 +2514,7 @@ function (dojo, declare) {
             // IF IT'S YOUR CARD
             if( notif.args.player_id == this.player_id )
             {
-                dojo.destroy( `card_${notif.args.card_id}` );
-                this.splayCardsInHand();
+                this.animateDiscard( `card_${notif.args.card_id}` );
             }
 
             // UPDATE CARD AMOUNT UI
@@ -2553,11 +2566,14 @@ function (dojo, declare) {
 
             this.selectedPolyomino = null;
 
-            // HANDLE DISCARDS
-            notif.args.discards.forEach( function( card_id ){
-                dojo.destroy( `card_${card_id}` );
-            });
-            this.splayCardsInHand();
+            // HANDLE DISCARDS FOR ACTIVE PLAYER
+            if( notif.args.player_id == this.player_id )
+            {
+                var game = this;
+                notif.args.discards.forEach( function( card_id ){
+                    game.animateDiscard( `card_${card_id}` );
+                });
+            }
 
             // UPDATE CARD AMOUNT UI
             dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
