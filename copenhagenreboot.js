@@ -1194,8 +1194,6 @@ function (dojo, declare) {
         {
             var zoom = dojo.getStyle("page-content","zoom");
 
-            console.log( dojo );
-
             return {x: x/zoom, y:y/zoom};
         },
 
