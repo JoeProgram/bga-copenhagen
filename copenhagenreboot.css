@@ -833,16 +833,6 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     top:  0px;    
 }
 
-#polyomino_placement_target
-{
-    display:  block;
-    position: absolute;
-    left:  328px;
-    top: 128px;    
-    width: 158px;
-    height: 158px;
-}
-
 #polyomino_placement .copen_polyomino
 {
     filter:  drop-shadow(0.35rem 0.35rem 0.4rem rgba(0,0,0,0.5));
@@ -952,12 +942,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 
     background-image:  url('img/cards.png');
 
-    -webkit-mask-image: url('img/cards.png');
-    mask-image: url('img/cards.png');
-    -webkit-mask-repeat: no-repeat;
-    mask-repeat: no-repeat;
-    -webkit-mask-position: -420px 0px;
-    mask-position: -420px 0px;
+    clip-path: polygon(0% 0%, 40% 0%, 100% 60%, 100% 100%, 0% 100%);
 }
 
 .copen_new_color.copen_hidden

@@ -119,7 +119,6 @@
         </div>
 
         <div id="polyomino_placement">
-            <div id="polyomino_placement_target"></div>
             <div id="polyomino_placement_buttons">
                 <div id="polyomino_rotate_button" class="copen_usable"></div>
                 <div id="polyomino_flip_button" class="copen_usable"></div>
