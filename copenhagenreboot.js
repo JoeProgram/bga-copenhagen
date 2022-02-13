@@ -1044,6 +1044,21 @@ function (dojo, declare) {
             return cardsOfColor >= cost;
         },
 
+        styleSelectedPolyominoBasedOnValidity( validity, gridCells )
+        {
+            if( validity )
+            {
+                dojo.removeClass( this.selectedPolyomino.id, "copen_invalid_placement");  
+                dojo.removeClass( "confirm_polyomino_placement", "copen_button_disabled");
+            } 
+            else
+            {
+                dojo.addClass( this.selectedPolyomino.id, "copen_invalid_placement");
+                dojo.addClass( "confirm_polyomino_placement", "copen_button_disabled");
+                this.showOverlap( gridCells );
+            } 
+        },
+
         showOverlap: function( gridCells )
         {
             for( var i = 0; i < gridCells.length; i++)
@@ -1421,17 +1436,7 @@ function (dojo, declare) {
 
             // CLIENT VALIDATION - CHECK FOR A VALID POSITION
             var validity = this.isValidPlacementPosition( gridCells );
-            if( validity )
-            {
-                dojo.removeClass( this.selectedPolyomino.id, "copen_invalid_placement");  
-                dojo.removeClass( "confirm_polyomino_placement", "copen_button_disabled");
-            } 
-            else
-            {
-                dojo.addClass( this.selectedPolyomino.id, "copen_invalid_placement");
-                dojo.addClass( "confirm_polyomino_placement", "copen_button_disabled");
-                this.showOverlap( gridCells );
-            } 
+            this.styleSelectedPolyominoBasedOnValidity( validity, gridCells );
 
             // DETERMINE HTML PLACEMENT FOR POLYOMINO
             var polyominoNode = dojo.query(`#copen_wrapper #${this.selectedPolyomino.id}`)[0];
@@ -1444,6 +1449,21 @@ function (dojo, declare) {
             var animation = this.slideToObjectPos( this.selectedPolyomino.id, minGridCellNode.id, htmlPlacement.htmlX, htmlPlacement.htmlY, 250 );
             animation.play();
 
+        },
+
+        // UPDATE THE POLYOMINO'S STYLE WITHOUT AFFECTING IT'S POSITION
+        //  like when the polyomino is selected, and then the construction discount is applied
+        updateSelectedPolyominoStyle: function()
+        {
+            this.hideOverlap();
+
+            var coordinates = this.getCoordinatesFromId( this.cellToPlacePolyomino );
+            var adjustedCoordinates = this.getAdjustedCoordinates( this.selectedPolyomino["shape"], coordinates);
+            var gridCells = this.getGridCellsForPolyominoAtCoordinates( this.selectedPolyomino["shape"] , adjustedCoordinates );
+
+            // CLIENT VALIDATION - CHECK FOR A VALID POSITION
+            var validity = this.isValidPlacementPosition( gridCells );
+            this.styleSelectedPolyominoBasedOnValidity( validity, gridCells );
         },
 
         dropPolyominoOnBoard: function()
@@ -2612,6 +2632,10 @@ function (dojo, declare) {
             {
                 this.hasConstructionDiscounted = true;
                 this.determineUsablePolyominoes();
+
+                // IF HAS SELECTED POLYOMINO, ALSO SET STYLE ON THAT
+                if( this.selectedPolyomino != null ) this.updateSelectedPolyominoStyle();
+
             }
         },
 
