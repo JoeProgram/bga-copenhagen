@@ -657,11 +657,11 @@ function (dojo, declare) {
         //  which means we need to hook up the tooltips to the new nodes
         updateSpecialAbilityTooltips: function()
         {
-            this.addTooltipToClass('copen_any_cards', _("Any cards"), "");
-            this.addTooltipToClass('copen_additional_card', _("Additional card"), "");
-            this.addTooltipToClass('copen_construction_discount', _("Construction Dicount"), "");
-            this.addTooltipToClass('copen_change_of_colors', _("Change of colors"), "");
-            this.addTooltipToClass('copen_both_actions', _("Both actions"), "");
+            this.addTooltipToClass('copen_any_cards', _("Any cards: The cards you take don't have to be next to each other"), "");
+            this.addTooltipToClass('copen_additional_card', _("Additional card: You can take a third card"), "");
+            this.addTooltipToClass('copen_construction_discount', _("Construction Discount: Discard 1 less card when you place a facade tile"), "");
+            this.addTooltipToClass('copen_change_of_colors', _("Change of colors: Treat one color of card in your hand as a different color"), "");
+            this.addTooltipToClass('copen_both_actions', _("Both actions: You can take cards and place a facade tile this turn"), "");
         },
 
         makeHarborCard: function( cardData )
