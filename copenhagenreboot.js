@@ -104,6 +104,7 @@ function (dojo, declare) {
             this.discardHandlers = []; // keep track of click handles attached to cards in hand when choosing which cards to discard
 
             this.discardAnimationTime = 500;
+            this.animationTimeBetweenRefillHaborCards = 100;
 
         },
         
@@ -2541,9 +2542,19 @@ function (dojo, declare) {
 
         notif_refillHarbor: function(notif)
         {
-            for( var cardId in notif.args.harbor )
+
+            // JAVASCRIPT NOTE 
+            //  we're doing a loop over a delayed closure - which would usually have issues
+            //  as when the closure function fires, it'd just be using the last value of "cardId" for every call - not what we want
+            //  but in javascript, if we replace "var" with "let" in the loop, it instead keeps ahold of each value of cardId for each seperate loop 
+            var index = 0;
+            for( let cardId in notif.args.harbor ) 
             {
-                this.makeHarborCard( notif.args.harbor[cardId] );
+                var game = this;
+                setTimeout( function(){
+                    game.makeHarborCard( notif.args.harbor[cardId]);
+                }, index * this.animationTimeBetweenRefillHaborCards );
+                index ++;
             }
 
             if( notif.args.mermaid_card == "deck" && dojo.query("#copen_wrapper small_mermaid_card").length > 0)
