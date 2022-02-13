@@ -172,11 +172,12 @@ $machinestates = array(
 
     8 => array(
         "name" => "coatOfArms",
+        "action" => "stCoatOfArms",
         "description" => clienttranslate('${actplayer} must take an ability tile, place a special facade tile, or flip over their used ability tiles'),
         "descriptionmyturn" => clienttranslate('${you} must take an ability tile, place a special facade tile, or flip over your used ability tiles'),
         "type" => "activeplayer",
         "possibleactions" => array( "placePolyomino", "takeAbilityTile", "resetUsedAbilities" ),
-        "transitions" => array( "coatOfArms" => 8, "calculateScore" => 7, "zombiePass" => 50 ),
+        "transitions" => array( "coatOfArms" => 8, "calculateScore" => 7, "refillHarbor" => 50, "zombiePass" => 50 ),
     ), 
 
     50 => array(

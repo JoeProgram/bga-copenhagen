@@ -220,8 +220,15 @@ class CopenhagenReboot extends Table
             for( $i = 1; $i <= count($players); $i++)
             {
                 $sql .= "(NULL, '$special_ability_name', $i),";
+
+                // CODE FOR TESTING- GIVE PLAYERS ABILITIES RIGHT AWAY
+                //$keys = array_keys( $players);
+                //$player_id = $keys[$i - 1];
+                //$sql .= "($player_id, '$special_ability_name', $i),";                        
             }
         }
+
+
 
         // CREATE ANY TILE SPECIAL ABILITIES
         //   Each player starts with one
@@ -795,6 +802,28 @@ class CopenhagenReboot extends Table
                 )
             );
         }
+    }
+
+    // CAN THE PLAYER TAKE AT LEAST 1 OF THE 3 COAT OF ARMS ACTIONS?
+    function hasValidCoatOfArmsActionToTake()
+    {
+        $player_id = self::getActivePlayerId();
+
+        // IF THERE ARE WHITE TILES TO TAKE
+        $unowned_white_tiles = self::getObjectListFromDB( "SELECT id FROM polyomino WHERE color = 'white' AND owner IS NULL" );
+        if( count($unowned_white_tiles) > 0 ) return true;
+
+        // IF THERE ARE ABILITIES THEY DON'T OWN
+        $owned_ability_tiles = self::getObjectListFromDB( "SELECT id, used FROM ability_tile WHERE owner = $player_id " );
+        if(count($owned_ability_tiles) < 5) return true;
+
+        // IF THEY HAVE USED ABILITIES
+        for( $i = 0; $i < count($owned_ability_tiles); $i++)
+        {
+            if( $owned_ability_tiles[$i]["used"] == 1 ) return true;
+        }
+
+        return false;
     }
 
 
@@ -1528,6 +1557,31 @@ class CopenhagenReboot extends Table
         else
         {
              $this->gamestate->nextState("refillHarbor");
+        }
+    }
+
+    function stCoatOfArms()
+    {
+
+        // MAKE SURE THE PLAYER HAS A VALID MOVE
+        //  in rare circumstances, the player may not be able to do any of the 3 coat of arm actions
+        //  in that case, we just skip it
+        if( ! $this->hasValidCoatOfArmsActionToTake())
+        {
+
+            $player_id = self::getActivePlayerId();
+            $player_name = self::getActivePlayerName();
+
+            self::notifyAllPlayers( 
+                "skippingCoatOfArms", 
+                clienttranslate("Skipping ${player_name}'s coat of arms action, as they can't do any of the 3 actions."  ),
+                array(
+                    "player_id" => $player_id,
+                    "player_name" => $player_name,
+                )   
+            );
+
+            $this->gamestate->nextState("refillHarbor");
         }
     }
 
