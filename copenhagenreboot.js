@@ -1310,7 +1310,12 @@ function (dojo, declare) {
 
             // prepare polyomino preview for use
             var polyomino = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
-            dojo.style("polyomino_preview","background-position", dojo.getStyle(polyomino, "background-position"));
+
+            var imageNode = dojo.query(`#${polyomino.id} .copen_polyomino_image`)[0];
+            var previewImageNode = dojo.query("#polyomino_preview .copen_polyomino_image")[0];
+            dojo.style(previewImageNode,"background-position", dojo.getStyle(imageNode, "background-position"));
+
+
             dojo.style("polyomino_preview","width", dojo.getStyle(polyomino, "width") + "px");
             dojo.style("polyomino_preview","height", dojo.getStyle(polyomino, "height") + "px");
             dojo.style("polyomino_preview","transform",""); // reset the transform from whatever it was before

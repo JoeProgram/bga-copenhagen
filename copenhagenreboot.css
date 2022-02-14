@@ -606,7 +606,6 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 #polyomino_preview
 {
     opacity: 0.5;
-    background-image: url('img/polyominoes.png');
     position: absolute;
     display: block;
 }

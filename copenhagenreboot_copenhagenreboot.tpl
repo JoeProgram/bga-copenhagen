@@ -107,7 +107,9 @@
                 </div>
             <!-- END owned -->
 
-                <div id="polyomino_preview"></div>
+                <div id="polyomino_preview">
+                    <div class="copen_polyomino_image"></div>
+                </div>
 
                 <div class="copen_board_cells">
                     <!-- BEGIN board_cell -->
