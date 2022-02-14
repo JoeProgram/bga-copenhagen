@@ -1209,6 +1209,7 @@ function (dojo, declare) {
         adjustPositionBasedOnZoom: function( x, y )
         {
             var zoom = dojo.getStyle("page-content","zoom");
+            if( zoom == undefined ) zoom = 1; // not getting zoom on firefox
 
             return {x: x/zoom, y:y/zoom};
         },
