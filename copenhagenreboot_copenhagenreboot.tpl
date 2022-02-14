@@ -216,7 +216,9 @@ var jstpl_player_board = '<div class="copen_hand_size_wrapper">' +
                         '</div>';
 
 
-var jstpl_log_polyomino = '<div class="copen_log_polyomino copen_${color}-${squares}"></div>';
+var jstpl_log_polyomino =   '<div class="copen_log_polyomino copen_${color}-${squares}">' +
+                                '<div class="copen_polyomino_image"></div>' +
+                            '</div>';
 
 var jstpl_ability_tile= '<div id="${ability_name}-${copy}" class="copen_ability_tile copen_${ability_name}">'+
                             '<div class="copen_ability_tile_inner">' +
