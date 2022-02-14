@@ -553,6 +553,8 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 .copen_playerboard_color_3da045{ background-position: -460px 0px; }  /* green */
 .copen_playerboard_color_e2474a{ background-position: -690px 0px; }  /* red */
 
+
+
 .copen_playerboard .copen_coat_of_arms
 {
     display: block;
@@ -561,8 +563,14 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     height: 49px;
     background-image:  url('img/coat_of_arms.png');
     transform:  scale(0.5);
-    opactiy: 0;
+    opacity: 0; 
 }
+
+.copen_playerboard_color_3785bd .copen_coat_of_arms{ background-position: -44px 0px; }     /* blue */
+.copen_playerboard_color_fbcc3c .copen_coat_of_arms{ background-position: -0px 0px; }  /* yellow */
+.copen_playerboard_color_3da045 .copen_coat_of_arms{ background-position: -88px 0px; }  /* green */
+.copen_playerboard_color_e2474a .copen_coat_of_arms{ background-position: -133px 0px; }  /* red */
+
 
 .copen_playerboard .copen_coat_of_arms_1 { left: 81px; top: 256px; }
 .copen_playerboard .copen_coat_of_arms_2 { left: 149px; top: 188px; }
