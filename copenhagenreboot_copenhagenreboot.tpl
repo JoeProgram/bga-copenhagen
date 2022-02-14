@@ -95,6 +95,16 @@
 
             <!-- BEGIN owned -->
             <div id="player_{ID}_playerboard" class="copen_playerboard">
+            
+                <div class="copen_coat_of_arms_emblems">
+                    <div id="copen_coat_of_arms_1_{ID}" class="copen_coat_of_arms copen_coat_of_arms_1"></div>
+                    <div id="copen_coat_of_arms_2_{ID}" class="copen_coat_of_arms copen_coat_of_arms_2"></div>
+                    <div id="copen_coat_of_arms_3_{ID}" class="copen_coat_of_arms copen_coat_of_arms_3"></div>
+                    <div id="copen_coat_of_arms_4_{ID}" class="copen_coat_of_arms copen_coat_of_arms_4"></div>
+                    <div id="copen_coat_of_arms_5_{ID}" class="copen_coat_of_arms copen_coat_of_arms_5"></div>
+                    <div id="copen_coat_of_arms_6_{ID}" class="copen_coat_of_arms copen_coat_of_arms_6"></div>
+                    <div id="copen_coat_of_arms_7_{ID}" class="copen_coat_of_arms copen_coat_of_arms_7"></div>
+                </div>
             <!-- END owned -->
 
                 <div id="polyomino_preview"></div>
@@ -146,6 +156,16 @@
                 <div id="player_area_{ID}" class="copen_player_area">
 
                     <div id="player_{ID}_playerboard" class="copen_playerboard copen_playerboard_color_{COLOR}">
+                        <div class="copen_coat_of_arms_emblems">
+                            <div id="copen_coat_of_arms_1_{ID}" class="copen_coat_of_arms copen_coat_of_arms_1"></div>
+                            <div id="copen_coat_of_arms_2_{ID}" class="copen_coat_of_arms copen_coat_of_arms_2"></div>
+                            <div id="copen_coat_of_arms_3_{ID}" class="copen_coat_of_arms copen_coat_of_arms_3"></div>
+                            <div id="copen_coat_of_arms_4_{ID}" class="copen_coat_of_arms copen_coat_of_arms_4"></div>
+                            <div id="copen_coat_of_arms_5_{ID}" class="copen_coat_of_arms copen_coat_of_arms_5"></div>
+                            <div id="copen_coat_of_arms_6_{ID}" class="copen_coat_of_arms copen_coat_of_arms_6"></div>
+                            <div id="copen_coat_of_arms_7_{ID}" class="copen_coat_of_arms copen_coat_of_arms_7"></div>
+                        </div>
+
                         <div class="copen_board_cells">
 
                             <!-- BEGIN opponent_board_cell -->

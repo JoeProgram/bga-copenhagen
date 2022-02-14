@@ -19,6 +19,7 @@
 
 define([
     "dojo",
+    //"dojox.fx.ext-dojo.complex",
     "dojo/_base/declare",
     "ebg/core/gamegui",
     "ebg/counter"
@@ -282,7 +283,6 @@ function (dojo, declare) {
 
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
-
 
             //console.log( "Ending game setup" );
 
@@ -1700,6 +1700,44 @@ function (dojo, declare) {
             return {htmlX:0, htmlY:htmlY };
         },
 
+        animateCoatOfArms: function( coatOfArmsId, playerId )
+        {
+            var nodeName = `copen_coat_of_arms_${coatOfArmsId}_${playerId}`;
+
+            var animation = dojo.animateProperty({
+                node: nodeName,
+                duration: 500,
+                properties: 
+                {
+                    opacity: {start: 0, end: 1},
+                    propertyTransform: {start: 0.5, end: 1.25 }
+                },
+                onAnimate: function (values) {
+                    console.log( values) ;
+                    dojo.style(nodeName, 'transform', `scale( ${ values.propertyTransform.replace("px","")} )`);
+                },
+            });
+
+            dojo.connect( animation, "onEnd", function()
+            {
+
+                console.log( dojo );
+                console.log( "onEnd");
+
+                dojo.animateProperty({
+                    node: nodeName,
+                    duration: 500,
+                    delay: 100,
+                    properties: 
+                    {
+                        opacity: {start: 1, end: 0},
+                    }  
+                }).play();
+            });
+
+            animation.play();
+        },
+
         determineWhichAbilityTilesAreTakeable: function()
         {
             var game = this;
@@ -2607,6 +2645,9 @@ function (dojo, declare) {
             // UPDATE CARD AMOUNT UI
             dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
             
+            // SHOW FEEDBACK FOR COAT OF ARMS
+            this.animateCoatOfArms(1, notif.args.player_id);
+
         },
 
         notif_takeAbilityTile: function(notif)
