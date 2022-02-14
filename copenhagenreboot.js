@@ -1704,6 +1704,8 @@ function (dojo, declare) {
         {
             var nodeName = `copen_coat_of_arms_${coatOfArmsId}_${playerId}`;
 
+            dojo.style( nodeName, "z-index", 20);
+
             var animation = dojo.animateProperty({
                 node: nodeName,
                 duration: 500,
@@ -1713,17 +1715,12 @@ function (dojo, declare) {
                     propertyTransform: {start: 0.5, end: 1.25 }
                 },
                 onAnimate: function (values) {
-                    console.log( values) ;
                     dojo.style(nodeName, 'transform', `scale( ${ values.propertyTransform.replace("px","")} )`);
                 },
             });
 
             dojo.connect( animation, "onEnd", function()
             {
-
-                console.log( dojo );
-                console.log( "onEnd");
-
                 dojo.animateProperty({
                     node: nodeName,
                     duration: 500,
@@ -1731,7 +1728,10 @@ function (dojo, declare) {
                     properties: 
                     {
                         opacity: {start: 1, end: 0},
-                    }  
+                    },
+                    onEnd: function(){
+                      dojo.style( nodeName, "z-index", 1);  
+                    }
                 }).play();
             });
 
@@ -2645,8 +2645,13 @@ function (dojo, declare) {
             // UPDATE CARD AMOUNT UI
             dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
             
+
             // SHOW FEEDBACK FOR COAT OF ARMS
-            this.animateCoatOfArms(1, notif.args.player_id);
+            for( var coat_of_arms_id_key in notif.args.coat_of_arms_ids )
+            {
+                var coat_of_arms_id = notif.args.coat_of_arms_ids[ coat_of_arms_id_key];
+                this.animateCoatOfArms( coat_of_arms_id, notif.args.player_id );
+            }
 
         },
 

@@ -1088,6 +1088,7 @@ class CopenhagenReboot extends Table
         $playerboard = $this->getPlayerboard( $player_id );
 
         // COAT OF ARMS
+        $coat_of_arms_ids = [];
         $coat_of_arms_earned = self::getGameStateValue( 'coat_of_arms_earned' );
 
         // ADD COAT OF ARMS FOR EACH COVERED COAT OF ARMS CELL 
@@ -1097,6 +1098,7 @@ class CopenhagenReboot extends Table
             $y = $grid_cell["y"];
             if( in_array( "$x-$y", $this->coat_of_arms_board_cells ))
             { 
+                $coat_of_arms_ids[] = array_search("$x-$y",  $this->coat_of_arms_board_cells ) + 1;
                 $coat_of_arms_earned += 1;
                 self::incStat( 1, "coat_of_arms_earned", $player_id );
             }
@@ -1112,10 +1114,10 @@ class CopenhagenReboot extends Table
                 && $this->isRowComplete($row, $playerboard)
             ) 
             {
+                $coat_of_arms_ids[] = array_search($row, $this->coat_of_arms_board_rows) + 1 + count($this->coat_of_arms_board_cells );
                 $coat_of_arms_earned += 1;
                 self::incStat( 1, "coat_of_arms_earned", $player_id );
             }
-            
         } 
 
         // REMOVE COAT OF ARMS POINT IF PLACING WHITE TILE
@@ -1184,6 +1186,7 @@ class CopenhagenReboot extends Table
                 ),
                 "playerboard" => $playerboard, // get refreshed playerboard after update
                 "discards" => $discard_ids,
+                "coat_of_arms_ids" => $coat_of_arms_ids,
                 "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
             )   
         );
