@@ -86,6 +86,7 @@ $machinestates = array(
             "activateAbilityBothActions", 
             "activateAbilityConstructionDiscount",
             "activateAbilityChangeOfColors",
+            "undo",
         ),
         "transitions" => array(  "checkHandSize" => 4, "calculateScore" => 7, "coatOfArms" => 8, "zombiePass" => 50 )
     ), 
@@ -96,7 +97,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} must take another card'),
         "descriptionmyturn" => clienttranslate('${you} must take another card next to the one you just took'),
         "type" => "activeplayer",
-        "possibleactions" => array( "takeCard", "activateAbilityAnyCards", "activateAbilityAdditionalCard", "activateAbilityBothActions" ),
+        "possibleactions" => array( "takeCard", "activateAbilityAnyCards", "activateAbilityAdditionalCard", "activateAbilityBothActions", "undo" ),
         "transitions" => array(  "checkHandSize" => 4, "zombiePass" => 50 )
     ), 
 
@@ -105,7 +106,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} must take another card'),
         "descriptionmyturn" => clienttranslate('${you} must take another card'),
         "type" => "activeplayer",
-        "possibleactions" => array( "takeCard", "activateAbilityBothActions"),
+        "possibleactions" => array( "takeCard", "activateAbilityBothActions", "undo"),
         "transitions" => array(  "checkHandSize" => 4, "zombiePass" => 50 )
     ), 
 
@@ -114,7 +115,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} may use special ability tiles'),
         "descriptionmyturn" => clienttranslate('${you} may use special ability tiles'),
         "type" => "activeplayer",
-        "possibleactions" => array( "activateAbilityAdditionalCard", "activateAbilityBothActions", "endTurn" ),
+        "possibleactions" => array( "activateAbilityAdditionalCard", "activateAbilityBothActions", "endTurn", "undo" ),
         "transitions" => array(  "takeAdditionalCard" => 9, "placePolyominoAfterTakingCards" => 11,  "refillHarbor" => 50, "zombiePass" => 50 )
     ), 
 
@@ -149,7 +150,7 @@ $machinestates = array(
         "descriptionmyturn" => clienttranslate('${you} must discard a card. You can only have 7 cards in hand.'),
         "type" => "activeplayer",
         "possibleactions" => array( 
-            "discard",
+            "discard", "undo",
          ),
         "transitions" => array(  
             "takeAdjacentCard" => 5,
@@ -176,7 +177,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} must take an ability tile, place a special facade tile, or flip over their used ability tiles'),
         "descriptionmyturn" => clienttranslate('${you} must take an ability tile, place a special facade tile, or flip over your used ability tiles'),
         "type" => "activeplayer",
-        "possibleactions" => array( "placePolyomino", "takeAbilityTile", "resetUsedAbilities" ),
+        "possibleactions" => array( "placePolyomino", "takeAbilityTile", "resetUsedAbilities", "undo" ),
         "transitions" => array( "coatOfArms" => 8, "calculateScore" => 7, "refillHarbor" => 50, "zombiePass" => 50 ),
     ), 
 

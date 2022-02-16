@@ -132,7 +132,9 @@ $gameinfos = array(
     'max' => 1437
 ),
 
+
 'enable_3d' => false,
+'db_undo_support' => true,
 
 // Game presentation
 // Short game presentation text that will appear on the game description page, structured as an array of paragraphs.

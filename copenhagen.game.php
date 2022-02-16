@@ -1389,6 +1389,13 @@ class Copenhagen extends Table
         
     }
 
+    function undo()
+    {
+        self::checkAction("undo");
+        $this->undoRestorePoint();
+        $this->gamestate->reloadState();
+    }
+
     function endTurn()
     {
         self::checkAction( 'endTurn' );
@@ -1441,6 +1448,8 @@ class Copenhagen extends Table
         self::setGameStateValue( 'change_of_colors_to', -1 );
 
         self::incStat( 1, "turns");
+
+        $this->undoSavepoint();
 
         $this->gamestate->nextState("playerTurn");
     }

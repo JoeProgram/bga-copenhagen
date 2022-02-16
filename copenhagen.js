@@ -129,6 +129,23 @@ function (dojo, declare) {
             // DEBUG - see all game data in console
             // console.log( gamedatas);
 
+            // INITALIZE VALUES
+            //  since we're now supporting undo - these need to be initialized here
+            this.maxHandSizeDiscardHandlers = [];
+            this.stateName = "";
+            this.selectedPolyomino = null;
+            this.hasConstructionDiscounted = false;
+            this.dragClient = {x:0, y:0 };
+            this.dragPositionLastFrame = {x:0, y:0};
+            this.changeOfColorsCardHandlers = []; 
+            this.changeColorsFromTo = null;
+            this.cardsToDiscard = [];
+            this.cellToPlacePolyomino = null;
+            this.discardHandlers = [];
+
+            console.log( "running setup - selectedPolyomino is ");
+            console.log( this.selectedPolyomino );
+
             // DECK
             this.updateDeckDisplay(gamedatas.cards_in_deck);
 
@@ -582,11 +599,15 @@ function (dojo, declare) {
                       
             if( this.isCurrentPlayerActive() )
             {            
+
+                this.addActionButton( 'undo', _("Undo Turn"), "onUndo", null, false, "gray" );
+
                 switch( stateName )
                 {
 
                 case 'playerTurn':
                     this.createPositionPolyominoButtons();
+                    dojo.style("undo","display","none"); // hide undo when there's nothing to undo
                     break;
 
                 case 'takeCardsLastCall':
@@ -2496,6 +2517,19 @@ function (dojo, declare) {
             }, this, function( result ){} ); 
         },
 
+
+        onUndo: function( event )
+        {
+
+            if( !this.checkAction('undo')) return;
+
+            this.ajaxcall( "/copenhagen/copenhagen/undo.html",
+            {
+                lock: true, 
+            }, this, function( result ){} ); 
+
+        },
+
         onEndTurn: function( event )
         {
 
@@ -2700,6 +2734,8 @@ function (dojo, declare) {
                 if( this.selectedPolyomino != null ) this.updateSelectedPolyominoStyle();
 
             }
+
+            dojo.style("undo","display","inline");
         },
 
         notif_activateAbilityChangeOfColors: function(notif)
@@ -2709,6 +2745,8 @@ function (dojo, declare) {
             dojo.addClass( node, "copen_activated");
 
             this.triggerChangeOfColorsAbility(notif.args.from_color, notif.args.to_color);
+
+            dojo.style("undo","display","inline");
         },
 
         notif_usedAbility: function(notif)
