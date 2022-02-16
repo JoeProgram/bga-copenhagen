@@ -8,9 +8,9 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  *
- * copenhagenreboot.js
+ * copenhagen.js
  *
- * CopenhagenReboot user interface script
+ * Copenhagen user interface script
  * 
  * In this file, you are describing the logic of your user interface, in Javascript language.
  *
@@ -25,9 +25,9 @@ define([
     "ebg/counter"
 ],
 function (dojo, declare) {
-    return declare("bgagame.copenhagenreboot", ebg.core.gamegui, {
+    return declare("bgagame.copenhagen", ebg.core.gamegui, {
         constructor: function(){
-            // console.log('copenhagenreboot constructor');
+            // console.log('copenhagen constructor');
               
             // Here, you can init the global variables of your user interface
             // Example:
@@ -636,13 +636,7 @@ function (dojo, declare) {
             else dojo.style("deck","display","block");
             this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in deck"), "");
 
-            if( 
-                !this.isSmallMermaidCardVisible()
-                && numberCardsInDeck <= this.cardsRemainingWarningThreshold
-            )
-            {
-                this.announceCardsRemainingInDeck( numberCardsInDeck );
-            }
+            dojo.query("#copen_wrapper #deck #cards_remaining")[0].innerText = numberCardsInDeck;
         },
 
         isSmallMermaidCardVisible: function()
@@ -775,6 +769,9 @@ function (dojo, declare) {
             }, 500);
         },
 
+        // ORPHANED
+        //  keeping it around in case I want to put it back
+        /*
         announceCardsRemainingInDeck: function( cardsRemaining )
         {
 
@@ -817,6 +814,7 @@ function (dojo, declare) {
             animation.play();
 
         },
+        */
 
         determineTopPolyominoInEveryStack: function()
         {
@@ -1411,7 +1409,7 @@ function (dojo, declare) {
             }
 
             // SEND SERVER REQUEST
-            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/placePolyomino.html",
+            this.ajaxcall( "/copenhagen/copenhagen/placePolyomino.html",
             {
                 lock: true, 
                 color: this.getPolyominoColorFromId( this.selectedPolyomino.id) ,
@@ -1913,9 +1911,9 @@ function (dojo, declare) {
             if( this.checkAction('takeCard'))
             {
                 var endPoint = "";
-                if( this.stateName == "playerTurn") endPoint = "/copenhagenreboot/copenhagenreboot/takeCard.html";
-                else if( this.stateName == "takeAdjacentCard") endPoint = "/copenhagenreboot/copenhagenreboot/takeAdjacentCard.html";
-                else if( this.stateName == "takeAdditionalCard") endPoint = "/copenhagenreboot/copenhagenreboot/takeAdditionalCard.html";
+                if( this.stateName == "playerTurn") endPoint = "/copenhagen/copenhagen/takeCard.html";
+                else if( this.stateName == "takeAdjacentCard") endPoint = "/copenhagen/copenhagen/takeAdjacentCard.html";
+                else if( this.stateName == "takeAdditionalCard") endPoint = "/copenhagen/copenhagen/takeAdditionalCard.html";
 
                 this.ajaxcall( endPoint,
                 {
@@ -1934,7 +1932,7 @@ function (dojo, declare) {
             if( this.checkAction('discard'))
             {
 
-                this.ajaxcall( "/copenhagenreboot/copenhagenreboot/discardDownToMaxHandSize.html",
+                this.ajaxcall( "/copenhagen/copenhagen/discardDownToMaxHandSize.html",
                 {
                     lock: true, 
                     card_id:event.currentTarget.id.split("_")[1],
@@ -2340,7 +2338,7 @@ function (dojo, declare) {
                 var ability_name = event.currentTarget.id.split("-")[0];
                 var copy = event.currentTarget.id.split("-")[1];
 
-                this.ajaxcall( "/copenhagenreboot/copenhagenreboot/takeAbilityTile.html",
+                this.ajaxcall( "/copenhagen/copenhagen/takeAbilityTile.html",
                 {
                     lock: true, 
                     ability_name: ability_name,
@@ -2357,7 +2355,7 @@ function (dojo, declare) {
             if( !this.checkAction('activateAbilityAnyCards')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
 
-            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityAnyCards.html",
+            this.ajaxcall( "/copenhagen/copenhagen/activateAbilityAnyCards.html",
             {
                 lock: true, 
             }, this, function( result ){} ); 
@@ -2372,7 +2370,7 @@ function (dojo, declare) {
             if( !this.checkAction('activateAbilityAdditionalCard')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
 
-            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityAdditionalCard.html",
+            this.ajaxcall( "/copenhagen/copenhagen/activateAbilityAdditionalCard.html",
             {
                 lock: true, 
             }, this, function( result ){} ); 
@@ -2387,7 +2385,7 @@ function (dojo, declare) {
             if( !this.checkAction('activateAbilityBothActions')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
 
-            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityBothActions.html",
+            this.ajaxcall( "/copenhagen/copenhagen/activateAbilityBothActions.html",
             {
                 lock: true, 
             }, this, function( result ){} ); 
@@ -2402,7 +2400,7 @@ function (dojo, declare) {
             if( !this.checkAction('activateAbilityConstructionDiscount')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
 
-            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityConstructionDiscount.html",
+            this.ajaxcall( "/copenhagen/copenhagen/activateAbilityConstructionDiscount.html",
             {
                 lock: true, 
             }, this, function( result ){} ); 
@@ -2473,7 +2471,7 @@ function (dojo, declare) {
             var toColorName = this.getColorNameOfCard( dojo.query( ".copen_new_color", event.currentTarget)[0] );
             var toColor = toColorName.split("_")[1];
 
-            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/activateAbilityChangeOfColors.html",
+            this.ajaxcall( "/copenhagen/copenhagen/activateAbilityChangeOfColors.html",
             {
                 lock: true, 
                 from_color: fromColor,
@@ -2492,7 +2490,7 @@ function (dojo, declare) {
             if( !this.checkAction('resetUsedAbilities')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
 
-            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/resetUsedAbilities.html",
+            this.ajaxcall( "/copenhagen/copenhagen/resetUsedAbilities.html",
             {
                 lock: true, 
             }, this, function( result ){} ); 
@@ -2503,7 +2501,7 @@ function (dojo, declare) {
 
             if( !this.checkAction('endTurn')) return;
 
-            this.ajaxcall( "/copenhagenreboot/copenhagenreboot/endTurn.html",
+            this.ajaxcall( "/copenhagen/copenhagen/endTurn.html",
             {
                 lock: true, 
             }, this, function( result ){} ); 
@@ -2520,7 +2518,7 @@ function (dojo, declare) {
             In this method, you associate each of your game notifications with your local method to handle it.
             
             Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" calls in
-                  your copenhagenreboot.game.php file.
+                  your copenhagen.game.php file.
         
         */
         setupNotifications: function()
@@ -2601,7 +2599,9 @@ function (dojo, declare) {
                 index ++;
             }
 
-            if( notif.args.mermaid_card == "deck" && dojo.query("#copen_wrapper small_mermaid_card").length > 0)
+            console.log( notif);
+
+            if( notif.args.mermaid_card == "deck" && dojo.query("#copen_wrapper #small_mermaid_card").length > 0)
             {
                 this.slideToObjectAndDestroy( "small_mermaid_card", "deck");
             } 

@@ -8,7 +8,7 @@
   * See http://en.boardgamearena.com/#!doc/Studio for more information.
   * -----
   * 
-  * copenhagenreboot.game.php
+  * copenhagen.game.php
   *
   * This is the main file for your game logic.
   *
@@ -26,7 +26,7 @@
 require_once( APP_GAMEMODULE_PATH.'module/table/table.game.php' );
 
 
-class CopenhagenReboot extends Table
+class Copenhagen extends Table
 {
 	function __construct( )
 	{
@@ -68,7 +68,7 @@ class CopenhagenReboot extends Table
     protected function getGameName( )
     {
 		// Used for translations and stuff. Please do not modify.
-        return "copenhagenreboot";
+        return "copenhagen";
     }	
 
     /*
@@ -833,7 +833,7 @@ class CopenhagenReboot extends Table
 
     /*
         Each time a player is doing some game action, one of the methods below is called.
-        (note: each method below must match an input method in copenhagenreboot.action.php)
+        (note: each method below must match an input method in copenhagen.action.php)
     */
 
     function takeCard( $card_id )

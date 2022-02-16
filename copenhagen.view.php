@@ -8,18 +8,18 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  *
- * copenhagenreboot.view.php
+ * copenhagen.view.php
  *
  */
   
   require_once( APP_BASE_PATH."view/common/game.view.php" );
   
 
-  class view_copenhagenreboot_copenhagenreboot extends game_view
+  class view_copenhagen_copenhagen extends game_view
   {
 
     function getGameName() {
-        return "copenhagenreboot";
+        return "copenhagen";
     }     
 
     
@@ -66,8 +66,8 @@
         }
 
         // BUILD PLAYERBOARDS
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "opponent_board_cell"); // Nested bock must be declared first
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "opponent_playerboard");
+        $this->page->begin_block( "copenhagen_copenhagen", "opponent_board_cell"); // Nested bock must be declared first
+        $this->page->begin_block( "copenhagen_copenhagen", "opponent_playerboard");
         for($i = $starting_index; $i < $players_nbr; $i++ )
         {
             $player_id = $relative_player_sequence[$i];
@@ -94,19 +94,19 @@
         }
 
         // DROP NAME ID
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned");
+        $this->page->begin_block( "copenhagen_copenhagen", "owned");
         $this->page->insert_block( "owned", array(
             'ID' => $current_player_id,
         ));
 
         // DROP NAME ID - ABILITY AREA
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "owned_ability_tile_area");
+        $this->page->begin_block( "copenhagen_copenhagen", "owned_ability_tile_area");
         $this->page->insert_block( "owned_ability_tile_area", array(
             'ID' => $current_player_id,
         ));
 
         // BUILDS CELLS OF PLAYERBOARD
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "board_cell");
+        $this->page->begin_block( "copenhagen_copenhagen", "board_cell");
 
         for( $x = 0; $x < $this->game->board_width; $x++ )
         {
@@ -120,7 +120,7 @@
         }
 
         // BUILDS COLOR CHANGE OPTIONS
-        $this->page->begin_block( "copenhagenreboot_copenhagenreboot", "change_of_colors_option");
+        $this->page->begin_block( "copenhagen_copenhagen", "change_of_colors_option");
         for( $i = 0; $i < 4; $i++ ) $this->page->insert_block( "change_of_colors_option", []);
 
 

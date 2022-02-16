@@ -7,9 +7,9 @@
  * See http://en.boardgamearena.com/#!doc/Studio for more information.
  * -----
  *
- * copenhagenreboot.css
+ * copenhagen.css
  *
- * CopenhagenReboot stylesheet
+ * Copenhagen stylesheet
  *
  */
 
@@ -111,19 +111,14 @@
 #cards_remaining
 {
     position: absolute;
-    text-align: center;
     color:  white;
-    font-weight: bold;
+    font-weight: bold; 
    
-    width: 60px;
-    height: 60px;
+    width: 28px;
+    height: 41px;
 
-    left:  -50%;
-    z-index:  40;
     margin-top: 10px; 
-    opacity: 0;
-
-    text-shadow: 2px 2px #888888;
+    opacity: 0.75; 
 }
 
 #small_mermaid_card

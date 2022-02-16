@@ -8,21 +8,21 @@
  * See http://en.doc.boardgamearena.com/Studio for more information.
  * -----
  * 
- * copenhagenreboot.action.php
+ * copenhagen.action.php
  *
- * CopenhagenReboot main action entry point
+ * Copenhagen main action entry point
  *
  *
  * In this file, you are describing all the methods that can be called from your
  * user interface logic (javascript).
  *       
  * If you define a method "myAction" here, then you can call it from your javascript code with:
- * this.ajaxcall( "/copenhagenreboot/copenhagenreboot/myAction.html", ...)
+ * this.ajaxcall( "/copenhagen/copenhagen/myAction.html", ...)
  *
  */
   
   
-  class action_copenhagenreboot extends APP_GameAction
+  class action_copenhagen extends APP_GameAction
   { 
 
     // Constructor: please do not modify
@@ -35,7 +35,7 @@
   	    }
   	    else
   	    {
-            $this->view = "copenhagenreboot_copenhagenreboot";
+            $this->view = "copenhagen_copenhagen";
             self::trace( "Complete reinitialization of board game" );
       }
   	} 
