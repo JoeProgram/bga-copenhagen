@@ -143,9 +143,6 @@ function (dojo, declare) {
             this.cellToPlacePolyomino = null;
             this.discardHandlers = [];
 
-            console.log( "running setup - selectedPolyomino is ");
-            console.log( this.selectedPolyomino );
-
             // DECK
             this.updateDeckDisplay(gamedatas.cards_in_deck);
 
@@ -263,6 +260,7 @@ function (dojo, declare) {
                 {
                     this.triggerChangeOfColorsAbility( this.gamedatas.change_of_colors.from_color, this.gamedatas.change_of_colors.to_color);
                 }
+
             }
 
 
@@ -607,7 +605,13 @@ function (dojo, declare) {
 
                 case 'playerTurn':
                     this.createPositionPolyominoButtons();
-                    dojo.style("undo","display","none"); // hide undo when there's nothing to undo
+
+                    // TURN OFF THE UNDO BUTTON IF THERE'S NOTHING TO UNDO
+                    //  Special case - if the player clicked an activated ability, then refreshed the page, they should be able to undo
+                    if( this.gamedatas.activated_abilities.length == 0 )
+                    {
+                        dojo.style("undo","display","none"); // hide undo when there's nothing to undo
+                    }
                     break;
 
                 case 'takeCardsLastCall':
@@ -1286,6 +1290,7 @@ function (dojo, declare) {
 
         showSelectDiscardUI: function( color, cost )
         {
+
             // MAKE SURE WE'RE COMING IN WITH CLEAN DATA STRUCTURE
             this.discardHandlers = [];
 
@@ -1311,9 +1316,11 @@ function (dojo, declare) {
             }
 
             // DISPLAY INSTRUCTIONS TO USER
-            if( cost == 1 ) _(`Select 1 card to discard`);
-            else this.gamedatas.gamestate.descriptionmyturn = _(`Select ${cost} cards to discard`);
+            this.gamedatas.gamestate.descriptionmyturn = _(`Select ${cost} card(s) to discard`);
             this.updatePageTitle();
+
+            // DISPLAY UNDO BUTTON
+            dojo.style("undo","display","inline");
 
         },
 
@@ -2458,6 +2465,10 @@ function (dojo, declare) {
                 this.changeOfColorsCardHandlers.push( handler ); 
             }
 
+            // DISPLAY UNDO BUTTON
+            dojo.style("undo","display","inline");
+
+
         },
 
         onSelectColorFromHandToChange: function ( event )
@@ -2632,8 +2643,6 @@ function (dojo, declare) {
                 }, index * this.animationTimeBetweenRefillHaborCards );
                 index ++;
             }
-
-            console.log( notif);
 
             if( notif.args.mermaid_card == "deck" && dojo.query("#copen_wrapper #small_mermaid_card").length > 0)
             {

@@ -125,7 +125,7 @@ $machinestates = array(
         "description" => clienttranslate('${actplayer} may place a facade tile'),
         "descriptionmyturn" => clienttranslate('${you} may place a facade tile'),
         "type" => "activeplayer",
-        "possibleactions" => array( "placePolyomino", "endTurn", "activateAbilityConstructionDiscount", "activateAbilityChangeOfColors",),
+        "possibleactions" => array( "placePolyomino", "endTurn", "activateAbilityConstructionDiscount", "activateAbilityChangeOfColors", "undo"),
         "transitions" => array(  "calculateScore" => 7, "refillHarbor" => 50, "zombiePass" => 50 )
     ), 
     

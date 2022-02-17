@@ -438,7 +438,7 @@ class Copenhagen extends Table
         {
             return "placePolyominoAfterTakingCards";
         }
-        else if( ($has_additional_card_ability_available || $has_both_actions_ability_available) && $cards_taken_this_turn == 2)
+        else if( ($has_additional_card_ability_available || $has_both_actions_ability_available) && $cards_taken_this_turn >= 2)
         {
             return "takeCardsLastCall";
         }
