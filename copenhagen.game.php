@@ -170,6 +170,7 @@ class Copenhagen extends Table
         // CARD COUNTING FOR PROGRESSION SYSTEM - PART 2
         self::setGameStateValue( 'total_drawable_cards', $drawable_cards );
 
+
         // CREATE PLAYERBOARDS
         $sql = "INSERT INTO board_cell(owner, x, y) VALUES ";
         foreach( $players as $player_id => $player )
@@ -1493,6 +1494,7 @@ class Copenhagen extends Table
     {
 
         $cards = [];
+        $mermaid_card_id = self::getGameStateValue( "mermaid_card_id" );
 
         for( $i = 0; $i < $this->harbor_number; $i ++)
         {
@@ -1501,12 +1503,16 @@ class Copenhagen extends Table
 
                 // prepare deck
                 if( $this->cards->countCardInLocation("deck") == 0 ) $this->shuffleDiscardIntoDeck();
-                $cards[] = $this->cards->pickCardForLocation('deck', 'harbor', $i);
+                $card = $this->cards->pickCardForLocation('deck', 'harbor', $i);
+                $cards[] = $card;
+
+                // IF WE'VE DRAWN THE MERMAID CARD, STOP DRAWING CARDS
+                if( $card['id'] == $mermaid_card_id ) break;
             }            
         }
 
         // NOTIFY CLIENTS
-        $mermaid_card_id = self::getGameStateValue( "mermaid_card_id" );
+        
         $mermaid_card = $this->cards->getCard( $mermaid_card_id );
 
         self::notifyAllPlayers( 

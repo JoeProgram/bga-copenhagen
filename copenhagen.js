@@ -746,8 +746,6 @@ function (dojo, declare) {
             this.addTooltipHtmlToClass('copen_construction_discount', _("Construction Discount: Discard 1 less card when you place a facade tile"), "");
             this.addTooltipHtmlToClass('copen_change_of_colors', _("Change of colors: Treat ALL cards of one color in your hand as a different color"), "");
             this.addTooltipHtmlToClass('copen_both_actions', _("Both actions: You can take cards and place a facade tile this turn"), "");
-
-            console.log( this.tooltips);
         },
 
         // IMMEDIATELY CLOSE TOOLTIPS
@@ -1160,7 +1158,6 @@ function (dojo, declare) {
                 dojo.addClass( "confirm_polyomino_placement", "copen_button_disabled");
                 var hasOverlap = this.showOverlap( gridCells );
 
-                console.log( this.tooltips);
 
                 // LEAVE A HELPFUL TOOLTIP
                 // tooltips are going currently preventing dragging
