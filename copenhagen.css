@@ -248,10 +248,11 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     cursor: grabbing ;
 }
 
-.copen_log_polyomino
+.copen_log_polyomino,
 {
     display: inline-block;
 }
+
 
 .copen_purple-2  
 {
@@ -839,6 +840,32 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     height: 43px;
     background-image: url('img/tiles.png');
     position: relative;
+}
+
+.copen_title_polyomino
+{
+    vertical-align: text-top;
+    display:  inline-block;
+    width: 23px;
+    height: 23px;
+    background-position: -455px 0px;
+    background-image: url('img/polyominoes.png');
+}
+
+.copen_title_ability_tile,
+.copen_title_ability_tile_used
+{
+    vertical-align: text-top;
+    display:  inline-block;
+    width: 24px;
+    height: 23px;
+    background-position: -242px 0px;
+    background-image: url('img/tiles.png');
+}
+
+.copen_title_ability_tile_used
+{
+    background-position: -242px -25px;
 }
 
 #shadow_box{

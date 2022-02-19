@@ -231,6 +231,10 @@ var jstpl_log_ability_tile = '<div class="copen_log_ability_tile copen_log_abili
 
 var jstpl_overlap = '<div id="${id}" class="copen_overlap"></div>';
 
+var jstpl_title_special_ability_tile =      '<div class="copen_title_ability_tile"></div>';
+var jstpl_title_special_ability_tile_used = '<div class="copen_title_ability_tile_used"></div>';
+var jstpl_title_special_facade_tile =       '<div class="copen_title_polyomino"></div>';
+
 </script>  
 
 {OVERALL_GAME_FOOTER}

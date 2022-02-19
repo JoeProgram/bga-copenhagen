@@ -51,7 +51,11 @@ function (dojo, declare) {
 
             this.whitePolyominosPerStack = 3;
 
-            this.log_replace_keys = ['log_polyomino', 'log_ability_tile']; // keys in the log that we do post-processing on
+            // keys in the log that we do custom pre-processing on
+            this.preprocess_string_keys = [
+                'log_polyomino', 
+                'log_ability_tile',
+            ]; 
 
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
@@ -677,9 +681,9 @@ function (dojo, declare) {
         updateSpecialAbilityTooltips: function()
         {
             this.addTooltipToClass('copen_any_cards', _("Any cards: The cards you take don't have to be next to each other"), "");
-            this.addTooltipToClass('copen_additional_card', _("Additional card: You can take a third card"), "");
+            this.addTooltipToClass('copen_additional_card', _("Additional card: You can take a third card from anywhere."), "");
             this.addTooltipToClass('copen_construction_discount', _("Construction Discount: Discard 1 less card when you place a facade tile"), "");
-            this.addTooltipToClass('copen_change_of_colors', _("Change of colors: Treat one color of card in your hand as a different color"), "");
+            this.addTooltipToClass('copen_change_of_colors', _("Change of colors: Treat ALL cards of one color in your hand as a different color"), "");
             this.addTooltipToClass('copen_both_actions', _("Both actions: You can take cards and place a facade tile this turn"), "");
         },
 
@@ -1063,13 +1067,15 @@ function (dojo, declare) {
             
             // STANDARD RULES FOR OTHER COLORS
             var cardsOfColor = this.countColoredCardsInHand( color );
-            //var squares = this.getPolyominoSquaresFromId( this.selectedPolyomino.id );
             var cost = this.getCostOfShapeAtPosition( gridCells, color);
             return cardsOfColor >= cost;
         },
 
         styleSelectedPolyominoBasedOnValidity( validity, gridCells )
         {
+
+            this.removeTooltip( this.selectedPolyomino.id);
+
             if( validity )
             {
                 dojo.removeClass( this.selectedPolyomino.id, "copen_invalid_placement");  
@@ -1079,19 +1085,41 @@ function (dojo, declare) {
             {
                 dojo.addClass( this.selectedPolyomino.id, "copen_invalid_placement");
                 dojo.addClass( "confirm_polyomino_placement", "copen_button_disabled");
-                this.showOverlap( gridCells );
+                var hasOverlap = this.showOverlap( gridCells );
+
+                // LEAVE A HELPFUL TOOLTIP
+                // tooltips are going currently preventing dragging
+                /*
+                if( hasOverlap )
+                {
+                    this.addTooltipHtml( this.selectedPolyomino.id, _("This facade tile can't be placed here. It can't overlap other facade tiles."), '');
+                }
+                else if( !this.isGroundedPosition( gridCells ) )
+                {
+                    this.addTooltipHtml( this.selectedPolyomino.id, _("This facade tile can't be placed here. It needs to be supported - sitting on the lowest row or sitting on another facade tile."), '');
+                }
+                else  // Since there's only 3 reasons you can't place a tile, we assume its this last one if it's not the other two
+                {
+                    this.addTooltipHtml( this.selectedPolyomino.id, _("This facade tile can't be placed here. Since you have one less card than you need, you have to place this facade tile so it touches one of the same color."), '');
+                }*/
             } 
         },
 
         showOverlap: function( gridCells )
         {
+
+            var hasOverlap = false;
+
             for( var i = 0; i < gridCells.length; i++)
             {
                 if( !this.isCellEmpty( gridCells[i] ))
                 {
                     dojo.style(this.selectedPolyomino.overlaps[i],"display","block");
+                    hasOverlap = true;
                 }
             }
+
+            return hasOverlap;
         },
 
         hideOverlap: function()
@@ -2786,12 +2814,19 @@ function (dojo, declare) {
                 if (log && args && !args.processed) {
                     args.processed = true;
                     
-                    for ( var i in this.log_replace_keys) {
+                    for ( var i in this.preprocess_string_keys) {
 
-                        var key = this.log_replace_keys[i];
-                        if(key in args)  // only replace key if it's present
+                        var key = this.preprocess_string_keys[i];
+
+                        // HANDLE KEYS IN TITLE MESSAGES
+                        //  the strings in title messages are not passed through args, so work on the log function directly
+                        log = this.preProcessTitle( log );
+
+                        // HANDLE KEYS IN LOG MESSAGES
+                        //  keys in log messages get passed into args directly
+                        if(key in args) 
                         {  
-                            args[key] = this.postProcessLogKey(key, args); 
+                            args[key] = this.preProcessLog(key, args); 
                         }                           
                     }
 
@@ -2802,20 +2837,23 @@ function (dojo, declare) {
             return this.inherited(arguments);
         },
 
-        postProcessLogKey(key, args)
+        preProcessLog(key, args)
         {
 
             switch(key)
             {
                 case 'log_polyomino':
-                    return this.postProcessLogPolyomino( key, args );
+                    return this.preProcessLogPolyomino( key, args );
 
                 case 'log_ability_tile':
-                    return this.postProcessLogAbilityTile( key, args );
+                    return this.preProcessLogAbilityTile( key, args );
+
+                case 'title_special_facade_tile':
+                    return this.preProcessTitleFormatStringSpecialFacadeTile( key, args);
             }
         },
 
-        postProcessLogPolyomino( key, args )
+        preProcessLogPolyomino( key, args )
         {
 
             var color = args[key].split("-")[0];
@@ -2827,12 +2865,45 @@ function (dojo, declare) {
             }); 
         },
 
-        postProcessLogAbilityTile( key, args )
+        preProcessLogAbilityTile( key, args )
         {
-
             return this.format_block('jstpl_log_ability_tile',{
                 log_ability_tile: args[key],               
             }); 
+        },
+
+        preProcessTitle( title )
+        {
+
+            title = this.preProcessTitleSpecialFacadeTile( title );
+            title = this.preProcessSpecialAbilityTile( title );
+            title = this.preProcessSpecialAbilityTileUsed( title );
+
+            return title;
+        },
+
+        preProcessTitleSpecialFacadeTile( title )
+        {
+            return title.replace(
+                "${title_special_facade_tile}",
+                this.format_block('jstpl_title_special_facade_tile',{})
+            ); 
+        },
+
+        preProcessSpecialAbilityTile( title )
+        {
+            return title.replace(
+                "${title_ability_tile}",
+                this.format_block('jstpl_title_special_ability_tile',{})
+            ); 
+        },
+
+        preProcessSpecialAbilityTileUsed( title )
+        {
+            return title.replace(
+                "${title_ability_tile_used}",
+                this.format_block('jstpl_title_special_ability_tile_used',{})
+            ); 
         },
 
 
