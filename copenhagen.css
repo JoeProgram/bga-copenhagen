@@ -129,6 +129,20 @@
     opacity: 0.75; 
 }
 
+#small_mermaid_card_slot
+{
+    background-image: url('img/tiny_cards.png');
+    background-position: -28px -42px;
+
+    position:  absolute;
+    top: 41px;
+
+    display: block;
+    width: 28px;
+    height: 41px;
+}
+
+
 #small_mermaid_card
 {
     display: block;

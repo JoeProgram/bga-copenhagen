@@ -151,6 +151,8 @@ function (dojo, declare) {
             this.updateDeckDisplay(gamedatas.cards_in_deck);
 
             // MERMAID CARD
+            this.addTooltip("small_mermaid_card", _('Once the deck is empty, it will be reshuffled with this game-ending card somewhere in the bottom 10 cards'),'');
+            this.addTooltip("small_mermaid_card_slot", _('The game-ending card is shuffled somewhere in the bottom 10 cards of the deck'),'');
             if( gamedatas.mermaid_card == "deck") dojo.destroy("small_mermaid_card");
 
             // HARBOR CARDS
@@ -661,7 +663,7 @@ function (dojo, declare) {
 
         updateDeckDisplay: function( numberCardsInDeck )
         {
-            this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in deck"), "");
+            this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in the deck"), "");
             dojo.query("#copen_wrapper #deck #cards_remaining")[0].innerText = numberCardsInDeck;
         },
 

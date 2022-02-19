@@ -31,6 +31,7 @@
             <div id="deck">
                 <div id="cards_remaining" ><div>10</div> </div>
             </div>
+            <div id="small_mermaid_card_slot"></div>
             <div id="small_mermaid_card"></div>
         </div>
 
