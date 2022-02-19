@@ -748,6 +748,16 @@ function (dojo, declare) {
             this.addTooltipToClass('copen_both_actions', _("Both actions: You can take cards and place a facade tile this turn"), "");
         },
 
+        // IMMEDIATELY CLOSE TOOLTIPS
+        //  tooltips and dragging don't play together well
+        hideTooltip() { 
+            var node = dojo.byId("dijit__MasterTooltip_0");
+            if( node )
+            {
+                dojo.addClass( node ,"copen_hidden");  
+            } 
+        },
+
         makeHarborCard: function( cardData )
         {
                 var cardHtml = this.format_block('jstpl_card',{   // make the html in memory
@@ -1148,9 +1158,10 @@ function (dojo, declare) {
                 dojo.addClass( "confirm_polyomino_placement", "copen_button_disabled");
                 var hasOverlap = this.showOverlap( gridCells );
 
+                console.log( this.tooltips);
+
                 // LEAVE A HELPFUL TOOLTIP
                 // tooltips are going currently preventing dragging
-                /*
                 if( hasOverlap )
                 {
                     this.addTooltipHtml( this.selectedPolyomino.id, _("This facade tile can't be placed here. It can't overlap other facade tiles."), '');
@@ -1162,7 +1173,12 @@ function (dojo, declare) {
                 else  // Since there's only 3 reasons you can't place a tile, we assume its this last one if it's not the other two
                 {
                     this.addTooltipHtml( this.selectedPolyomino.id, _("This facade tile can't be placed here. Since you have one less card than you need, you have to place this facade tile so it touches one of the same color."), '');
-                }*/
+                }
+
+                // SLOW DOWN HOW FAST THIS TOOLTIP COMES UP
+                //  I found the default speed was too fast,
+                //  and passing the parameter into addTooltipHtml didn't work
+                this.tooltips[ this.selectedPolyomino.id ].showDelay = 1000;
             } 
         },
 
@@ -2090,7 +2106,6 @@ function (dojo, declare) {
 
         onDragStartPolyomino: function( event )
         {
-            dojo.query("html").addClass("draggable-cursor");
 
             var target = event.currentTarget ?? event.customTarget;
 
@@ -2112,6 +2127,8 @@ function (dojo, declare) {
 
             this.hideOverlap();
             
+            this.hideTooltip();
+            this.removeTooltip( this.selectedPolyomino.id);
 
             var adjustedClientXY = this.adjustPositionBasedOnZoom( event.clientX, event.clientY);
             this.dragPositionLastFrame = {x: adjustedClientXY.x, y:adjustedClientXY.y};
