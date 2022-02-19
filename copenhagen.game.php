@@ -1542,25 +1542,40 @@ class Copenhagen extends Table
 
     function stCalculateScore()
     {
+        $player_id = self::getActivePlayerId();
+        $player_name = self::getActivePlayerName();
+        
+        $player = self::getObjectFromDB( "SELECT * FROM player WHERE player_id=$player_id");
+        $previous_points = $player['player_score'];
+
         $points = 0;
 
-        $player_id = self::getActivePlayerId();
+
 
         $playerboard = $this->getPlayerboard( $player_id );
 
         for( $x = 0; $x < $this->board_width; $x++) $points += ( $this->getColumnPoints($x, $playerboard));
         for( $y = 0; $y < $this->board_height; $y++) $points += ( $this->getRowPoints($y, $playerboard));
 
-        self::DbQuery( "UPDATE player SET player_score=$points WHERE player_id=$player_id;" );
+        if( $points != $previous_points )
+        {
 
-        self::notifyAllPlayers( 
-            "updateScore", 
-            "",
-            array(
-                "score" => $points,
-                "player_id" => $player_id,
-            )   
-        );
+            $point_difference = $points - $previous_points;
+
+            self::DbQuery( "UPDATE player SET player_score=$points WHERE player_id=$player_id;" );
+
+            self::notifyAllPlayers( 
+                "updateScore", 
+                clienttranslate('${player_name} earns ${point_difference} point(s)'),
+                array(
+                    "score" => $points,
+                    "player_id" => $player_id,
+
+                    "player_name" => $player_name,
+                    "point_difference" => $point_difference,
+                )   
+            );
+        }
 
         // CHECK IF THEY CROSSED THE ENDGAME SCORE THRESHOLD
         if( $points >= $this->end_of_game_points )
