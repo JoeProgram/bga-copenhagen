@@ -741,11 +741,13 @@ function (dojo, declare) {
         //  which means we need to hook up the tooltips to the new nodes
         updateSpecialAbilityTooltips: function()
         {
-            this.addTooltipToClass('copen_any_cards', _("Any cards: The cards you take don't have to be next to each other"), "");
-            this.addTooltipToClass('copen_additional_card', _("Additional card: You can take a third card from anywhere."), "");
-            this.addTooltipToClass('copen_construction_discount', _("Construction Discount: Discard 1 less card when you place a facade tile"), "");
-            this.addTooltipToClass('copen_change_of_colors', _("Change of colors: Treat ALL cards of one color in your hand as a different color"), "");
-            this.addTooltipToClass('copen_both_actions', _("Both actions: You can take cards and place a facade tile this turn"), "");
+            this.addTooltipHtmlToClass('copen_any_cards', _("Any cards: The cards you take don't have to be next to each other"), "");
+            this.addTooltipHtmlToClass('copen_additional_card', _("Additional card: You can take a third card from anywhere."), "");
+            this.addTooltipHtmlToClass('copen_construction_discount', _("Construction Discount: Discard 1 less card when you place a facade tile"), "");
+            this.addTooltipHtmlToClass('copen_change_of_colors', _("Change of colors: Treat ALL cards of one color in your hand as a different color"), "");
+            this.addTooltipHtmlToClass('copen_both_actions', _("Both actions: You can take cards and place a facade tile this turn"), "");
+
+            console.log( this.tooltips);
         },
 
         // IMMEDIATELY CLOSE TOOLTIPS
