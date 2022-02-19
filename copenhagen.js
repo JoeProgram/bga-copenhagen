@@ -151,7 +151,7 @@ function (dojo, declare) {
             this.updateDeckDisplay(gamedatas.cards_in_deck);
 
             // MERMAID CARD
-            if( gamedatas.mermaid_card == "deck") dojo.style("small_mermaid_card","display","none");
+            if( gamedatas.mermaid_card == "deck") dojo.destroy("small_mermaid_card");
 
             // HARBOR CARDS
             for( var card_id in gamedatas.harbor )
@@ -661,18 +661,77 @@ function (dojo, declare) {
 
         updateDeckDisplay: function( numberCardsInDeck )
         {
-            if( numberCardsInDeck == 0 ) dojo.style("deck","display","none");
-            else dojo.style("deck","display","block");
             this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in deck"), "");
-
             dojo.query("#copen_wrapper #deck #cards_remaining")[0].innerText = numberCardsInDeck;
         },
 
         isSmallMermaidCardVisible: function()
         {
             var query = dojo.query("#copen_wrapper #small_mermaid_card");
-            if( query.length == 0 ) return false;
-            return dojo.getStyle(query[0], "display") != "none";
+            return query.length != 0 ;
+        },
+
+        playShuffleDeckAnimation: function( numberOfCards )
+        {
+            var numberOfCardsMinusOne = numberOfCards - 1;
+
+            dojo.style("deck","display","none");
+
+            var game = this;
+            setTimeout( function(){
+
+                for( let i = 0; i < 10; i++ )
+                {
+                    setTimeout( function(){
+
+                        var node = dojo.place( game.format_block('jstpl_deck_shuffle_card',{"id": i}), 'deck_cards', "first" );
+                        dojo.style( node.id, "opacity", 0 );
+
+                        dojo.animateProperty({
+                            node: node,
+                            properties: {
+                                opacity: 1,
+                                duration: 500,
+                            },
+                            onEnd: function(){
+
+                                if( i == 0 )
+                                {
+                                    dojo.style("deck", "display", "block");
+
+                                    
+                                    var animation = dojo.animateProperty({
+                                        node: "deck",
+                                        duration: 1000,
+                                        properties: 
+                                        {
+                                            count: {start: 0, end: numberOfCardsMinusOne },
+
+                                        },
+                                        onAnimate: function (values) {
+                                            dojo.byId("cards_remaining").innerText = parseInt(values.count.replace("px",""));
+                                        },
+                                        onEnd: function() {
+
+                                            game.slideToObjectAndDestroy("small_mermaid_card", "deck_cards", 500, 0 );
+                                            dojo.style("small_mermaid_card", "z-index", 0);
+                                            setTimeout( function(){
+                                                game.updateDeckDisplay( numberOfCards );  
+                                            }, 500);
+
+                                        }
+                                    }).play();
+                                }
+                            }
+                        }).play();
+
+                        game.placeOnObjectPos( node.id, "deck_cards", 0, -60 );
+                        game.slideToObjectAndDestroy( node.id, "deck_cards", 500, 0 );
+                        dojo.style( node.id, "z-index", 0 );
+                    }, i * 100);
+                }
+            }, 750);
+
         },
 
         // REAPPLY TOOLTIPS TO SPECIAL ABILITIES
@@ -2410,6 +2469,7 @@ function (dojo, declare) {
 
             if( !this.checkAction('activateAbilityAnyCards')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+            if( dojo.hasClass( event.currentTarget, "copen_activated")) return; // don't re-activate
 
             this.ajaxcall( "/copenhagen/copenhagen/activateAbilityAnyCards.html",
             {
@@ -2425,6 +2485,7 @@ function (dojo, declare) {
 
             if( !this.checkAction('activateAbilityAdditionalCard')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+            if( dojo.hasClass( event.currentTarget, "copen_activated")) return; // don't re-activate
 
             this.ajaxcall( "/copenhagen/copenhagen/activateAbilityAdditionalCard.html",
             {
@@ -2440,6 +2501,7 @@ function (dojo, declare) {
 
             if( !this.checkAction('activateAbilityBothActions')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+            if( dojo.hasClass( event.currentTarget, "copen_activated")) return; // don't re-activate
 
             this.ajaxcall( "/copenhagen/copenhagen/activateAbilityBothActions.html",
             {
@@ -2455,6 +2517,7 @@ function (dojo, declare) {
 
             if( !this.checkAction('activateAbilityConstructionDiscount')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+            if( dojo.hasClass( event.currentTarget, "copen_activated")) return; // don't re-activate
 
             this.ajaxcall( "/copenhagen/copenhagen/activateAbilityConstructionDiscount.html",
             {
@@ -2471,6 +2534,7 @@ function (dojo, declare) {
             // VALIDATION
             if( !this.checkAction('activateAbilityChangeOfColors')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
+            if( dojo.hasClass( event.currentTarget, "copen_activated")) return; // don't re-activate
             if( dojo.query("#copen_wrapper #cards_in_hand .copen_card").length == 0 ) return; // can't use if you have no cards in hand
             
 
@@ -2674,10 +2738,16 @@ function (dojo, declare) {
 
             if( notif.args.mermaid_card == "deck" && dojo.query("#copen_wrapper #small_mermaid_card").length > 0)
             {
-                this.slideToObjectAndDestroy( "small_mermaid_card", "deck");
+                var game = this;
+                setTimeout( function(){
+                    game.playShuffleDeckAnimation( notif.args.cards_in_deck );
+                }, 200);
             } 
-
-            this.updateDeckDisplay( notif.args.cards_in_deck);
+            else
+            {
+              this.updateDeckDisplay( notif.args.cards_in_deck);  
+            }
+            
         },
 
         notif_placePolyomino: function(notif)

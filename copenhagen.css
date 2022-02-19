@@ -95,9 +95,15 @@
     position: absolute;
     width: 28px;
     display: block;
+    height:  41px;
 }
 
-#deck
+#deck{
+    z-index: 1;
+}
+
+#deck,
+.deck_shuffle_card
 {
     display: block;
     width: 28px;
@@ -147,6 +153,7 @@
 #harbor_cards .copen_card
 {
     top: 0px;
+    z-index: 2; 
 }
 
 #harbor_cards .copen_card:hover

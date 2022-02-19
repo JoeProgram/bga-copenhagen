@@ -235,6 +235,8 @@ var jstpl_title_special_ability_tile =      '<div class="copen_title_ability_til
 var jstpl_title_special_ability_tile_used = '<div class="copen_title_ability_tile_used"></div>';
 var jstpl_title_special_facade_tile =       '<div class="copen_title_polyomino"></div>';
 
+var jstpl_deck_shuffle_card = '<div id="deck_shuffle_card_${id}" class="deck_shuffle_card"></div>';
+
 </script>  
 
 {OVERALL_GAME_FOOTER}
