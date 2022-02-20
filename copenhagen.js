@@ -272,6 +272,7 @@ function (dojo, declare) {
 
             // TOOLTIPS
             this.updateSpecialAbilityTooltips();
+            this.updatePolyominoStackTooltips();
             
             this.determineTopPolyominoInEveryStack();
 
@@ -748,6 +749,39 @@ function (dojo, declare) {
             this.addTooltipHtmlToClass('copen_both_actions', _("Both actions: You can take cards and place a facade tile this turn"), "");
         },
 
+        updatePolyominoStackTooltips: function()
+        {
+
+            var stackQuery = dojo.query('.copen_stack');
+            var totalWhitePolyominoesRemaining = 0;
+
+            for( var i = 0; i < stackQuery.length; i++)
+            {
+                var color = stackQuery[i].id.split('-')[0];
+                var tilesInStack = stackQuery[i].children.length;
+
+                if( color != "white")
+                {
+                    this.addTooltipHtml(stackQuery[i].id,_(`${tilesInStack} ${color} facade tile(s)`),'');
+                    this.tooltips[stackQuery[i].id].showDelay = 500;
+                }
+                else
+                {
+                    totalWhitePolyominoesRemaining += tilesInStack;
+                }
+            }
+
+            // SPECIAL COUNT FOR WHITE
+            //  It's probably a little more useful just to count all the tiles, rather than each individual stack
+            for( var i = 1; i <= 4; i++)
+            {
+                var stackId = `white-1_stack_${i}`;
+                this.addTooltipHtml(stackId,_(`${totalWhitePolyominoesRemaining} ${color} facade tile(s)`),'');
+                this.tooltips[stackId].showDelay = 500;
+            }
+
+        },
+
         // IMMEDIATELY CLOSE TOOLTIPS
         //  tooltips and dragging don't play together well
         hideTooltip() { 
@@ -868,53 +902,6 @@ function (dojo, declare) {
                 game.splayCardsInHand();
             }, 500);
         },
-
-        // ORPHANED
-        //  keeping it around in case I want to put it back
-        /*
-        announceCardsRemainingInDeck: function( cardsRemaining )
-        {
-
-            var cardsRemainingNode = dojo.query("#copen_wrapper #cards_remaining")[0];
-
-            // MAKE SURE IT'S CHANGED
-            if(parseInt(cardsRemainingNode.innerText) == cardsRemaining) return;            
-
-            cardsRemainingNode.innerText = cardsRemaining;
-
-            // RESET VALUES FROM PREVIOUS ANIMATION (IF ANY)
-            dojo.style(cardsRemainingNode, "opacity", "");
-            dojo.style(cardsRemainingNode, "font-size", "");
-            dojo.style(cardsRemainingNode, "margin-top", "");
-
-            // ANIMATION
-            var animation = dojo.animateProperty({
-                node: cardsRemainingNode,
-                properties: {
-                    opacity: 1,
-                    duration: 1000,
-                    fontSize: {end: 40, units: "pt"}, // note you use camelCase, and not dashes
-                    marginTop: {end: -10, units: "px"}
-                },
-                onEnd: function(){
-                    try{
-                        dojo.animateProperty({
-                            delay: 250,
-                            node: cardsRemainingNode,
-                            properties: {
-                                opacity: 0,
-                            }
-                        }).play();
-                    } catch (error) {
-                        // bubble up errors that otherwise would be silent
-                        console.error(error);
-                    }
-                }
-            })
-            animation.play();
-
-        },
-        */
 
         determineTopPolyominoInEveryStack: function()
         {
@@ -2790,6 +2777,10 @@ function (dojo, declare) {
                 this.connectDraggingEventsToPolyomino( newTopOfStack );
             }
 
+            // UPDATE STACK TOOLTIPS
+            this.updatePolyominoStackTooltips();
+
+            // CLEAN UP POSITION UI
             if( this.player_id == notif.args.player_id)
             {
               this.fadeOutPolyominoPlacementUI(); // NOTE: this needs to come after polyomino placement, or it messes up where the polyomino ends up

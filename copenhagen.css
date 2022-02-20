@@ -280,17 +280,26 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 
 
+.copen_stack { position: absolute; }
+.copen_stack .copen_polyomino { position: absolute; }
+.copen_stack .copen_polyomino:nth-child(1) { left: 0px; top: 4px; }
+.copen_stack .copen_polyomino:nth-child(2) { left: 2px; top: 2px; }
+.copen_stack .copen_polyomino:nth-child(3) { left: 4px; top: 0px; }
+
+
+
+#purple-2_stack { left: 0px; top: 0px; }
+
 .copen_purple-2  
 {
     width: 68px;
     height: 34px;
 }
+
 .copen_purple-2 .copen_polyomino_image { background-position: 0px -212px; }
 
-#purple-2_1{ left: 0px; top: 4px; }
-#purple-2_2{ left: 2px; top: 2px; }
-#purple-2_3{ left: 4px; top: 0px; }
 
+#purple-3_stack { left: 74px; top: 0px; }
 .copen_purple-3
 {
     width: 102px;
@@ -298,34 +307,24 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_purple-3 .copen_polyomino_image { background-position: 0px -176px; }
 
-#purple-3_1{ left: 74px; top: 4px; }
-#purple-3_2{ left: 76px; top: 2px; }
-#purple-3_3{ left: 78px; top: 0px; }
 
+#purple-4_stack { left: 181px; top: 0px; }
 .copen_purple-4
 {
     width: 136px;
     height: 34px;
-
-    left: 181px;
-    top: 4px;
 }
 .copen_purple-4 .copen_polyomino_image { background-position: -312px 0px; }
 
-#purple-4_1{ left: 181px; top: 4px; }
-#purple-4_2{ left: 183px; top: 2px; }
-#purple-4_3{ left: 185px; top: 0px; }
-
+#purple-5_stack { left: 322px; top: 0px; }
 .copen_purple-5
 {
     width: 170px;
     height: 34px;
-
-    left: 322px;
-    top: 4px;
 }
 .copen_purple-5 .copen_polyomino_image { background-position: -208px -176px; }
 
+#green-2_stack { left: 0px; top: 41px; }
 .copen_green-2
 {
     width: 68px;
@@ -333,10 +332,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_green-2 .copen_polyomino_image { background-position: -70px -212px; }
 
-#green-2_1{ left: 0px; top: 45px; }
-#green-2_2{ left: 2px; top: 43px; }
-#green-2_3{ left: 4px; top: 41px; }
-
+#green-3_stack { left: 74px; top: 41px; }
 .copen_green-3
 {
     width: 102px;
@@ -344,10 +340,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_green-3 .copen_polyomino_image { background-position: -104px -176px; }
 
-#green-3_1{ left: 74px; top: 45px; }
-#green-3_2{ left: 76px; top: 43px; }
-#green-3_3{ left: 78px; top: 41px; }
-
+#green-4_stack { left: 181px; top: 41px; }
 .copen_green-4
 {
     width: 102px;
@@ -355,20 +348,15 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_green-4 .copen_polyomino_image { background-position: -104px -106px; }
 
-#green-4_1{ left: 181px; top: 45px; }
-#green-4_2{ left: 183px; top: 43px; }
-#green-4_3{ left: 185px; top: 41px; }
-
+#green-5_stack { left: 293px; top: 41px; }
 .copen_green-5
 {
     width: 102px;
     height: 102px;
-
-    top: 45px;
-    left: 293px;
 }
 .copen_green-5 .copen_polyomino_image { background-position: -104px 0px; }
 
+#red-2_stack { left: 0px; top: 132px; }
 .copen_red-2
 {
     width: 68px;
@@ -376,10 +364,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_red-2 .copen_polyomino_image { background-position: -140px -212px; }
 
-#red-2_1{ left: 0px; top: 136px; }
-#red-2_2{ left: 2px; top: 134px; }
-#red-2_3{ left: 4px; top: 132px; }
-
+#red-3_stack { left: 74px; top: 132px; }
 .copen_red-3
 {
     width: 68px;
@@ -387,10 +372,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_red-3 .copen_polyomino_image { background-position: -382px -36px; }
 
-#red-3_1{ left: 74px; top: 136px; }
-#red-3_2{ left: 76px; top: 134px; }
-#red-3_3{ left: 78px; top: 132px; }
-
+#red-4_stack { left: 148px; top: 132px; }
 .copen_red-4
 {
     width: 68px;
@@ -398,20 +380,15 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_red-4 .copen_polyomino_image { background-position: -450px -176px; }
 
-#red-4_1{ left: 148px; top: 136px; }
-#red-4_2{ left: 150px; top: 134px; }
-#red-4_3{ left: 152px; top: 132px; }
-
+#red-5_stack { left: 223px; top: 132px; }
 .copen_red-5
 {
     width: 102px;
     height: 68px;
-
-    top: 136px;
-    left: 223px;
 }
 .copen_red-5 .copen_polyomino_image { background-position: 0px -106px; }
 
+#blue-2_stack { left: 0px; top: 209px; }
 .copen_blue-2
 {
     width: 68px;
@@ -419,10 +396,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_blue-2 .copen_polyomino_image { background-position: -210px -212px; }
 
-#blue-2_1{ left: 0px; top: 213px; }
-#blue-2_2{ left: 2px; top: 211px; }
-#blue-2_3{ left: 4px; top: 209px; }
-
+#blue-3_stack { left: 74px; top: 209px; }
 .copen_blue-3
 {
     width: 68px;
@@ -430,10 +404,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_blue-3 .copen_polyomino_image { background-position: -312px -36px; }
 
-#blue-3_1{ left: 74px; top: 213px; }
-#blue-3_2{ left: 76px; top: 211px; }
-#blue-3_3{ left: 78px; top: 209px; }
-
+#blue-4_stack { left: 169px; top: 209px; }
 .copen_blue-4
 {
     width: 102px;
@@ -441,20 +412,16 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_blue-4 .copen_polyomino_image { background-position: -208px -106px; }
 
-#blue-4_1{ left: 169px; top: 213px; }
-#blue-4_2{ left: 171px; top: 211px; }
-#blue-4_3{ left: 173px; top: 209px; }
 
+#blue-5_stack { left: 293px; top: 179px; }
 .copen_blue-5
 {
     width: 102px;
     height: 102px;
-
-    top: 183px;
-    left: 293px;
 }
 .copen_blue-5 .copen_polyomino_image { background-position: -208px 0px; }
 
+#yellow-2_stack { left: 0px; top: 307px; }
 .copen_yellow-2
 {
     width: 68px;
@@ -462,10 +429,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_yellow-2 .copen_polyomino_image {background-position: -280px -212px; }
 
-#yellow-2_1{ left: 0px; top: 311px; }
-#yellow-2_2{ left: 2px; top: 309px; }
-#yellow-2_3{ left: 4px; top: 307px; }
-
+#yellow-3_stack { left: 74px; top: 307px; }
 .copen_yellow-3
 {
     width: 68px;
@@ -473,10 +437,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_yellow-3 .copen_polyomino_image {background-position: -380px -176px; }
 
-#yellow-3_1{ left: 74px; top: 311px; }
-#yellow-3_2{ left: 76px; top: 309px; }
-#yellow-3_3{ left: 78px; top: 307px; }
-
+#yellow-4_stack { left: 169px; top: 307px; }
 .copen_yellow-4
 {
     width: 102px;
@@ -484,19 +445,23 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_yellow-4 .copen_polyomino_image {background-position: -312px -106px; }
 
-#yellow-4_1{ left: 169px; top: 311px; }
-#yellow-4_2{ left: 171px; top: 309px; }
-#yellow-4_3{ left: 173px; top: 307px; }
 
+#yellow-5_stack { left: 293px; top: 274px; }
 .copen_yellow-5
 {
     width: 102px;
     height: 102px;
-
-    left: 293px;
-    top:  279px;
 }
 .copen_yellow-5 .copen_polyomino_image {background-position: 0px 0px; }
+
+
+#white-1_stack_1 { left: 258px; top: 396px; }
+#white-1_stack_2 { left: 292px; top: 396px; }
+#white-1_stack_3 { left: 326px; top: 396px; }
+#white-1_stack_4 { left: 361px; top: 396px; }
+.copen_stack .copen_white_polyomino:nth-child(1){ z-index: 1; }
+.copen_stack .copen_white_polyomino:nth-child(2){ z-index: 2; }
+.copen_stack .copen_white_polyomino:nth-child(3){ z-index: 3; }
 
 .copen_white-1
 {
@@ -504,19 +469,6 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     height: 34px;  
 }
 .copen_white-1 .copen_polyomino_image {background-position: -416px -106px; }
-
-#white-1_1{ left: 258px; top: 400px; z-index: 1;}
-#white-1_2{ left: 260px; top: 398px; z-index: 2;}
-#white-1_3{ left: 262px; top: 396px; z-index: 3;}
-#white-1_4{ left: 292px; top: 400px; z-index: 1;}
-#white-1_5{ left: 294px; top: 398px; z-index: 2;}
-#white-1_6{ left: 296px; top: 396px; z-index: 3;}
-#white-1_7{ left: 326px; top: 400px; z-index: 1;}
-#white-1_8{ left: 329px; top: 398px; z-index: 2;}
-#white-1_9{ left: 330px; top: 396px; z-index: 3;}
-#white-1_10{ left: 361px; top: 400px; z-index: 1;}
-#white-1_11{ left: 363px; top: 398px; z-index: 2;}
-#white-1_12{ left: 365px; top: 396px; z-index: 3;}
 
 
 .copen_player_area
@@ -532,7 +484,6 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     display: block;
     position: absolute;
 
-    /*background-color:  rgba(255,255,255,0.5);*/
     top: 184px;
     left: 430px;
     width: 66px;
