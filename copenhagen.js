@@ -217,15 +217,19 @@ function (dojo, declare) {
                     rotation: polyomino.rotation,              
                 }); 
 
+                var polyominoNode = null;
                 if( polyomino.owner == null )
                 {
-                    dojo.place( polyominoHtml, this.getStackIdFromPolyominoId( `${polyomino.color}-${polyomino.squares}_${polyomino.copy}`));
+                    polyominoNode = dojo.place( polyominoHtml, this.getStackIdFromPolyominoId( `${polyomino.color}-${polyomino.squares}_${polyomino.copy}`));
                 }
                 else
                 {
                     dojo.place( polyominoHtml, `player_${polyomino.owner}_playerboard`);
-                    this.placePolyomino( polyomino ); 
+                    polyominoNode = this.placePolyomino( polyomino ); 
                 }
+
+                this.addColorblindSquares( polyominoNode );
+
             }
 
             // ABILITY TILES
@@ -974,6 +978,32 @@ function (dojo, declare) {
                 if( cardsOfColor >= cost ) dojo.addClass( polyomino, "copen_usable");
                 else dojo.addClass(polyomino, "copen_unusable");
             });
+        },
+
+        // ADD SQUARES TO THE SHAPES THAT WE CAN STYLE FOR COLORBLIND MODE
+        addColorblindSquares: function( polyominoNode )
+        {
+
+            var color = this.getPolyominoColorFromId( polyominoNode.id );
+            var squares = this.getPolyominoSquaresFromId( polyominoNode.id );
+
+            var shape = this.polyominoShapes[`${color}-${squares}`];
+            
+
+
+            if( squares == 2 )
+            {
+                for( var i = 0; i < squares; i++)
+                {
+                    var squareNode = dojo.place(`<div id="${polyominoNode.id}_square_${i}" class="copen_square"></div>`, polyominoNode);
+
+                    //console.log("add colorblind squares");
+                    //console.log( squareNode );
+                    //console.log( polyominoNode );
+
+                    dojo.style( squareNode, "left", `${i * this.cellMeasurement }px` );
+                }
+            }
         },
 
         createPositionPolyominoButtons: function()
@@ -1729,6 +1759,7 @@ function (dojo, declare) {
             this.attachToNewParent( polyominoNodeId, `player_${polyominoData.owner}_playerboard`);
             this.slideToObjectPos( polyominoNodeId, boardCellNode, htmlPlacement.htmlX, htmlPlacement.htmlY, 500 ).play();
 
+            return dojo.byId( polyominoNodeId ); // since we attachToNewParent, that destroys the old node - so let's be kind and return the new
         },
 
         // get a copy of the shape,

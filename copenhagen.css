@@ -1012,4 +1012,33 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     padding-top: 10px;
 }
 
+/****************** COLORBLIND SUPPORT ******************/
 
+.copen_colorblind .copen_polyomino .copen_square
+{
+
+    display: block;
+    width: 34px;
+    height: 34px;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+}
+
+.copen_colorblind .copen_polyomino.copen_green_polyomino .copen_square
+{
+    background-image:  url('img/colorblind_symbols.png');
+    background-position: -68px 0px;
+}
+
+.copen_colorblind .copen_polyomino.copen_red_polyomino .copen_square
+{
+    background-image:  url('img/colorblind_symbols.png');
+    background-position: -34px 0px;
+}
+
+.copen_colorblind .copen_polyomino.copen_blue_polyomino .copen_square
+{
+    background-image:  url('img/colorblind_symbols.png');
+    background-position: -0px 0px;
+}

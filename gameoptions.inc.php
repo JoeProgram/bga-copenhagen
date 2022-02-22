@@ -53,6 +53,20 @@ $game_options = array(
 
     */
 
+); 
+
+$game_preferences = array(
+
+    100 => array(
+        'name' => totranslate('Colorblind Support'),
+        'needReload' => true, 
+        'values' => array(
+            1 => array('name' => totranslate('Off'), 'cssPref' => ''),
+            2 => array('name' => totranslate('On'), 'cssPref' => 'copen_colorblind'),
+        ),
+        'default' => 1,
+    ),
+
 );
 
 
