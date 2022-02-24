@@ -1025,20 +1025,90 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     left: 0px;
 }
 
-.copen_colorblind .copen_polyomino.copen_green_polyomino .copen_square
+
+.copen_colorblind .copen_polyomino_image
 {
-    background-image:  url('img/colorblind_symbols.png');
-    background-position: -68px 0px;
+    background-image: url('img/polyominoes_colorblind.png');
 }
 
-.copen_colorblind .copen_polyomino.copen_red_polyomino .copen_square
+.copen_colorblind .copen_card,
+.copen_colorblind .copen_new_color
 {
-    background-image:  url('img/colorblind_symbols.png');
-    background-position: -34px 0px;
+    background-image:  url('img/cards_colorblind.png');
 }
 
-.copen_colorblind .copen_polyomino.copen_blue_polyomino .copen_square
+
+.copen_colorblind .copen_green_polyomino,
+.copen_colorblind .copen_green_card
 {
-    background-image:  url('img/colorblind_symbols.png');
-    background-position: -0px 0px;
+    filter: saturate(2);  
+}
+
+.copen_colorblind .copen_green_polyomino.copen_usable:hover,
+.copen_colorblind .copen_green_card.copen_usable:hover
+{
+    filter: saturate(2)  drop-shadow(0px 0px 5px white);  
+}
+
+.copen_colorblind .copen_green_polyomino.copen_unusable:hover,
+.copen_colorblind .copen_green_card.copen_unusable:hover
+{
+    filter: saturate(2)  drop-shadow(0px 0px 5px red);  
+}
+
+
+
+.copen_colorblind .copen_red_polyomino,
+.copen_colorblind .copen_red_card
+{
+    filter: saturate(4);  
+}
+
+.copen_colorblind .copen_red_polyomino.copen_usable:hover,
+.copen_colorblind .copen_red_card.copen_usable:hover
+{
+    filter: saturate(4) drop-shadow(0px 0px 5px white);  
+}
+.copen_colorblind .copen_red_polyomino.copen_unusable:hover,
+.copen_colorblind .copen_red_card.copen_unusable:hover
+{
+    filter: saturate(4) drop-shadow(0px 0px 5px red);  
+}
+
+
+
+.copen_colorblind .copen_purple_polyomino,
+.copen_colorblind .copen_purple_card
+{
+    filter: saturate(3) brightness(0.8) contrast(1.5);   
+}
+
+.copen_colorblind .copen_purple_polyomino.copen_usable:hover,
+.copen_colorblind .copen_purple_card.copen_usable:hover
+{
+    filter: saturate(3) brightness(0.8) contrast(1.5) drop-shadow(0px 0px 5px white);   
+}
+
+.copen_colorblind .copen_purple_polyomino.copen_unusable:hover,
+.copen_colorblind .copen_purple_card.copen_unusable:hover
+{
+    filter: saturate(3) brightness(0.8) contrast(1.5) drop-shadow(0px 0px 5px red);   
+}
+
+.copen_colorblind .copen_blue_polyomino,
+.copen_colorblind .copen_blue_card
+{
+    filter: saturate(1.5) contrast(1.2);   
+}
+
+.copen_colorblind .copen_blue_polyomino.copen_usable:hover,
+.copen_colorblind .copen_blue_card.copen_usable:hover
+{
+    filter: saturate(1.5) contrast(1.2) drop-shadow(0px 0px 5px white);   
+}
+
+.copen_colorblind .copen_blue_polyomino.copen_unusable:hover,
+.copen_colorblind .copen_blue_card.copen_unusable:hover
+{
+    filter: saturate(1.5) contrast(1.2) drop-shadow(0px 0px 5px red);   
 }
