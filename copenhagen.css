@@ -1014,18 +1014,6 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 
 /****************** COLORBLIND SUPPORT ******************/
 
-.copen_colorblind .copen_polyomino .copen_square
-{
-
-    display: block;
-    width: 34px;
-    height: 34px;
-    position: absolute;
-    top: 0px;
-    left: 0px;
-}
-
-
 .copen_colorblind .copen_polyomino_image
 {
     background-image: url('img/polyominoes_colorblind.png');
@@ -1112,3 +1100,6 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 {
     filter: saturate(1.5) contrast(1.2) drop-shadow(0px 0px 5px red);   
 }
+
+/*
+.copen_colorblind .copen_playerboard_color_e2474a{ filter: saturate(2); } /* red */
