@@ -530,12 +530,25 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     background-image:  url('img/playerboards.png');
 }
 
-.copen_playerboard_color_3785bd{ background-position: 0px 0px; }     /* blue */
-.copen_playerboard_color_3da045{ background-position: -460px 0px; }  /* green */
-.copen_playerboard_color_e2474a{ background-position: -690px 0px; }  /* red */
+.copen_playerboard .copen_playerboard_image
+{
+    display: block;
+    width: 230px;
+    height: 425px;
 
-.copen_playerboard_color_fbcc3c, /* deprecated */
-.copen_playerboard_color_d7b03b
+    position:  absolute;
+    top:  0px;
+    left: 0px;
+
+    background-image:  url('img/playerboards.png');
+}
+
+.copen_playerboard_color_3785bd .copen_playerboard_image{ background-position: 0px 0px; }     /* blue */
+.copen_playerboard_color_3da045 .copen_playerboard_image{ background-position: -460px 0px; }  /* green */
+.copen_playerboard_color_e2474a .copen_playerboard_image{ background-position: -690px 0px; }  /* red */
+
+.copen_playerboard_color_fbcc3c .copen_playerboard_image, /* deprecated */
+.copen_playerboard_color_d7b03b .copen_playerboard_image
 { background-position: -230px 0px; }  /* yellow */
 
 
@@ -1101,5 +1114,8 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     filter: saturate(1.5) contrast(1.2) drop-shadow(0px 0px 5px red);   
 }
 
-/*
-.copen_colorblind .copen_playerboard_color_e2474a{ filter: saturate(2); } /* red */
+
+.copen_colorblind .copen_playerboard_color_e2474a .copen_playerboard_image  /* red */
+{ 
+        filter: saturate(4); 
+} 

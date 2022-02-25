@@ -97,6 +97,8 @@
             <!-- BEGIN owned -->
             <div id="player_{ID}_playerboard" class="copen_playerboard">
             
+                <div class="copen_playerboard_image"></div>
+
                 <div class="copen_coat_of_arms_emblems">
                     <div id="copen_coat_of_arms_1_{ID}" class="copen_coat_of_arms copen_coat_of_arms_1"></div>
                     <div id="copen_coat_of_arms_2_{ID}" class="copen_coat_of_arms copen_coat_of_arms_2"></div>
@@ -159,6 +161,9 @@
                 <div id="player_area_{ID}" class="copen_player_area">
 
                     <div id="player_{ID}_playerboard" class="copen_playerboard copen_playerboard_color_{COLOR}">
+
+                        <div class="copen_playerboard_image"></div>
+
                         <div class="copen_coat_of_arms_emblems">
                             <div id="copen_coat_of_arms_1_{ID}" class="copen_coat_of_arms copen_coat_of_arms_1"></div>
                             <div id="copen_coat_of_arms_2_{ID}" class="copen_coat_of_arms copen_coat_of_arms_2"></div>
