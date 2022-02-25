@@ -1517,7 +1517,7 @@ class Copenhagen extends Table
 
         self::notifyAllPlayers( 
             "refillHarbor", 
-            "",
+            clienttranslate('The discard pile has been shuffled into the deck, with the game-ending card somewhere in the bottom 10 cards'),
             array(
                 "harbor" => $cards,
                 "cards_in_deck" => $this->cards->countCardInLocation("deck"),
