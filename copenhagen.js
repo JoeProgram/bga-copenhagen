@@ -50,6 +50,8 @@ function (dojo, declare) {
             this.adjacentOffsets = [{x:1,y:0}, {x:0,y:-1}, {x:-1,y:0}, {x:0,y:1}];
 
             this.whitePolyominosPerStack = 3;
+            this.mermaidCardWarningThreshold = 10;
+            this.mermaidCardWarningAnimation = null;
 
             // keys in the log that we do custom pre-processing on
             this.preprocess_string_keys = [
@@ -147,13 +149,14 @@ function (dojo, declare) {
             this.cellToPlacePolyomino = null;
             this.discardHandlers = [];
 
-            // DECK
-            this.updateDeckDisplay(gamedatas.cards_in_deck);
-
             // MERMAID CARD
             this.addTooltip("small_mermaid_card", _('Once the deck is empty, it will be reshuffled with this game-ending card somewhere in the bottom 10 cards'),'');
             this.addTooltip("small_mermaid_card_slot", _('The game-ending card is shuffled somewhere in the bottom 10 cards of the deck'),'');
             if( gamedatas.mermaid_card == "deck") dojo.destroy("small_mermaid_card");
+
+            // DECK
+            //  needs to come after mermaid card, since it checks the state of it
+            this.updateDeckDisplay(gamedatas.cards_in_deck);
 
             // HARBOR CARDS
             for( var card_id in gamedatas.harbor )
@@ -666,13 +669,68 @@ function (dojo, declare) {
 
         updateDeckDisplay: function( numberCardsInDeck )
         {
-            this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in the deck"), "");
+            // TOOLTIPS
+            if( this.isSmallMermaidCardVisible() )  this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in the deck. When this runs out of cards, it will be reshuffled once."), "");
+            else if( numberCardsInDeck > 10 )  this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in the deck. The game-ending card is somewhere in the bottom 10 cards."), "");
+            else this.addTooltip( "deck", `${numberCardsInDeck} ` + _("cards in the deck. The game could end immediately if the game-ending card is drawn."), "");
+
+            // NUMBER DISPLAY
             dojo.query("#copen_wrapper #deck #cards_remaining")[0].innerText = numberCardsInDeck;
+            if( !this.isSmallMermaidCardVisible() && numberCardsInDeck <= this.mermaidCardWarningThreshold && this.mermaidCardWarningAnimation == null ) this.playDeckWarningAnimation();
+        },
+
+        playDeckWarningAnimation: function()
+        {
+
+            dojo.style("cards_remaining", "opacity", 1);
+
+            this.mermaidCardWarningAnimation = this.deckWarningAnimationIn();
+        },
+
+        // DECK WARNING ANIMATION IN MULTIPLE PARTS
+        //   I need them to chain and loop - this is the best I've figured out so far
+        deckWarningAnimationIn: function()
+        {
+
+
+            var game = this;
+            dojo.animateProperty({
+                node: "cards_remaining",
+                duration: 1000,                
+                properties: {
+                    color: { start: "white", end: "#fccd3e" },
+                    x: {start: 1, end: 1.25},
+                },
+                onAnimate: function (values) {
+                    dojo.style("cards_remaining", "transform", `scale(${values.x.replace("px","")})`);
+                },
+                onEnd: function(){game.deckWarningAnimationOut()},
+            }).play();
+
+        },
+
+        deckWarningAnimationOut: function()
+        {
+            var game = this;
+            dojo.animateProperty({
+                node: "cards_remaining",
+                duration: 1000,
+                properties: {
+                    color: { start: "#fccd3e", end: "white" } ,
+                    x: {start: 1.25, end: 1},
+                },
+                onAnimate: function (values) {
+                    dojo.style("cards_remaining", "transform", `scale(${values.x.replace("px","")})`);
+                },
+                onEnd: function(){game.deckWarningAnimationIn()},
+            }).play(); 
         },
 
         isSmallMermaidCardVisible: function()
         {
+
             var query = dojo.query("#copen_wrapper #small_mermaid_card");
+
             return query.length != 0 ;
         },
 
