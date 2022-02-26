@@ -206,6 +206,7 @@
 
 /****************************** JAVASCRIPT HTML TEMPLATES ******************************/
 var jstpl_card= '<div id="card_${id}" class="copen_card copen_${color}_card">' +
+                    '<div class="copen_card_image"></div>' +
                     '<div class="copen_new_color copen_hidden"></div>' +
                 '</div>';
 

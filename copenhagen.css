@@ -168,11 +168,13 @@
 {
     top: 0px;
     z-index: 2; 
+    transition: transform 0.25s;
 }
 
 #harbor_cards .copen_card:hover
 {
     z-index: 10; 
+    
 }
 
 .copen_card
@@ -181,15 +183,35 @@
     position:  absolute;
     width: 66px;
     height: 101px;
-    background-image:  url('img/cards.png');
+
+    perspective: 500px;
 }
 
-.copen_red_card { background-position: 0px 0px; }
-.copen_yellow_card { background-position: -70px 0px; }
-.copen_green_card { background-position: -140px 0px; }
-.copen_blue_card { background-position: -210px 0px; }
-.copen_purple_card { background-position: -280px 0px; }
-.copen_mermaid_card {  background-position: -350px 0px; }
+.copen_card_image
+{
+    display: block;
+    width: 66px;
+    height: 101px;
+
+    position:  absolute;
+    top: 0px;
+    left: 0px;
+
+    background-image:  url('img/cards.png');  
+    background-size: 431px 101px;
+
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+.copen_red_card .copen_card_image{ background-position: -1.5px 0px; }
+.copen_yellow_card .copen_card_image{ background-position: -73.5px 0px; }
+.copen_green_card .copen_card_image{ background-position: -146px 0px; }
+.copen_blue_card .copen_card_image{ background-position: -218.5px 0px; }
+.copen_purple_card .copen_card_image{ background-position: -291.5px 0px; }
+.copen_mermaid_card .copen_card_image{  background-position: -363.5px 0px; }
+
+
 
 .copen_harbor_position
 {
@@ -768,6 +790,9 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     -webkit-backface-visibility: hidden; /* Safari */
     backface-visibility: hidden;
     transform-style: preserve-3d;
+
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
 }
 
 .copen_log_ability_tile
@@ -1041,7 +1066,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     background-image: url('img/polyominoes_colorblind.png');
 }
 
-.copen_colorblind .copen_card,
+.copen_colorblind .copen_card .copen_card_image,
 .copen_colorblind .copen_new_color
 {
     background-image:  url('img/cards_colorblind.png');

@@ -44,6 +44,9 @@ function (dojo, declare) {
             this.maxHandSize = 7;
             this.maxHandSizeDiscardHandlers = []; // keep track of the events we attach to cards to allow the player to discard - since we'll want to disconnect them afterwards
 
+            this.cardXAxisRotationFactor = 1/4.0;
+            this.cardYAxisRotationFactor = 1/2.0;
+
             this.stateName = "";
 
             this.cardColorOrder = ["copen_red_card", "copen_yellow_card", "copen_green_card", "copen_blue_card", "copen_purple_card"];
@@ -283,8 +286,11 @@ function (dojo, declare) {
 
             // CONNECT INTERACTIVE ELEMENTS
 
-            // new system
             dojo.query("#copen_wrapper").connect( 'ondragover', this, 'onDragOver');
+
+            var game = this;
+            dojo.query("#copen_wrapper #harbor_cards .copen_card").forEach( function(x){ game.connectMouseOverEventsToCard(x); });    
+
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, this.selectPolyominoEventHandlerName); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ondragstart', this, "onDragStartPolyomino"); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ontouchstart', this, "onTouchStartPolyomino"); 
@@ -797,6 +803,13 @@ function (dojo, declare) {
 
         },
 
+        connectMouseOverEventsToCard: function( cardNode )
+        {
+            dojo.connect(cardNode, 'onmousemove', this, "onMouseMoveHarborCard");
+            dojo.connect(cardNode, 'onmouseout', this, "onMouseOutHarborCard");
+        },
+
+
         // REAPPLY TOOLTIPS TO SPECIAL ABILITIES
         //  since we re-parent special ability tokens - that means nodes get destroyed and recreated
         //  which means we need to hook up the tooltips to the new nodes
@@ -863,6 +876,9 @@ function (dojo, declare) {
                 this.placeOnObject( card, "deck" ); // we use some visual illusion here.  The card starts on its final parent, but we snap it to the deck, then animate its slide back to its actual parent
                 this.slideToObject( card, `harbor_position_${cardData.location_arg}`, 500  ).play();
                 dojo.connect(card, "onclick", this, "onTakeHarborCard");
+
+                this.connectMouseOverEventsToCard( card );    
+
         },
 
         getColorNameOfCard: function( node )
@@ -2075,6 +2091,27 @@ function (dojo, declare) {
         
         */
 
+        onMouseMoveHarborCard: function( event )
+        {
+            // ONLY WORKS FOR ACTIVE PLAYER
+            if( !this.isCurrentPlayerActive() ) return;
+
+            dojo.style(event.currentTarget, "transform", "scale(1.1)");
+
+            var offsetX = event.clientX - dojo.position( event.currentTarget).x; // We calculate our own offsetX, rather than using the one on the event, as the event one is affected by whether the mouse is on or off the rotated card
+            var offsetY = event.clientY - dojo.position( event.currentTarget).y;
+            var rotateY = (offsetX - (dojo.getContentBox( event.currentTarget ).w / 2)) * this.cardYAxisRotationFactor ;
+            var rotateX = -(offsetY - (dojo.getContentBox( event.currentTarget ).h / 2)) * this.cardXAxisRotationFactor ;
+            
+            dojo.style(event.currentTarget.childNodes[0],"transform",`rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
+        },
+
+        onMouseOutHarborCard: function (event)
+        {
+            dojo.style(event.currentTarget, "transform", "");
+            dojo.style(event.currentTarget.childNodes[0], "transform", "");
+        },
+
         onTakeHarborCard: function( event )
         {
 
@@ -2753,6 +2790,12 @@ function (dojo, declare) {
         notif_takeCard: function(notif)
         {
 
+            // CLEAR 3D STYLING
+            var cardNode = dojo.byId(`card_${notif.args.card_id}`);
+            dojo.style(cardNode,"transform","");
+            dojo.style(cardNode.childNodes[0],"transform","");
+
+
             // IF ITS YOUR CARD
             if( notif.args.player_id == this.player_id )
             {
@@ -2800,6 +2843,7 @@ function (dojo, declare) {
                     game.makeHarborCard( notif.args.harbor[cardId]);
                 }, index * this.animationTimeBetweenRefillHaborCards );
                 index ++;
+
             }
 
             if( notif.args.mermaid_card == "deck" && dojo.query("#copen_wrapper #small_mermaid_card").length > 0)
