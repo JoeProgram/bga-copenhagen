@@ -307,7 +307,8 @@ function (dojo, declare) {
 
             // CHANGE OF COLORS UI
             dojo.query("#copen_wrapper .copen_change_of_colors_option").connect('onclick', this, 'onSelectChangeOfColorsOption' );
-          
+            dojo.query("#copen_wrapper .copen_change_of_colors_option .copen_card").forEach( function(x){ game.connectMouseOverEventsToCard(x); });
+
             //CLICKING ABILITY TILES
             dojo.query("#copen_wrapper .copen_ability_tile_stack .copen_ability_tile:last-child").connect( 'onclick', this, 'onTakeAbilityTile');
             dojo.query("#copen_wrapper #owned_player_area .copen_any_cards").connect( 'onclick', this, 'onActivateAbilityAnyCards');
@@ -2105,13 +2106,18 @@ function (dojo, declare) {
             var rotateY = (offsetX - (dojo.getContentBox( event.currentTarget ).w / 2)) * this.cardYAxisRotationFactor ;
             var rotateX = -(offsetY - (dojo.getContentBox( event.currentTarget ).h / 2)) * this.cardXAxisRotationFactor ;
             
-            dojo.style(event.currentTarget.childNodes[0],"transform",`rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
+            // ROTATE THE CARD IMAGE AND THE NEW COLOR (IN CASE ITS VISIBLE)
+            //  JAVASCRIPT NOTE: node.childNodes returns elements and text nodes, node.children does NOT return text nodes - so it's usually what you want
+            //    
+            dojo.style(event.currentTarget.children[0],"transform",`rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
+            dojo.style(event.currentTarget.children[1],"transform",`rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
         },
 
         onMouseOutHarborCard: function (event)
         {
             dojo.style(event.currentTarget, "transform", "");
-            dojo.style(event.currentTarget.childNodes[0], "transform", "");
+            dojo.style(event.currentTarget.children[0], "transform", "");
+            dojo.style(event.currentTarget.children[1], "transform", "");
         },
 
         onTakeHarborCard: function( event )
