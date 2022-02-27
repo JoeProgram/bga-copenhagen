@@ -2198,12 +2198,25 @@ function (dojo, declare) {
 
         onDragStartPolyomino: function( event )
         {
+            
+            console.log("onDragStartPolyomino");
 
             var target = event.currentTarget ?? event.customTarget;
 
-            // disable the normal ghosting image by moving its position outside the window
-            //  ignore for touchscreens
-            if( event.currentTarget != null ) event.dataTransfer.setDragImage(target, window.outerWidth, window.outerHeight);
+            // DISABLING DRAG IMAGE
+            if( event.currentTarget != null )
+            {
+
+                // FRAGILE BROWSER ALERT - REMOVING DRAG IMAGE
+                //  I want the user to drag the polyomino itself, rather than a ghosted image (leaving the original in place)
+                //  it's surprisingly hard to get all browsers to do this
+                //    some advice is to set the drag image offscreen - but that doesn't work on Safari, where it constrains the image to under the mouse
+                //    some advice is to create an empty pixel just-in-time - but that doesn't work on Safari, where if the image isn't pre-loaded, it will immediately break and call an ondragend
+                //    having an empty pixel in the HTML that is 1 x 1 with a clear alpha is the only way I've seen this work across all browsers
+                var deck = dojo.byId("empty_pixel");
+                event.dataTransfer.setDragImage( deck, 0, 0);
+
+            }
 
             if( !this.checkAction('placePolyomino')) return;
             if( !dojo.hasClass(target, "copen_usable")) return;
@@ -2284,7 +2297,8 @@ function (dojo, declare) {
             dojo.stopEvent( event );
             if( this.selectedPolyomino == null ) return;
 
-            
+            console.log("onDragEndPolyomino");
+
             // IF WE START WITH DRAG, WE DON'T TURN ON PLACEMENT UI IMMEDIATELY.
             //   do it now, if it hasn't been done
             if( dojo.getStyle("polyomino_placement", "display") == "none")

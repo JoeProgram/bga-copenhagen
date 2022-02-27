@@ -200,6 +200,7 @@
     </div>
 
     <div id="shadow_box"></div>
+    <div id="empty_pixel"></div>
 
 </div>
 

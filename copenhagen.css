@@ -935,6 +935,15 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     z-index: -2;
 }
 
+#empty_pixel
+{
+    display: block;
+    width: 1px;
+    height: 1px;
+    background-image: url('img/tiny_cards.png');
+    background-position: -30px 0px;
+}
+
 
 #polyomino_placement
 {
