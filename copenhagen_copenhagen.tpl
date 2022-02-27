@@ -143,8 +143,10 @@
         <div id="change_of_colors_ui">
             <!-- BEGIN change_of_colors_option -->
                 <div class="copen_change_of_colors_option copen_usable">
-                    <div class="copen_card"></div>
-                    <div class="copen_new_color"></div>
+                    <div class="copen_card">
+                        <div class="copen_card_image"></div>
+                        <div class="copen_new_color"></div>
+                    </div>
                 </div>
             <!-- END change_of_colors_option -->
         </div>
