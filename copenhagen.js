@@ -2246,6 +2246,7 @@ function (dojo, declare) {
         onTouchStartPolyomino: function( event )
         {
 
+            //console.log( "onTouchStartPolyomino" );
             // FAKE AN EVENT
             //  I tried all sorts of things to send an event along
             //  I tried event.currentTarget.dispatchEvent, which never caused the event code to fire
@@ -2298,6 +2299,8 @@ function (dojo, declare) {
         onDragEndPolyomino: function( event )
         {
 
+            //console.log("onDragEndPolyomino");
+
             dojo.stopEvent( event );
             if( this.selectedPolyomino == null ) return;
 
@@ -2318,10 +2321,13 @@ function (dojo, declare) {
 
         onTouchEndPolyomino: function( event )
         {
+            //console.log("onDragEndPolyomino");
+
             // JAVASCRIPT NOTE
             //  I thought stopping events was just to prevent that event from being sent to parents of the child catching the event
             //  But in this case, an iPad will send both a touchend event AND a onclick if the user hasn't moved their finger past a certain threshold
             //  you can stop the onclick by stopping the event
+            
             dojo.stopEvent( event );
 
             var syntheticEvent = new MouseEvent("ondragend");
@@ -2481,6 +2487,9 @@ function (dojo, declare) {
 
         onPolyominoClickPassThrough: function( event )
         {
+
+            //console.log("onPolyominoClickPassThrough");
+
             var cellNode = this.getCellNodeAtPageCoordinate( {x:event.pageX, y:event.pageY});
             
             // WE'RE NOT GUARANTEED TO GET A CELL NODE
