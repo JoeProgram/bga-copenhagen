@@ -1674,14 +1674,16 @@ function (dojo, declare) {
         dropPolyominoOnBoard: function()
         {
 
+
             try{
 
                 // FIRST, SCOOT POLYOMINO TO BE FULLY ON BOARD (IF NEEDED)
                 var boardCellsNode = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cells`)[0];
-                var polyominoNode = dojo.query(`#${this.selectedPolyomino.id}`)[0];
+                var polyominoNode = dojo.byId(this.selectedPolyomino.id);
 
                 boardCellsNodePosition = dojo.position( boardCellsNode, true );
                 polyominoNodePosition = dojo.position( polyominoNode, true);
+
 
                 // SCOOT LEFT OR RIGHT
                 if( polyominoNodePosition.x < boardCellsNodePosition.x )
@@ -1710,6 +1712,7 @@ function (dojo, declare) {
                 // FIND CELL CLOSEST TO THE POLYOMINO'S MIN HTML COORDINATE
                 polyominoNodePosition = dojo.position( polyominoNode, true); // refresh the position after any scooting
                 
+
                 var originCell = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_0_0`)[0];
 
                 // LOOP THROUGH ALL COLUMNS TO SEE WHICH IS CLOSEST
@@ -2201,7 +2204,6 @@ function (dojo, declare) {
         onDragStartPolyomino: function( event )
         {
             
-            console.log("onDragStartPolyomino");
 
             var target = event.currentTarget ?? event.customTarget;
 
@@ -2299,7 +2301,6 @@ function (dojo, declare) {
             dojo.stopEvent( event );
             if( this.selectedPolyomino == null ) return;
 
-            console.log("onDragEndPolyomino");
 
             // IF WE START WITH DRAG, WE DON'T TURN ON PLACEMENT UI IMMEDIATELY.
             //   do it now, if it hasn't been done
@@ -2317,6 +2318,12 @@ function (dojo, declare) {
 
         onTouchEndPolyomino: function( event )
         {
+            // JAVASCRIPT NOTE
+            //  I thought stopping events was just to prevent that event from being sent to parents of the child catching the event
+            //  But in this case, an iPad will send both a touchend event AND a onclick if the user hasn't moved their finger past a certain threshold
+            //  you can stop the onclick by stopping the event
+            dojo.stopEvent( event );
+
             var syntheticEvent = new MouseEvent("ondragend");
 
             this.onDragEndPolyomino( syntheticEvent );
@@ -2503,7 +2510,8 @@ function (dojo, declare) {
             this.slideToObjectPos( this.selectedPolyomino["id"], stackId, this.selectedPolyomino.originalPosition.l, this.selectedPolyomino.originalPosition.t, 500 ).play();
 
             // RECONNECT THE EVENTS
-            var polyominoNode = dojo.query(`#copen_wrapper #${this.selectedPolyomino["id"]}`)[0];
+            var polyominoNode = dojo.byId(this.selectedPolyomino.id);
+            dojo.connect( polyominoNode, "onclick", this, "onSelectPolyomino" );
             this.connectDraggingEventsToPolyomino( polyominoNode );
 
             this.removeOverlap();
@@ -2533,6 +2541,7 @@ function (dojo, declare) {
             else if( event.customTarget != null ) targetId = event.customTarget.id
 
             var coordinates = this.getCoordinatesFromId( targetId );
+
             this.positionPolyomino( coordinates);
         },
 
@@ -2909,7 +2918,7 @@ function (dojo, declare) {
             var newTopOfStack = this.determineTopPolyominoInStack( stackId );         
             if( newTopOfStack != null )
             {
-                dojo.connect( newTopOfStack, "onclick", this, this.selectPolyominoEventHandlerName );
+                dojo.connect( newTopOfStack, "onclick", this, "onSelectPolyomino" );
                 this.connectDraggingEventsToPolyomino( newTopOfStack );
             }
 

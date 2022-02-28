@@ -1177,76 +1177,29 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     background-image:  url('img/cards_colorblind.png');
 }
 
-
-.copen_colorblind .copen_green_polyomino,
 .copen_colorblind .copen_green_card .copen_card_image,
 .copen_new_color.copen_green_card
 {
     filter: saturate(2);  
 }
 
-.copen_colorblind .copen_green_polyomino.copen_usable:hover
-{
-    filter: saturate(2)  drop-shadow(0px 0px 5px white);  
-}
 
-.copen_colorblind .copen_green_polyomino.copen_unusable:hover
-{
-    filter: saturate(2)  drop-shadow(0px 0px 5px red);  
-}
-
-
-
-.copen_colorblind .copen_red_polyomino,
 .copen_colorblind .copen_red_card .copen_card_image,
 .copen_new_color.copen_red_card
 {
     filter: saturate(4);  
 }
 
-.copen_colorblind .copen_red_polyomino.copen_usable:hover
-{
-    filter: saturate(4) drop-shadow(0px 0px 5px white);  
-}
-.copen_colorblind .copen_red_polyomino.copen_unusable:hover
-{
-    filter: saturate(4) drop-shadow(0px 0px 5px red);  
-}
-
-
-
-.copen_colorblind .copen_purple_polyomino,
 .copen_colorblind .copen_purple_card .copen_card_image,
 .copen_new_color.copen_purple_card
 {
     filter: saturate(3) brightness(0.8) contrast(1.5);   
 }
 
-.copen_colorblind .copen_purple_polyomino.copen_usable:hover
-{
-    filter: saturate(3) brightness(0.8) contrast(1.5) drop-shadow(0px 0px 5px white);   
-}
-
-.copen_colorblind .copen_purple_polyomino.copen_unusable:hover
-{
-    filter: saturate(3) brightness(0.8) contrast(1.5) drop-shadow(0px 0px 5px red);   
-}
-
-.copen_colorblind .copen_blue_polyomino,
 .copen_colorblind .copen_blue_card .copen_card_image,
 .copen_new_color.copen_blue_card
 {
     filter: saturate(1.5) contrast(1.2);   
-}
-
-.copen_colorblind .copen_blue_polyomino.copen_usable:hover
-{
-    filter: saturate(1.5) contrast(1.2) drop-shadow(0px 0px 5px white);   
-}
-
-.copen_colorblind .copen_blue_polyomino.copen_unusable:hover
-{
-    filter: saturate(1.5) contrast(1.2) drop-shadow(0px 0px 5px red);   
 }
 
 .copen_colorblind .copen_playerboard_color_e2474a .copen_playerboard_image  /* red */
