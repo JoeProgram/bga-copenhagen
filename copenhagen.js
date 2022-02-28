@@ -320,6 +320,8 @@ function (dojo, declare) {
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
+            if( dojo.isSafari ) this.adjustAbilityTilesForSafari();
+
             //console.log( "Ending game setup" );
 
         },    
@@ -2263,7 +2265,7 @@ function (dojo, declare) {
 
             if( this.selectedPolyomino == null ) return;
 
-            // NOTE:
+            // FRAGILE BROWSER ALERT:
             //  Apparently, there's been a 13+ year discussion about the clientX and clientY values for ondrag in firefox (https://bugzilla.mozilla.org/show_bug.cgi?id=505521#c80)
             //  Currently, they always return 0 - so this event doesn't have much useful information
             //  We take the standard fix, which is to use the ondragover event to capture the mouse position, store it, and reuse it here
@@ -2768,6 +2770,13 @@ function (dojo, declare) {
                 lock: true, 
             }, this, function( result ){} ); 
 
+        },
+        
+        /********************* BROWSER SPECIFIC CODE **********************/
+
+        adjustAbilityTilesForSafari: function()
+        {
+            dojo.addClass("copen_wrapper", "copen_safari");
         },
 
         
