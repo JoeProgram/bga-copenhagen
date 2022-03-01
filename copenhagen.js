@@ -1520,7 +1520,8 @@ function (dojo, declare) {
 
             // HIDE ADDITIONAL ELEMENTS
             dojo.query("#copen_wrapper #polyomino_placement_buttons").style("display","none");
-            dojo.query(`#copen_wrapper #owned_player_area`).addClass("copen_behind_shadow_box");  
+            dojo.query(`#copen_wrapper #owned_player_area`).addClass("copen_behind_shadow_box");
+            dojo.query('#copen_wrapper #polyomino_placement').addClass("copen_behind_shadow_box");  
 
             // FIRST, TAG ALL CARDS IN HAND AS UNUSABLE
             dojo.query("#copen_wrapper #cards_in_hand .copen_card").addClass("copen_unusable");
@@ -1651,6 +1652,7 @@ function (dojo, declare) {
                 //  2. They only have base cards or color changed cards
                 if( cardsOfColor - cost > 0 && this.hasMixOfBaseCardsAndChangedColorCards(color))
                 {
+
                     if( this.cardsToDiscard.length == 0 )
                     {
                         this.showSelectDiscardUI( color, cost );

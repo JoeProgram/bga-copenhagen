@@ -1177,26 +1177,26 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 
 .copen_colorblind .copen_green_card .copen_card_image,
-.copen_new_color.copen_green_card
+.copen_colorblind .copen_new_color.copen_green_card
 {
     filter: saturate(2);  
 }
 
 
 .copen_colorblind .copen_red_card .copen_card_image,
-.copen_new_color.copen_red_card
+.copen_colorblind .copen_new_color.copen_red_card
 {
     filter: saturate(4);  
 }
 
 .copen_colorblind .copen_purple_card .copen_card_image,
-.copen_new_color.copen_purple_card
+.copen_colorblind .copen_new_color.copen_purple_card
 {
     filter: saturate(3) brightness(0.8) contrast(1.5);   
 }
 
 .copen_colorblind .copen_blue_card .copen_card_image,
-.copen_new_color.copen_blue_card
+.copen_colorblind .copen_new_color.copen_blue_card
 {
     filter: saturate(1.5) contrast(1.2);   
 }
