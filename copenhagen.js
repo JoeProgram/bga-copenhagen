@@ -40,6 +40,7 @@ function (dojo, declare) {
             this.cellMeasurement = 34;
             this.cardWidth = 66;
             this.cardSplayDistance = 24;
+            this.cardHorizontalSpacing = 20;
             this.cardsRemainingWarningThreshold = 14;
             this.maxHandSize = 7;
             this.maxHandSizeDiscardHandlers = []; // keep track of the events we attach to cards to allow the player to discard - since we'll want to disconnect them afterwards
@@ -115,6 +116,7 @@ function (dojo, declare) {
 
             this.discardAnimationTime = 500;
             this.animationTimeBetweenRefillHaborCards = 100;
+            this.animationTimeBetweenCardSpread = 25;
 
         },
         
@@ -418,8 +420,11 @@ function (dojo, declare) {
 
             if( args.active_player != this.player_id ) return;
 
+            this.fadeInHand();
+            this.spreadCardsHorizontally();
 
             dojo.addClass("hand","copen_over_max_hand_size");
+            dojo.query("#copen_wrapper #cards_in_hand .copen_card").addClass("copen_usable");
 
             var cardsInHandNode = dojo.query("#copen_wrapper #cards_in_hand")[0]; 
             var cardsInHand = this.getChildElementNodes( cardsInHandNode );
@@ -436,11 +441,29 @@ function (dojo, declare) {
         onLeavingStateDiscardDownToMaxHandSize()
         {
 
+            // FADE SHADOW BOX
+            dojo.animateProperty({
+                node: "shadow_box",
+                duration: 500,
+                properties: 
+                {
+                    opacity: {start: 0.5, end: 0},
+                },
+
+                // CLEAR BEHIND SHADOW BOX PROPERTY
+                //  we do this on end so the elements don't pop in too early
+                onEnd: function(){
+                    dojo.query("#copen_wrapper .copen_behind_shadow_box").removeClass("copen_behind_shadow_box");
+                },
+            }).play();
+
             if( this.maxHandSizeDiscardHandlers.length > 0 )
             {
                 dojo.removeClass("hand","copen_over_max_hand_size");
                 dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
             }
+
+            this.splayCardsInHand();
         },
 
         onEnteringTakeAdjacentCard( args )
@@ -923,10 +946,10 @@ function (dojo, declare) {
 
         splayCardsInHand: function()
         {
-            var cardsInHandNode = dojo.query("#copen_wrapper #cards_in_hand")[0]; 
+            var cardsInHandNode = dojo.byId("cards_in_hand"); 
             var cardsInHand = this.getChildElementNodes( cardsInHandNode );
 
-            if( cardsInHand == 0 ) return; // do nothing if we don't have any cards in hand
+            if( cardsInHand.length == 0 ) return; // do nothing if we don't have any cards in hand
 
             var lastCard = cardsInHand[ cardsInHand.length - 1];
             var lastCardTop = dojo.position( lastCard ).y;
@@ -937,6 +960,35 @@ function (dojo, declare) {
                 this.placeOnObjectPos( cardsInHand[i], "hand_bottom_card_target", 0, -this.cardSplayDistance * (cardsInHand.length - 1 - i) );
             }
 
+        },
+
+        // PUT CARDS IN HORIZONTAL ROW
+        //  used for discarding them - when you need a better click area
+        spreadCardsHorizontally: function()
+        {
+            var cardsInHandNode = dojo.byId("cards_in_hand"); 
+
+            var topChunkHeight = dojo.getContentBox("top_chunk").h;
+            var topChunkWidth = dojo.getContentBox("top_chunk").w;
+            var numberOfCards = cardsInHandNode.children.length;
+            var cardDisplayWidth = (numberOfCards * this.cardWidth) + (numberOfCards * this.cardHorizontalSpacing);
+            var leftMargin = (topChunkWidth - cardDisplayWidth)/2;
+
+            var game = this;
+            for( let i = 0; i < cardsInHandNode.children.length; i++)
+            {
+                setTimeout(function(){
+                    var card = cardsInHandNode.children[i];
+
+                    // placeOnObjecPos wants to center things in a way that's not helpful here
+                    //   so we do some math to undo that
+                    var x = game.cardWidth/2;
+                    x -= topChunkWidth/2;
+                    x += leftMargin + (i * (game.cardWidth + game.cardHorizontalSpacing));
+
+                    game.placeOnObjectPos( card, "top_chunk", x, 0);
+                }, i * game.animationTimeBetweenCardSpread );
+            }
         },
 
         countColoredCardsInHand: function( color )
@@ -1486,6 +1538,9 @@ function (dojo, declare) {
                 dojo.removeClass( query[i], "copen_unusable");
                 dojo.addClass( query[i], "copen_usable");
             }
+
+            // SPREAD CARDS OUT TO BE EASY TO CLICK
+            this.spreadCardsHorizontally();
 
             // DISPLAY INSTRUCTIONS TO USER
             this.gamedatas.gamestate.descriptionmyturn = _(`Select ${cost} card(s) to discard`);
@@ -2851,7 +2906,9 @@ function (dojo, declare) {
                 var card = this.attachToNewParent( `card_${notif.args.card_id}`, "cards_in_hand");
                 dojo.place( card, "cards_in_hand", this.findPositionForNewCardInHand( card ));
 
-                this.splayCardsInHand();
+                // SPLAY CARDS IN HAND IF WE DON'T HAVE TOO MANY
+                //  otherwise, we'll be spreading them differently and don't want the animations to fight
+                if( dojo.byId("cards_in_hand").children.length <= this.maxHandSize ) this.splayCardsInHand();
             }
 
             // IF ITS AN OPPONENTS CARD
@@ -2955,6 +3012,10 @@ function (dojo, declare) {
             // UPDATE CARD AMOUNT UI
             dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
             
+            // SPLAY CARDS IN HAND
+            //  if the player had to select which cards to discard, reset that layout now
+            //this.splayCardsInHand();
+
 
             // SHOW FEEDBACK FOR COAT OF ARMS
             for( var coat_of_arms_id_key in notif.args.coat_of_arms_ids )

@@ -541,7 +541,6 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 
 #hand.copen_over_max_hand_size
 {
-    filter:  drop-shadow(0px 0px 5px red);
     cursor:  pointer;
 }
 
