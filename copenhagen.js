@@ -432,8 +432,10 @@ function (dojo, declare) {
             for( var i = 0; i < cardsInHand.length; i++ )
             {
                 // have to connect this a little differently, since we want to remove thse handlers later
-                var discardHandler = dojo.connect( cardsInHand[i], "onclick", this, "onDiscardCardOverMaxHandSize");
-                this.maxHandSizeDiscardHandlers.push( discardHandler ); 
+                var handlers = this.connectMouseOverEventsToCard( cardsInHand[i]);
+                handlers.push( dojo.connect( cardsInHand[i], "onclick", this, "onDiscardCardOverMaxHandSize"));
+                
+                this.maxHandSizeDiscardHandlers = this.maxHandSizeDiscardHandlers.concat( handlers ); 
             }
 
         },
@@ -457,11 +459,10 @@ function (dojo, declare) {
                 },
             }).play();
 
-            if( this.maxHandSizeDiscardHandlers.length > 0 )
-            {
-                dojo.removeClass("hand","copen_over_max_hand_size");
-                dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
-            }
+
+            dojo.removeClass("hand","copen_over_max_hand_size");
+            dojo.forEach( this.maxHandSizeDiscardHandlers, dojo.disconnect);
+            dojo.query("#copen_wrapper .copen_usable").removeClass("copen_usable");
 
             this.splayCardsInHand();
         },
@@ -833,10 +834,18 @@ function (dojo, declare) {
 
         connectMouseOverEventsToCard: function( cardNode )
         {
-            dojo.connect(cardNode, 'onmousemove', this, "onMouseMoveHarborCard");
-            dojo.connect(cardNode, 'onmouseout', this, "onMouseOutHarborCard");
+            var handlers = []
+            handlers.push( dojo.connect(cardNode, 'onmousemove', this, "onMouseMoveHarborCard"));
+            handlers.push( dojo.connect(cardNode, 'onmouseout', this, "onMouseOutHarborCard"));
+            return handlers;
         },
 
+        resetCard3DRotation: function( cardNode )
+        {
+            dojo.style(cardNode, "transform", "");
+            dojo.style(cardNode.children[0], "transform", "");
+            dojo.style(cardNode.children[1], "transform", "");  
+        },
 
         // REAPPLY TOOLTIPS TO SPECIAL ABILITIES
         //  since we re-parent special ability tokens - that means nodes get destroyed and recreated
@@ -958,7 +967,12 @@ function (dojo, declare) {
             for( var i = 0; i < cardsInHand.length; i++)
             {
                 this.placeOnObjectPos( cardsInHand[i], "hand_bottom_card_target", 0, -this.cardSplayDistance * (cardsInHand.length - 1 - i) );
+            
+                // RESET ANY 3D ROTATION
+                this.resetCard3DRotation( cardsInHand[i] );
             }
+
+            
 
         },
 
@@ -2177,9 +2191,7 @@ function (dojo, declare) {
 
         onMouseOutHarborCard: function (event)
         {
-            dojo.style(event.currentTarget, "transform", "");
-            dojo.style(event.currentTarget.children[0], "transform", "");
-            dojo.style(event.currentTarget.children[1], "transform", "");
+            this.resetCard3DRotation( event.currentTarget );
         },
 
         onTakeHarborCard: function( event )
@@ -2898,9 +2910,7 @@ function (dojo, declare) {
 
             // CLEAR 3D STYLING
             var cardNode = dojo.byId(`card_${notif.args.card_id}`);
-            dojo.style(cardNode,"transform","");
-            dojo.style(cardNode.childNodes[0],"transform","");
-
+            this.resetCard3DRotation( cardNode );
 
             // IF ITS YOUR CARD
             if( notif.args.player_id == this.player_id )
