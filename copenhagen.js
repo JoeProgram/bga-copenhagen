@@ -39,6 +39,7 @@ function (dojo, declare) {
 
             this.cellMeasurement = 34;
             this.cardWidth = 66;
+            this.cardHeight = 101
             this.cardSplayDistance = 24;
             this.cardHorizontalSpacing = 20;
             this.cardsRemainingWarningThreshold = 14;
@@ -411,6 +412,7 @@ function (dojo, declare) {
         onLeavingPlayerTurn()
         {
             dojo.query("#copen_wrapper .copen_card.copen_usable").removeClass("copen_usable");
+            dojo.query("#copen_wrapper .copen_card.copen_unusable").removeClass("copen_unusable");
             dojo.query("#copen_wrapper .copen_polyomino.copen_usable").removeClass("copen_usable");
             dojo.query("#copen_wrapper .copen_polyomino.copen_unusable").removeClass("copen_unusable");
         },
@@ -690,6 +692,11 @@ function (dojo, declare) {
         
         */
 
+        lerp( low, high, percent)
+        {
+            return low * (1 - percent) + high * percent;
+        },
+
         // When you get HTML children, you also get text nodes - which in this use case is usually some useless blank space
         //   this helper function returns just the element nodes
         getChildElementNodes: function( node )
@@ -843,6 +850,7 @@ function (dojo, declare) {
         resetCard3DRotation: function( cardNode )
         {
             dojo.style(cardNode, "transform", "");
+            dojo.style(cardNode, "filter", "");
             dojo.style(cardNode.children[0], "transform", "");
             dojo.style(cardNode.children[1], "transform", "");  
         },
@@ -1546,8 +1554,9 @@ function (dojo, declare) {
             for( var i = 0; i < query.length; i++ )
             {
                 // CONNECT HANDLERS IN A WAY TO REMOVE THEM LATER
-                var handler = dojo.connect( query[i], "onclick", this, "onSelectCardToDiscard");
-                this.discardHandlers.push( handler ); 
+                var handlers = this.connectMouseOverEventsToCard( query[i]);
+                handlers.push( dojo.connect( query[i], "onclick", this, "onSelectCardToDiscard") );
+                this.discardHandlers = this.discardHandlers.concat( handlers ); 
 
                 // SHOW THEM AS USABLE
                 dojo.removeClass( query[i], "copen_unusable");
@@ -1693,8 +1702,6 @@ function (dojo, declare) {
                 discards:this.cardsToDiscard.join(","),
             }, this, function( result ){} ); 
 
-            // IF WE USED THE DISCARD UI, CLEAN UP THE HANDLERS NOW THAT WE'RE DONE WITH IT
-            dojo.forEach( this.discardHandlers, dojo.disconnect);
         },
 
         positionPolyomino: function( coordinates )
@@ -2182,6 +2189,9 @@ function (dojo, declare) {
             var rotateY = (offsetX - (dojo.getContentBox( event.currentTarget ).w / 2)) * this.cardYAxisRotationFactor ;
             var rotateX = -(offsetY - (dojo.getContentBox( event.currentTarget ).h / 2)) * this.cardXAxisRotationFactor ;
             
+            console.log( offsetY);
+            dojo.style(event.currentTarget, "filter", `brightness(${this.lerp( 1.2, 0.8, offsetY/this.cardHeight)}) drop-shadow(0px 0px 5px white)`);
+
             // ROTATE THE CARD IMAGE AND THE NEW COLOR (IN CASE ITS VISIBLE)
             //  JAVASCRIPT NOTE: node.childNodes returns elements and text nodes, node.children does NOT return text nodes - so it's usually what you want
             //    
@@ -3021,12 +3031,11 @@ function (dojo, declare) {
                 });
             }
 
+            // CLEAN UP DISCARD UI
+            dojo.forEach( this.discardHandlers, dojo.disconnect);
+
             // UPDATE CARD AMOUNT UI
             dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
-            
-            // SPLAY CARDS IN HAND
-            //  if the player had to select which cards to discard, reset that layout now
-            //this.splayCardsInHand();
 
 
             // SHOW FEEDBACK FOR COAT OF ARMS
