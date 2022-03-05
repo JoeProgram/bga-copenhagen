@@ -1105,7 +1105,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 #change_of_colors_ui
 {
     display: none;
-    width: 353px;
+    width: 433px;
     height: 101px;
 
     position:  absolute;
@@ -1118,7 +1118,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     display:  inline-block;
     width: 66px;
     height: 101px;
-    margin-right: 4px;
+    margin-right: 24px;
     position:  relative;
 }
 

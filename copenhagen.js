@@ -39,10 +39,10 @@ function (dojo, declare) {
 
             this.cellMeasurement = 34;
             this.cardWidth = 66;
-            this.cardHeight = 101
+            this.cardHeight = 101;
             this.cardSplayDistance = 24;
             this.cardHorizontalSpacing = 20;
-            this.cardsRemainingWarningThreshold = 14;
+            this.colorChangeUITop = 360;
             this.maxHandSize = 7;
             this.maxHandSizeDiscardHandlers = []; // keep track of the events we attach to cards to allow the player to discard - since we'll want to disconnect them afterwards
 
@@ -2192,19 +2192,36 @@ function (dojo, declare) {
             for( var i = 0; i < this.cardColorOrder.length; i++ )
             {
                 if( this.cardColorOrder[i] == baseColorName) continue; //skip the base color card.  i.e. - we won't show an option to change "green" into "green"
-            
+
+                // SET THE OVERLAY COLOR ON THE COLOR CHANGE OPTION            
                 var query = dojo.query(".copen_new_color", cardColorOptionQuery[queryIndex]).addClass(this.cardColorOrder[i]);
+
+
+                // SET INITIAL STYLE TO PREP FOR ANIMATION
+                //  since we've added a delay, it also delays the animation setting the initial style
+                dojo.style( cardColorOptionQuery[queryIndex], "opacity", 0);
+                dojo.style( cardColorOptionQuery[queryIndex], "top", -20)
+
+                // FADE IT IN
+                dojo.animateProperty({
+                    node: cardColorOptionQuery[queryIndex],
+                    duration: 500,
+                    delay: i * 100,
+                    properties: 
+                    {
+                        opacity: {start: 0, end: 1},
+                        top: {start: -20, end: 0},
+                    }
+                }).play();
 
                 queryIndex += 1;
             }
 
-            var x = 0;
-            var y = this.cardHeight + this.cardHorizontalSpacing;
+            // HAVE CARDS APPEAR AT CONSISTENT HEIGHT, INDEPENDENT OF THE CARD SELECTED
+            var y = this.colorChangeUITop - dojo.position( selectedCard ).y 
 
             dojo.style("change_of_colors_ui","display","block");
-            this.placeOnObjectPos( "change_of_colors_ui", selectedCard, x, y );
-            dojo.style("change_of_colors_ui","left", "75px");
-
+            this.placeOnObjectPos( "change_of_colors_ui", selectedCard, 0, y );
         },
 
         fadeOutChangeOfColorsUI: function()
