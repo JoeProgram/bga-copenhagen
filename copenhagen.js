@@ -555,8 +555,18 @@ function (dojo, declare) {
 
             if( args.active_player != this.player_id ) return;
 
+
             dojo.query("#copen_wrapper .copen_white_polyomino.copen_top_of_stack").addClass( "copen_usable");
             dojo.query("#copen_wrapper #owned_player_area .copen_used_ability").addClass("copen_usable");
+            
+            // SPECIAL CASE - ALLOW IMAGE TO BE CLICKABLE IN HEADER
+            //   a user has reported trying to use the ability tile image in the header as a button
+            //   hey - why not?  Otherwise clicking it does nothing, which isn't useful.
+            if( this.hasUsedAbility())
+            {
+                dojo.query(".copen_title_ability_tile_used").addClass("copen_usable").connect("onclick", this, "onResetUsedAbilities");
+            }
+
             this.determineWhichAbilityTilesAreTakeable();
 
 
@@ -2049,6 +2059,8 @@ function (dojo, declare) {
             return {htmlX:0, htmlY:htmlY };
         },
 
+        /******************* SPECIAL ABILITY TILES ********************/
+
         animateCoatOfArms: function( coatOfArmsId, playerId )
         {
             var nodeName = `copen_coat_of_arms_${coatOfArmsId}_${playerId}`;
@@ -2101,6 +2113,11 @@ function (dojo, declare) {
         ownsAbility: function( abilityName )
         {
             return dojo.query(`#copen_wrapper #owned_player_area .copen_${abilityName}`).length > 0;
+        },
+
+        hasUsedAbility: function()
+        {
+            return dojo.query("#copen_wrapper #owned_player_area .copen_used_ability").length > 0;
         },
 
         setAbilityAsUsable: function (abilityName)
@@ -2931,6 +2948,7 @@ function (dojo, declare) {
 
         onResetUsedAbilities: function( event )
         {
+
             if( !this.checkAction('resetUsedAbilities')) return;
             if( !dojo.hasClass( event.currentTarget, "copen_usable")) return;
 
