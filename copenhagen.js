@@ -936,6 +936,8 @@ function (dojo, declare) {
 
         },
 
+        /********************** CARDS IN HAND INFORMATION ******************************/
+
         // we want to keep cards organized by color in hand
         //   we'll do that when we add the card to the hand
         findPositionForNewCardInHand: function( card )
@@ -961,6 +963,56 @@ function (dojo, declare) {
             return dojo.query("#copen_wrapper #cards_in_hand .copen_card").length;
         },
 
+        getColorNamesInHand: function()
+        {
+
+            var colorsInHand = [];
+            for( var i = 0; i < this.cardColorOrder.length ; i++ )
+            {
+                var color = this.cardColorOrder[i].split("_")[1]; // get the name of the color without the class prefix or suffix
+                if( this.countColoredCardsInHand( color ) > 0 ) colorsInHand.push( this.cardColorOrder[i]);
+            }
+
+            return colorsInHand;
+        },
+
+        countColoredCardsInHand: function( color )
+        {
+            return this.getNodeListOfColoredCardsInHand( color ).length;
+        },
+
+        getNodeListOfColoredCardsInHand: function( color )
+        {
+
+            // NOTE - have to go down to the copen_new_color layer to make sure this card hasn't had its color changed
+            // but then we actually return the parents, since its the .copen_cards we'll be operating on.
+            var baseCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card .copen_new_color.copen_hidden`);
+            var changedColorCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card .copen_new_color.copen_${color}_card`);
+            var baseCards = baseCards.concat( changedColorCards );
+
+
+
+            return baseCards.map( function(node){
+                return node.parentNode;
+            });
+        },
+
+
+        hasMixOfBaseCardsAndChangedColorCards: function( color )
+        {
+            var baseCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card .copen_new_color.copen_hidden`);
+            var changedColorCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card .copen_new_color.copen_${color}_card`);
+            
+            return baseCards.length > 0 && changedColorCards.length > 0;
+        },        
+
+        hasTooManyCardsInHand: function()
+        {
+            return dojo.query("#copen_wrapper #cards_in_hand .copen_card").length > this.maxHandSize;
+        },
+
+        /**************** CARDS IN HAND ARRANGEMENT *****************************/
+
         splayCardsInHand: function()
         {
             var cardsInHandNode = dojo.byId("cards_in_hand"); 
@@ -979,9 +1031,6 @@ function (dojo, declare) {
                 // RESET ANY 3D ROTATION
                 this.resetCard3DRotation( cardsInHand[i] );
             }
-
-            
-
         },
 
         // PUT CARDS IN HORIZONTAL ROW
@@ -1013,36 +1062,47 @@ function (dojo, declare) {
             }
         },
 
-        countColoredCardsInHand: function( color )
+        spreadCardsHorizontallyByColor: function()
         {
-            return this.getNodeListOfColoredCardsInHand( color ).length;
-        },
+            var colors = this.getColorNamesInHand();
+            var cardsInHandNode = dojo.byId("cards_in_hand"); 
 
-        getNodeListOfColoredCardsInHand: function( color )
-        {
-            // NOTE - have to go down to the copen_new_color layer to make sure this card hasn't had its color changed
-            // but then we actually return the parents, since its the .copen_cards we'll be operating on.
-            var baseCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card .copen_new_color.copen_hidden`);
-            var changedColorCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card .copen_new_color.copen_${color}_card`);
-            var baseCards = baseCards.concat( changedColorCards );
+            var topChunkHeight = dojo.getContentBox("top_chunk").h;
+            var topChunkWidth = dojo.getContentBox("top_chunk").w;
+            var cardDisplayWidth = (colors.length * this.cardWidth) + (colors.length * this.cardHorizontalSpacing);
+            var leftMargin = (topChunkWidth - cardDisplayWidth)/2;
 
-            return baseCards.map( function(node){
-                return node.parentNode;
-            });
-        },
+            var game = this;
+            for( let i = 0; i < cardsInHandNode.children.length; i++)
+            {
+                setTimeout(function(){
+
+                    var card = cardsInHandNode.children[i];
+                    var colorName = game.getColorNameOfCard( card );
+                    var colorIndex = colors.indexOf( colorName );
+
+                    // placeOnObjecPos wants to center things in a way that's not helpful here
+                    //   so we do some math to undo that
+                    var x = game.cardWidth/2;
+                    x -= topChunkWidth/2;
+                    x += leftMargin + (colorIndex * (game.cardWidth + game.cardHorizontalSpacing));
+
+                    // DETERMINE HOW HIGH UP THE CARD SHOULD BE PLACED
+                    //   we want to spread the cards verticall in the group so players can see how many they have of each card
+                    //   so have to do a little forward looking in the array to find that out
+                    // JAVASCRIPT NOTE
+                    //   node.children returns an HTMLCollection - not an array
+                    //   can convert it to an array with Array.from()
+                    var cardsYetToBeProcessed = Array.from(cardsInHandNode.children).slice( i + 1, cardsInHandNode.children.length);
+
+                    var numberSharedColorCardsYetToBeProcessed = cardsYetToBeProcessed.filter( node => dojo.hasClass( node, colorName )).length;
+                    var y = -(game.cardHeight + game.cardHorizontalSpacing);
+                    y -= numberSharedColorCardsYetToBeProcessed * game.cardSplayDistance;
 
 
-        hasMixOfBaseCardsAndChangedColorCards: function( color )
-        {
-            var baseCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card .copen_new_color.copen_hidden`);
-            var changedColorCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card .copen_new_color.copen_${color}_card`);
-            
-            return baseCards.length > 0 && changedColorCards.length > 0;
-        },        
-
-        hasTooManyCardsInHand: function()
-        {
-            return dojo.query("#copen_wrapper #cards_in_hand .copen_card").length > this.maxHandSize;
+                    game.placeOnObjectPos( card, "top_chunk", x, y);
+                }, i * game.animationTimeBetweenCardSpread );
+            }
         },
 
         animateDiscard: function( card )
@@ -1057,6 +1117,9 @@ function (dojo, declare) {
                 game.splayCardsInHand();
             }, 500);
         },
+
+
+        /************************ POLYOMINOES ******************************/
 
         determineTopPolyominoInEveryStack: function()
         {
@@ -2135,8 +2198,11 @@ function (dojo, declare) {
                 queryIndex += 1;
             }
 
+            var x = 0;
+            var y = this.cardHeight + this.cardHorizontalSpacing;
+
             dojo.style("change_of_colors_ui","display","block");
-            this.placeOnObject( "change_of_colors_ui", selectedCard );
+            this.placeOnObjectPos( "change_of_colors_ui", selectedCard, x, y );
             dojo.style("change_of_colors_ui","left", "75px");
 
         },
@@ -2160,7 +2226,9 @@ function (dojo, declare) {
                 {
                     opacity: {start: 0.5, end: 0},
                 }
-            }).play(); 
+            }).play();
+
+            this.splayCardsInHand(); 
         },
 
         ///////////////////////////////////////////////////
@@ -2189,7 +2257,6 @@ function (dojo, declare) {
             var rotateY = (offsetX - (dojo.getContentBox( event.currentTarget ).w / 2)) * this.cardYAxisRotationFactor ;
             var rotateX = -(offsetY - (dojo.getContentBox( event.currentTarget ).h / 2)) * this.cardXAxisRotationFactor ;
             
-            console.log( offsetY);
             dojo.style(event.currentTarget, "filter", `brightness(${this.lerp( 1.2, 0.8, offsetY/this.cardHeight)}) drop-shadow(0px 0px 5px white)`);
 
             // ROTATE THE CARD IMAGE AND THE NEW COLOR (IN CASE ITS VISIBLE)
@@ -2764,6 +2831,7 @@ function (dojo, declare) {
 
             // CHANGE OF COLORS DOES SOME UI WORK BEFORE TALKING TO THE SERVER
             this.fadeInHand();
+            this.spreadCardsHorizontallyByColor();
             dojo.addClass(event.currentTarget, "copen_activated");
 
             this.gamedatas.gamestate.originaldescriptionmyturn = this.gamedatas.gamestate.descriptionmyturn;
@@ -2794,12 +2862,23 @@ function (dojo, declare) {
 
             var colorName = this.getColorNameOfCard( event.currentTarget );
 
-
+            // TURN ON CHANGE OF COLORS UI
             var color = colorName.split("_")[1];
             this.showChangeOfColorsUI( event.currentTarget, colorName );
+ 
+            // PUT UNCHOSEN CARDS BEHIND THE SHADOW BOX
+            dojo.query("#copen_wrapper #cards_in_hand .copen_card").forEach( function(card){
+                if( !dojo.hasClass(card,colorName))
+                {
+                    dojo.addClass( card, "copen_behind_shadow_box");
+                }
+
+
+            });
+
 
             // GIVE INSTRUCTIONS
-            this.gamedatas.gamestate.descriptionmyturn = _(`What treat ${color} cards as what color?`);
+            this.gamedatas.gamestate.descriptionmyturn = _(`Treat ${color} cards as what color?`);
             this.updatePageTitle();
             
             // CLEAN UP EFFECTS ON CARDS IN HAND

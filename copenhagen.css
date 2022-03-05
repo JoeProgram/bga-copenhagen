@@ -996,6 +996,14 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 .copen_behind_shadow_box{
     z-index: -2;
 }
+ 
+/* WE NEED THE PLAYER AREA TO GO A LITTLE FURTHER BACK
+     since sometimes we show cards on top of it in the UI
+     and they should go under the player board */
+#owned_player_area.copen_behind_shadow_box{
+    z-index: -3;
+}
+
 
 #empty_pixel
 {
