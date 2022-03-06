@@ -215,6 +215,7 @@ var jstpl_card= '<div id="card_${id}" class="copen_card copen_${color}_card">' +
 
 var jstpl_polyomino=    '<div id="${color}-${squares}_${copy}" draggable="true" class="copen_polyomino copen_${color}_polyomino copen_${color}-${squares}" style="transform: rotateY(${flip}deg) rotateZ(${rotation}deg)">' +
                             '<div class="copen_polyomino_image"></div>' +
+                            '<div class="copen_polyominoes_remaining">${copy}</div>' +
                         '</div>';
 
 var jstpl_player_board = '<div class="copen_hand_size_wrapper">' +

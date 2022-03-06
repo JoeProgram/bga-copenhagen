@@ -60,7 +60,7 @@
     min-width: 250px;
 }
 
-
+/**************************** CARDS AND HARBOR ***********************/
 
 #harbors
 {
@@ -256,6 +256,9 @@
 #harbor_position_5{ left:330px; }
 #harbor_position_6{ left:396px; }
 
+
+/************************* GENERIC USABILITY STYLES ****************************/
+
 .copen_usable:hover
 {
     filter:  drop-shadow(0px 0px 5px white);
@@ -278,6 +281,7 @@
     display: none !important;
 }
 
+/********************************** POLYOMINOES *******************************/
 
 #polyominoes
 {
@@ -301,6 +305,7 @@
     display: block;
     width:  100%;
     height:  100%;
+    position: absolute;
     background-image: url('img/polyominoes.png');
     transform-style: preserve-3d;
 }
@@ -519,6 +524,59 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 }
 .copen_white-1 .copen_polyomino_image {background-position: -416px -106px; }
 
+/******************** POLYOMINOS REMAINING *************************/
+
+.copen_polyominoes_remaining
+{
+    display: none;
+    width: 34px;
+    height: 34px;
+    position: absolute;
+
+    font-size:  17px;
+    font-weight:  bold;
+
+    line-height: 34px; /* vertically centers text */
+}
+
+#polyominoes .copen_polyominoes_remaining
+{
+    display: block;
+}
+
+#polyominoes .copen_usable:active .copen_polyominoes_remaining
+{
+    display: none;
+}
+
+#polyominoes .copen_white-1 .copen_polyominoes_remaining
+{
+    display: none;
+}
+
+/* POSITION NUMBERS */
+.copen_green-4 .copen_polyominoes_remaining{ left: 34px; top: 34px; }
+.copen_green-5 .copen_polyominoes_remaining{ left: 0px; top: 34px; }
+.copen_red-3 .copen_polyominoes_remaining{ left: 0px; top: 34px; }
+.copen_red-4 .copen_polyominoes_remaining{ left: 0px; top: 34px; }
+.copen_red-5 .copen_polyominoes_remaining{ left: 0px; top: 34px; }
+.copen_blue-3 .copen_polyominoes_remaining{ left: 0px; top: 34px; }
+.copen_blue-4 .copen_polyominoes_remaining{ left: 0px; top: 34px; }
+.copen_blue-5 .copen_polyominoes_remaining{ left: 0px; top: 34px; }
+.copen_yellow-3 .copen_polyominoes_remaining{ left: 0px; top: 34px; }
+.copen_yellow-4 .copen_polyominoes_remaining{ left: 34px; top: 34px; }
+.copen_yellow-5 .copen_polyominoes_remaining{ left: 68px; top: 68px; }
+
+/* NUMBER COLORS */
+.copen_purple_polyomino .copen_polyominoes_remaining{ color:#321d42; }
+.copen_green_polyomino .copen_polyominoes_remaining{ color:#0f5310; }
+.copen_red_polyomino .copen_polyominoes_remaining{ color:#81211b; }
+.copen_blue_polyomino .copen_polyominoes_remaining{ color:#10587a; }
+.copen_yellow_polyomino .copen_polyominoes_remaining{ color:#806600; }
+
+
+
+/****************** CARDS IN HAND ***************************/
 
 .copen_player_area
 {
@@ -570,6 +628,9 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     width:  66px;
     height: 101px;
 }
+
+
+/****************** PLAYERBOARDS (THE HOUSES, NOT THE BGA UI) ***************************/
 
 .copen_playerboard
 {
@@ -737,6 +798,8 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 {
     display: inline-block;
 }
+
+/**************************** ABILITY TILES *****************************/
 
 #ability_tile_stacks
 {
@@ -970,7 +1033,7 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 {
     vertical-align: text-top;
     display:  inline-block;
-    width: 24px;
+    width: 23px;
     height: 23px;
     background-position: -450px 0px;
     background-image: url('img/tiles.png');

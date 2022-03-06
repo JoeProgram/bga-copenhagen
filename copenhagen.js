@@ -283,7 +283,6 @@ function (dojo, declare) {
 
             // TOOLTIPS
             this.updateSpecialAbilityTooltips();
-            this.updatePolyominoStackTooltips();
             
             this.determineTopPolyominoInEveryStack();
 
@@ -877,6 +876,7 @@ function (dojo, declare) {
             this.addTooltipHtmlToClass('copen_both_actions', _("Both actions: You can take cards and place a facade tile this turn"), "");
         },
 
+        /* REMOVING - BUT KEEPING AROUND JUST IN CASE FOR NOW
         updatePolyominoStackTooltips: function()
         {
 
@@ -908,7 +908,7 @@ function (dojo, declare) {
                 this.tooltips[stackId].showDelay = 500;
             }
 
-        },
+        },*/
 
         // IMMEDIATELY CLOSE TOOLTIPS
         //  tooltips and dragging don't play together well
@@ -3123,9 +3123,6 @@ function (dojo, declare) {
                 dojo.connect( newTopOfStack, "onclick", this, "onSelectPolyomino" );
                 this.connectDraggingEventsToPolyomino( newTopOfStack );
             }
-
-            // UPDATE STACK TOOLTIPS
-            this.updatePolyominoStackTooltips();
 
             // CLEAN UP POSITION UI
             if( this.player_id == notif.args.player_id)
