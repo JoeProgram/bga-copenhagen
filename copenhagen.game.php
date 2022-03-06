@@ -886,9 +886,9 @@ class Copenhagen extends Table
 
         // TODO- MAKE SURE CARD IS BESIDE EMPTY HARBOR SLOT
         $is_using_ability_any_cards = self::getGameStateValue("ability_activated_any_cards");
+        $adjacent_card_ids = $this->getCardIdsAdjacentToEmptyHarbor(); 
         if( !$is_using_ability_any_cards )
         {
-            $adjacent_card_ids = $this->getCardIdsAdjacentToEmptyHarbor(); 
             if( !in_array( $card_id, $adjacent_card_ids)) throw new feException( self::_("You have to take an adjacent card"));
         }
 
@@ -897,7 +897,10 @@ class Copenhagen extends Table
 
 
         // USE UP ANY USED ABILITIES
-        if( $is_using_ability_any_cards )
+        //  NOTE: We give the player a grace rule
+        //  If they have selected the any cards ability, but are taking two adjacent cards
+        //  we don't use up that ability
+        if( $is_using_ability_any_cards && !in_array( $card_id, $adjacent_card_ids) )
         {
             self::DbQuery("UPDATE ability_tile SET used = 1 WHERE ability_name = 'any_cards' AND owner = $player_id");
             $this->notifyPlayersOfUsedAbilities( ['any_cards'], $player_id, $player_name );
