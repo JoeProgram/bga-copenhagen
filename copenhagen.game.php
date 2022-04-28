@@ -1387,13 +1387,14 @@ class Copenhagen extends Table
         self::notifyPlayer( 
             $player_id,
             "activateAbilityChangeOfColors", 
-            clienttranslate('${player_name} is using the ${ability_log_name} ability to change ${from_color} cards to ${to_color}'),
+            clienttranslate('${player_name} is using the ${ability_log_name} ability to change ${from_color_translated} cards to ${to_color_translated}'),
             array(
                 "player_name" => $player_name,
                 "ability_log_name" => $ability_log_name,
                 "from_color" => $from_color,
                 "to_color" => $to_color,
-
+                "from_color_translated" => $this->colors_translated[$from_color],
+                "to_color_translated" => $this->colors_translated[$to_color],
                 "player_id" => $player_id,
                 "ability_name" => 'change_of_colors',
             )   
