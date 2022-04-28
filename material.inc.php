@@ -29,6 +29,13 @@ $this->board_width = 5;
 $this->end_of_game_points = 12;
 
 $this->colors = array("red", "yellow", "green", "blue", "purple");
+$this->colors_translated = array(
+    "red" => clienttranslate("red"),
+    "yellow" => clienttranslate("yellow"),
+    "green" => clienttranslate("green"),
+    "blue" => clienttranslate("blue"),
+    "purple" => clienttranslate("purple"),
+);
 $this->polyomino_colors = array("red", "yellow", "green", "blue", "purple", "white");
 $this->white_polyomino_copies = 12;
 

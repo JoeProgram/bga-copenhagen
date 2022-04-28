@@ -753,12 +753,13 @@ class Copenhagen extends Table
     {
         self::notifyAllPlayers( 
             "takeCard", 
-            clienttranslate('${player_name} takes a ${color} card'),
+            clienttranslate('${player_name} takes a ${color_translated} card'),
             array(
                 "card_id" => $card_id,
                 "player_id" => $player_id,
                 "player_name" => $player_name,
                 "color" => $color,
+                "color_translated" => $this->colors_translated[$color],
                 "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
             )   
         );
