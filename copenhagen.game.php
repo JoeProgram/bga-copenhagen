@@ -755,6 +755,7 @@ class Copenhagen extends Table
             "takeCard", 
             clienttranslate('${player_name} takes a ${color_translated} card'),
             array(
+                "i18n" => array( "color_translated" ), // need to call out which parameters will be translated.  Also have do wrap those parameters in clienttranslate() at some point.
                 "card_id" => $card_id,
                 "player_id" => $player_id,
                 "player_name" => $player_name,
@@ -1385,10 +1386,11 @@ class Copenhagen extends Table
         // NOTIFICATION
        $ability_log_name = $this->ability_log_names['change_of_colors'];
         self::notifyPlayer( 
-            $player_id,
+            $player_id, 
             "activateAbilityChangeOfColors", 
             clienttranslate('${player_name} is using the ${ability_log_name} ability to change ${from_color_translated} cards to ${to_color_translated}'),
             array(
+                "i18n" => array( "from_color_translated","to_color_translated" ),
                 "player_name" => $player_name,
                 "ability_log_name" => $ability_log_name,
                 "from_color" => $from_color,
