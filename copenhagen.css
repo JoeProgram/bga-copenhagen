@@ -66,8 +66,9 @@
 {
     position: absolute;
     display:  block;
+    top: -5px;
     left: 31px;
-    height: 7px;
+    height: 13px;
     width: 462px;
 
 }
@@ -77,7 +78,7 @@
     display: inline-block;
     position: absolute;
     width: 66px;
-    height: 6px;
+    height: 13px;
     background-image:  url('img/harbor.png');
     background-repeat: no-repeat;
 }
