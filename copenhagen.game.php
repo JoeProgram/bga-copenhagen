@@ -1273,6 +1273,13 @@ class Copenhagen extends Table
             )   
         );
 
+        // RESET FLAGS THAT MARK ABILITIES AS ACTIVE
+        self::setGameStateValue( 'ability_activated_any_cards', 0 );
+        self::setGameStateValue( 'ability_activated_additional_card', 0 );
+        self::setGameStateValue( 'ability_activated_construction_discount', 0 );
+        self::setGameStateValue( 'ability_activated_change_of_colors', 0 );
+        self::setGameStateValue( 'ability_activated_both_actions', 0 );
+        
         // COAT OF ARMS
         $coat_of_arms_earned = self::getGameStateValue( 'coat_of_arms_earned' );
         $coat_of_arms_earned -= 1;
