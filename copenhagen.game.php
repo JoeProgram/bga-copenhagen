@@ -972,15 +972,18 @@ class Copenhagen extends Table
         //   Cards are discarded face up, so it's okay to notify all players of the specific card discarded
         self::notifyAllPlayers( 
             "discardDownToMaxHandSize", 
-            clienttranslate('${player_name} discards a ${color} card'),
+            clienttranslate('${player_name} discards a ${color_translated} card'),
             array(
+                "i18n" => array( "color_translated"),
                 "player_id" => $player_id,
                 "player_name" => self::getActivePlayerName(),
                 "card_id" => $card_id,
                 "color" => $card["type"],
+                "color_translated" => $this->colors_translated[ $card["type"]],
                 "hand_size" => $this->cards->countCardInLocation( 'hand', $player_id ),
             )   
         );
+        
         
         $this->gamestate->nextState( $this->getNextTakeCardsState() );
 
