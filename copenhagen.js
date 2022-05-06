@@ -1562,12 +1562,14 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper #harbor_cards").addClass("copen_behind_shadow_box");
             dojo.query("#copen_wrapper #polyominoes").addClass("copen_behind_shadow_box");  
             dojo.query("#copen_wrapper #opponent_playerboards").addClass("copen_behind_shadow_box");  
-            dojo.query("#copen_wrapper #ability_tile_stacks").addClass("copen_behind_shadow_box");  
+            dojo.query("#copen_wrapper #ability_tile_stacks").addClass("copen_behind_shadow_box");
+            dojo.query("#copen_wrapper .copen_playerboard_image").addClass("copen_behind_shadow_box");  
 
+			// select elements to show
             dojo.query("#copen_wrapper #polyomino_placement").style("display","block");
             dojo.query("#copen_wrapper #polyomino_placement_buttons").style("display","block"); // sometimes we turn this off seperately from its parent - so make sure it's back on too
 
-
+			// fade in scrim
             dojo.animateProperty({
                 node: "shadow_box",
                 duration: 500,
@@ -1576,6 +1578,26 @@ function (dojo, declare) {
                     opacity: {start: 0, end: 0.5},
                 }
             }).play();
+            
+            // MAKE BUTTONS POP IN
+            var buttonIds = ["polyomino_rotate_button", "polyomino_flip_button"].forEach( function(button){
+            
+	            dojo.style(button,"transform", "scale(0)");
+	            // pop in buttons with animation so they're more visible
+	            dojo.animateProperty({
+					node: "polyomino_rotate_button",
+					duration: 500,
+					delay:500,
+					easing: dojo.fx.easing.backOut,
+					properties:
+					{
+						s: {start: 0, end: 1},
+	                },
+	                onAnimate: function (values) {
+	                    dojo.style(button, "transform", `scale(${values.s.replace("px","")})`);
+	                },
+				}).play();
+			});
 
         },
 
