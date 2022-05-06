@@ -182,7 +182,10 @@ function (dojo, declare) {
                     'jstpl_player_board', 
                     {hand_size: gamedatas.hand_sizes[player_id], player_id: player_id}
                 ), player_score_div, "after" );
+                
+                this.displayNumberOfCardsInHand(player_id, gamedatas.hand_sizes[player_id]); // add tooltips too
             }
+            
 
             // PLAYERBOARD DATA OBJECT
             this.playerboard = gamedatas.playerboards[this.player_id];
@@ -211,6 +214,7 @@ function (dojo, declare) {
                 this.placeOnObject( card, "hand_bottom_card_target" );
             }
             this.splayCardsInHand();
+
 
 
             // POLYOMINOES
@@ -432,7 +436,7 @@ function (dojo, declare) {
 
             for( var i = 0; i < cardsInHand.length; i++ )
             {
-                // have to connect this a little differently, since we want to remove thse handlers later
+                // have to connect this a little differently, since we want to remove these handlers later
                 var handlers = this.connectMouseOverEventsToCard( cardsInHand[i]);
                 handlers.push( dojo.connect( cardsInHand[i], "onclick", this, "onDiscardCardOverMaxHandSize"));
                 
@@ -876,40 +880,6 @@ function (dojo, declare) {
             this.addTooltipHtmlToClass('copen_both_actions', _("Both actions: You can take cards and place a facade tile this turn"), "");
         },
 
-        /* REMOVING - BUT KEEPING AROUND JUST IN CASE FOR NOW
-        updatePolyominoStackTooltips: function()
-        {
-
-            var stackQuery = dojo.query('.copen_stack');
-            var totalWhitePolyominoesRemaining = 0;
-
-            for( var i = 0; i < stackQuery.length; i++)
-            {
-                var color = stackQuery[i].id.split('-')[0];
-                var tilesInStack = stackQuery[i].children.length;
-
-                if( color != "white")
-                {
-                    this.addTooltipHtml(stackQuery[i].id,_(`${tilesInStack} ${color} facade tile(s)`),'');
-                    this.tooltips[stackQuery[i].id].showDelay = 500;
-                }
-                else
-                {
-                    totalWhitePolyominoesRemaining += tilesInStack;
-                }
-            }
-
-            // SPECIAL COUNT FOR WHITE
-            //  It's probably a little more useful just to count all the tiles, rather than each individual stack
-            for( var i = 1; i <= 4; i++)
-            {
-                var stackId = `white-1_stack_${i}`;
-                this.addTooltipHtml(stackId,_(`${totalWhitePolyominoesRemaining} ${color} facade tile(s)`),'');
-                this.tooltips[stackId].showDelay = 500;
-            }
-
-        },*/
-
         // IMMEDIATELY CLOSE TOOLTIPS
         //  tooltips and dragging don't play together well
         hideTooltip() { 
@@ -1020,6 +990,28 @@ function (dojo, declare) {
         {
             return dojo.query("#copen_wrapper #cards_in_hand .copen_card").length > this.maxHandSize;
         },
+        
+        // update the display and tooltips 
+        // that count how many cards a player has in their hand
+        // can be used for active player or opponents
+        displayNumberOfCardsInHand: function( player_id, hand_size )
+        {
+			dojo.query(`#player_board_${player_id} .copen_hand_size_number`)[0].textContent = hand_size;
+			
+			if( player_id == this.player_id)
+			{
+				// BGA FRAMEWORK NOTE - Since this string will be translated, I _think_ doing it with dojo.string.substitute is a little more secure than doing it with string templates
+				var hand_tooltip_text = dojo.string.substitute( _("You have ${hand} cards in hand, out of a maximum of 7."), {
+	    			hand: hand_size,
+				} );
+				
+				this.addTooltip(`player_hand_size_${player_id}`, hand_tooltip_text,'');
+				
+				this.addTooltip("cards_in_hand", hand_tooltip_text,'');
+			}
+			
+			
+		},
 
         /**************** CARDS IN HAND ARRANGEMENT *****************************/
 
@@ -1070,6 +1062,9 @@ function (dojo, declare) {
                     game.placeOnObjectPos( card, "top_chunk", x, 0);
                 }, i * game.animationTimeBetweenCardSpread );
             }
+            
+            // HIDE CARD COUNTING TOOLTIP
+            this.removeTooltip('cards_in_hand'); 
         },
 
         spreadCardsHorizontallyByColor: function()
@@ -2239,6 +2234,7 @@ function (dojo, declare) {
 
             dojo.style("change_of_colors_ui","display","block");
             this.placeOnObjectPos( "change_of_colors_ui", selectedCard, 0, y );
+            
         },
 
         fadeOutChangeOfColorsUI: function()
@@ -2263,6 +2259,8 @@ function (dojo, declare) {
             }).play();
 
             this.splayCardsInHand(); 
+            
+            this.displayNumberOfCardsInHand( this.player_id, this.getNumberOfCardsInHand()); // restore the tooltip on cards in hand
         },
 
         ///////////////////////////////////////////////////
@@ -2886,6 +2884,8 @@ function (dojo, declare) {
             // DISPLAY UNDO BUTTON
             dojo.style("undo","display","inline");
 
+            // HIDE CARD COUNTING TOOLTIP
+            this.removeTooltip('cards_in_hand');
 
         },
 
@@ -3054,7 +3054,7 @@ function (dojo, declare) {
             }
 
             // UPDATE CARD AMOUNT UI
-            dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
+            this.displayNumberOfCardsInHand( notif.args.player_id, notif.args.hand_size );
 
         },
 
@@ -3067,7 +3067,7 @@ function (dojo, declare) {
             }
 
             // UPDATE CARD AMOUNT UI
-            dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
+            this.displayNumberOfCardsInHand( notif.args.player_id, notif.args.hand_size );
         },
 
         notif_refillHarbor: function(notif)
@@ -3146,7 +3146,7 @@ function (dojo, declare) {
             dojo.forEach( this.discardHandlers, dojo.disconnect);
 
             // UPDATE CARD AMOUNT UI
-            dojo.query(`#player_board_${notif.args.player_id} .copen_hand_size_number`)[0].textContent = notif.args.hand_size;
+            this.displayNumberOfCardsInHand( notif.args.player_id, notif.args.hand_size );
 
 
             // SHOW FEEDBACK FOR COAT OF ARMS

@@ -221,7 +221,7 @@ var jstpl_polyomino=    '<div id="${color}-${squares}_${copy}" draggable="true" 
 var jstpl_player_board = '<div class="copen_hand_size_wrapper">' +
                             '<div class="copen_hand_size_card">' +
                                 '<div id="player_hand_size_${player_id}" class="copen_hand_size_number">' +
-                                    '${hand_size}' +
+                                    '${hand_size}'+
                                 '</div>' +
                             '</div>' + 
                         '</div>';
