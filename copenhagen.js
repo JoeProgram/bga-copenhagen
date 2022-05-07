@@ -326,7 +326,11 @@ function (dojo, declare) {
             // Setup game notifications to handle (see "setupNotifications" method below)
             this.setupNotifications();
 
+			// SAFARI SPECIFIC SETUP
             if( dojo.isSafari ) this.adjustAbilityTilesForSafari();
+
+			// REPLAY SPECIFIC SETUP
+			if( dojo.byId("archivecontrol")) dojo.style("shadow_box","display","none");
 
             //console.log( "Ending game setup" );
 
