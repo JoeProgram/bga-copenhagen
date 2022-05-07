@@ -330,7 +330,7 @@ function (dojo, declare) {
             if( dojo.isSafari ) this.adjustAbilityTilesForSafari();
 
 			// REPLAY SPECIFIC SETUP
-			if( dojo.byId("archivecontrol")) dojo.style("shadow_box","display","none");
+			if( dojo.byId("archivecontrol").children.length != 0 ) dojo.style("shadow_box","display","none");
 
             //console.log( "Ending game setup" );
 
