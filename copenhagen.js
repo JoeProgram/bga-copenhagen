@@ -2938,7 +2938,8 @@ function (dojo, declare) {
 
 
             // GIVE INSTRUCTIONS
-            this.gamedatas.gamestate.descriptionmyturn = _(`Treat ${color} cards as what color?`);
+            this.gamedatas.gamestate.descriptionmyturn = dojo.string.substitute( _("Treat ${color_translated} cards as what color?"), {color_translated: _(`${color}`)} );
+            
             this.updatePageTitle();
             
             // CLEAN UP EFFECTS ON CARDS IN HAND
