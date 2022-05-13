@@ -84,7 +84,21 @@ $stats_type = array(
         "ability_tiles_used" => array("id"=> 12,
             "name" => totranslate("Ability tiles used"),
             "type" => "int" ),
-
+        "brickwork_rows" => array("id"=> 18,
+            "name" => totranslate("Points from rows with brickwork"),
+            "type" => "int" ),
+        "window_rows" => array("id"=> 19,
+            "name" => totranslate("Points from rows with all windows"),
+            "type" => "int" ),
+        "brickwork_columns" => array("id"=> 20,
+            "name" => totranslate("Points from columns with brickwork"),
+            "type" => "int" ),
+        "window_columns" => array("id"=> 21,
+            "name" => totranslate("Points from columns with all windows"),
+            "type" => "int" ),
+        "empty_spaces" => array("id"=> 22,
+            "name" => totranslate("Empty spaces"),
+            "type" => "int" ),
 
 
     ),

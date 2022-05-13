@@ -118,6 +118,11 @@ class Copenhagen extends Table
         self::initStat( 'player', "cards_drawn", 0 );
         self::initStat( 'player', "cards_discarded_too_many", 0 );
         self::initStat( 'player', "facade_tiles_placed", 0 );
+        self::initStat( 'player', "brickwork_rows", 0 );
+        self::initStat( 'player', "window_rows", 0 );
+        self::initStat( 'player', "brickwork_columns", 0 );
+        self::initStat( 'player', "window_columns", 0 );
+        self::initStat( 'player', "empty_spaces", $this->board_squares );
 
         // SETUP DECK
         $cards_per_color = 14;
@@ -1098,7 +1103,14 @@ class Copenhagen extends Table
             $sql = "UPDATE board_cell SET color = '$color', fill = '$fill' WHERE owner = $player_id AND x = $grid_cell[x] AND y = $grid_cell[y] ;";
             self::DbQuery(  $sql );
         }
-        self::incStat( count($grid_cells), "squares_covered", $player_id );
+        
+        // UPDATE STATISTICS FOR GRID CELLS
+        $grid_cell_count = count($grid_cells);
+        self::incStat( $grid_cell_count, "squares_covered", $player_id );
+        
+        $squares_covered = self::getStat("squares_covered", $player_id );
+        $empty_squares = $this->board_squares - $squares_covered;
+        self::setStat( $empty_squares, "empty_spaces", $player_id );
 
         // GET NEW, UPDATED COPY OF PLAYERBOARD
         $playerboard = $this->getPlayerboard( $player_id );
@@ -1574,13 +1586,36 @@ class Copenhagen extends Table
 
         $points = 0;
 
-
-
         $playerboard = $this->getPlayerboard( $player_id );
 
-        for( $x = 0; $x < $this->board_width; $x++) $points += ( $this->getColumnPoints($x, $playerboard));
-        for( $y = 0; $y < $this->board_height; $y++) $points += ( $this->getRowPoints($y, $playerboard));
+        
+        // ROW AND COLUMN STATS
+        $brickwork_column_points = 0;
+        $window_column_points = 0;
+        $brickwork_row_points = 0;
+        $window_row_points = 0;
+        
+        // COUNT UP COMPLETED ROWS AND COLUMNS
+        for( $x = 0; $x < $this->board_width; $x++)
+        {
+            $column_points = $this->getColumnPoints($x, $playerboard);
+            
+            if( $column_points == $this->window_column_value) $window_column_points += $column_points;
+            else $brickwork_column_points += $column_points;
+            
+            $points += $column_points;
+        }
+        for( $y = 0; $y < $this->board_height; $y++)
+        {
+            $row_points = ( $this->getRowPoints($y, $playerboard));
+            
+            if( $row_points == $this->window_row_value) $window_row_points += $row_points;
+            else $brickwork_row_points += $row_points;
+            
+            $points += $row_points;
+        }
 
+        // UPDATE DATABASE AND NOTIFY, IF NEEDED
         if( $points != $previous_points )
         {
 
@@ -1599,6 +1634,13 @@ class Copenhagen extends Table
                     "point_difference" => $point_difference,
                 )   
             );
+            
+            // UPDATE ROW AND COLUMN STATISTICS
+            self::setStat( $brickwork_column_points, "brickwork_columns", $player_id);
+            self::setStat( $window_column_points, "window_columns", $player_id);
+            self::setStat( $brickwork_row_points, "brickwork_rows", $player_id);
+            self::setStat( $window_row_points, "window_rows", $player_id);
+            
         }
 
         // CHECK IF THEY CROSSED THE ENDGAME SCORE THRESHOLD
