@@ -1734,7 +1734,7 @@ function (dojo, declare) {
                 duration: 500,
                 properties: 
                 {
-                    opacity: {start: 0.5, end: 0},
+                    opacity: { end: 0},
                 }
             }).play(); 
         },
@@ -1842,6 +1842,28 @@ function (dojo, declare) {
             var validity = this.isValidPlacementPosition( gridCells );
             this.styleSelectedPolyominoBasedOnValidity( validity, gridCells );
         },
+
+		// IS THE POLYOMINO OVERLAPPING THE PLAYER'S BOARD AT ALL?
+		isPolyominoAboveBoard: function()
+		{
+			// FIRST, SCOOT POLYOMINO TO BE FULLY ON BOARD (IF NEEDED)
+            var boardCellsNode = dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cells`)[0];
+        	var polyominoNode = dojo.byId(this.selectedPolyomino.id);
+
+            boardCellsNodePosition = dojo.position( boardCellsNode, true );
+            polyominoNodePosition = dojo.position( polyominoNode, true);
+            
+            console.log("boardCellsNodePosition");
+            console.log(boardCellsNodePosition);
+            console.log("polyominoNodePosition");
+            console.log(polyominoNodePosition);
+            
+            
+            return ( polyominoNodePosition.x + polyominoNodePosition.w > boardCellsNodePosition.x)
+             	&& ( polyominoNodePosition.x < boardCellsNodePosition.x + boardCellsNodePosition.w)
+            	&& ( polyominoNodePosition.y + polyominoNodePosition.h > boardCellsNodePosition.y)
+            	&& ( polyominoNodePosition.y < boardCellsNodePosition.y + boardCellsNodePosition.h);
+		},
 
         dropPolyominoOnBoard: function()
         {
@@ -2508,6 +2530,12 @@ function (dojo, declare) {
             dojo.stopEvent( event );
             if( this.selectedPolyomino == null ) return;
 
+			// IF POLYOMINO ISN'T OVERLAPPING BOARD AT ALL, CANCEL PLACEMENT
+			if( !this.isPolyominoAboveBoard()) 
+			{
+				this.onCancelPolyominoPlacement( event );
+				return;
+			}
 
             // IF WE START WITH DRAG, WE DON'T TURN ON PLACEMENT UI IMMEDIATELY.
             //   do it now, if it hasn't been done
@@ -2938,7 +2966,7 @@ function (dojo, declare) {
 
 
             // GIVE INSTRUCTIONS
-            this.gamedatas.gamestate.descriptionmyturn = dojo.string.substitute( _("Treat ${color_translated} cards as what color?"), {color_translated: _(`${color}`)} );
+            this.gamedatas.gamestate.descriptionmyturn = dojo.string.substitute( _("Treat ${color_translated} cards as what color?"), {color_translated: _(color)} );
             
             this.updatePageTitle();
             
