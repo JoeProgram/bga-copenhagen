@@ -1054,6 +1054,7 @@ class Copenhagen extends Table
         if( !$this->isGroundedPosition($grid_cells, $playerboard)) throw new feException( self::_("The polyomino must sit on the bottom of the facade, or on another facade tile"));
 
         // CHECK PLAYER CAN AFFORD POLYOMINO
+        $is_adjacent_to_same_color = false;
         if( $color == "white")
         {
             if($this->gamestate->state()["name"] != "coatOfArms") throw new feException( self::_("You can only play special facade tiles from a coat of arms action"));
@@ -1061,7 +1062,11 @@ class Copenhagen extends Table
         else
         {
             $cost = $squares;
-            if( $this->isAdjacentToSameColor($grid_cells, $playerboard, $color)) $cost -= 1;
+            if( $this->isAdjacentToSameColor($grid_cells, $playerboard, $color))
+            {
+                $is_adjacent_to_same_color = true;
+                $cost -= 1;
+            }
             if( self::getGameStateValue("ability_activated_construction_discount") == 1 ) $cost -= 1;
 
             $valid_cards = $this->getCardsOfColorInHand( $color );
@@ -1174,8 +1179,10 @@ class Copenhagen extends Table
         $discarded_card_count = count($discard_ids);
 
         // DIFFERENT MESSAGES FOR NORMAL AND WHITE TILES
-        $notifyPlayerMessage = clienttranslate('${player_name} discards ${discarded_card_count} card(s) and places ${log_polyomino}');
-        if( $color == "white") $notifyPlayerMessage = clienttranslate('${player_name} places ${log_polyomino}');
+        $notify_player_message = clienttranslate('${player_name} discards ${discarded_card_count} card(s) and places ${log_polyomino}');
+        if( $is_adjacent_to_same_color ) $notify_player_message =  clienttranslate( '${player_name} discards ${discarded_card_count} card(s) and places ${log_polyomino} They discarded 1 less card because it\'s touching a tile of the same color.'); // NOTE: I would love not to repeat the text here, but couldn't figure out how to get it to translate otherwise.
+        
+        if( $color == "white") $notify_player_message = clienttranslate('${player_name} places ${log_polyomino}');
         
         // USE UP ANY ACTIVATED ABILITIES
         if( self::getGameStateValue("ability_activated_construction_discount") == 1)
@@ -1195,7 +1202,7 @@ class Copenhagen extends Table
         // NOTIFY CLIENTS
         self::notifyAllPlayers( 
             "placePolyomino", 
-            $notifyPlayerMessage,
+            $notify_player_message,
             array(
                 "player_name" => $player_name,
                 "discarded_card_count" => $discarded_card_count, 
