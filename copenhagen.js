@@ -10,9 +10,7 @@
  *
  * copenhagen.js
  *
- * Copenhagen user interface script
- * 
- * In this file, you are describing the logic of your user interface, in Javascript language.
+ * This file handles all the interactions of the client-side logic and communication with the server. 
  *
  */
 
@@ -26,17 +24,15 @@ define([
 ],
 function (dojo, declare) {
     return declare("bgagame.copenhagen", ebg.core.gamegui, {
+	
+		
+		// Defines global variables and data structures used throughout the client
         constructor: function(){
-            // console.log('copenhagen constructor');
-              
-            // Here, you can init the global variables of your user interface
-            // Example:
-            // this.myGlobalValue = 0;
 
+			// global variables about the layout of the boards and basic game rules
             this.boardWidth = 5;
             this.boardHeight = 9;
             this.playerboard = [];
-
             this.cellMeasurement = 34;
             this.cardWidth = 66;
             this.cardHeight = 101;
@@ -44,26 +40,44 @@ function (dojo, declare) {
             this.cardHorizontalSpacing = 20;
             this.colorChangeUITop = 360;
             this.maxHandSize = 7;
-            this.maxHandSizeDiscardHandlers = []; // keep track of the events we attach to cards to allow the player to discard - since we'll want to disconnect them afterwards
+			this.whitePolyominosPerStack = 3;
+			
+			// magic numbers for animation timing
+			this.discardAnimationTime = 500;
+            this.animationTimeBetweenRefillHaborCards = 100;
+            this.animationTimeBetweenCardSpread = 25;
 
+			// Determines how extreme the 3d effect of card hovering is
             this.cardXAxisRotationFactor = 1/4.0;
             this.cardYAxisRotationFactor = 1/2.0;
 
             this.stateName = "";
 
+			// since the cards in this game are just simple colors and have no special abilities, we can automatically sort them for the player to make counting easier.
+			// here we sort them by rainbow order
             this.cardColorOrder = ["copen_red_card", "copen_yellow_card", "copen_green_card", "copen_blue_card", "copen_purple_card"];
+    
+    		// when checking adjacent spots on the playerboard,
+    		// we check right, down, left, and up - mathematically defined here as a list of objects
             this.adjacentOffsets = [{x:1,y:0}, {x:0,y:-1}, {x:-1,y:0}, {x:0,y:1}];
 
-            this.whitePolyominosPerStack = 3;
+            // Players on BGA often play without reading all the rules
+            // The mermaid card rule is the one that consistenly catches them off-guard when the game seems to suddenly end
+            // so we add some extra effects to help warn players that it's coming
             this.mermaidCardWarningThreshold = 10;
             this.mermaidCardWarningAnimation = null;
 
             // keys in the log that we do custom pre-processing on
+            // this allows us to put pictures in the game log, which is a lot better player experience than saying
+           	// "4-square purple facade tile"
             this.preprocess_string_keys = [
                 'log_polyomino', 
                 'log_ability_tile',
             ]; 
 
+			// A dictionary of polyonimno shapes as represented by local coordinates
+			// We manipulate these during rotation and flipping to help the client keep track of valid or invalid placements,
+			// as well as color adjacency bonuses
             this.polyominoShapes = {
                 "purple-2":[{x:0,y:0},{x:1,y:0}],
                 "purple-3":[{x:0,y:0},{x:1,y:0},{x:2,y:0}],
@@ -93,13 +107,17 @@ function (dojo, declare) {
                 "white-1":[{x:0,y:0}],
             };
 
+			// a data structure to represent the player's polyomino that they're actively placing
             this.selectedPolyomino = null;
-            this.selectPolyominoEventHandlerName = "onSelectPolyomino";
 
-            this.dragClient = {x:0, y:0 };
+			// surprisingly, dragging still doesn't have great cross-browser support.
+			// we need to store a little extra data to help out mobile systems and firefox drag properly.
+            this.dragClient = {x:0, y:0 }; //used to pass the data of the dragged objects position from onDragOver to other DragEvents
             this.dragPositionLastFrame = {x:0, y:0};
+            this.isMobileDragging = 0; // there's a separate system for dragging on mobile. This keep tracks whether the drag has actually started.
 
-
+			// these are the 5 abilities in the game
+			// storing in them a dictionary makes the setup code cleaner
             this.abilityEventHandlers = {
                 "any_cards":"onActivateAbilityAnyCards",
                 "additional_card":"onActivateAbilityAdditionalCard",
@@ -108,6 +126,8 @@ function (dojo, declare) {
                 "both_actions":"onActivateAbilityBothActions",
             };
 
+			// track flags and event handlers - particularly event handlers that are dynamic (like on discarding cards from the hand)
+			this.maxHandSizeDiscardHandlers = []; // keep track of the events we attach to cards to allow the player to discard - since we'll want to disconnect them afterwards
             this.hasConstructionDiscounted = false;
             this.changeOfColorsCardHandlers = []; // keep track of the click handles attached to the hand of cards (doing it this way since cards in hand change all the time)
             this.changeColorsFromTo = null;
@@ -115,9 +135,7 @@ function (dojo, declare) {
             this.cellToPlacePolyomino = null;
             this.discardHandlers = []; // keep track of click handles attached to cards in hand when choosing which cards to discard
 
-            this.discardAnimationTime = 500;
-            this.animationTimeBetweenRefillHaborCards = 100;
-            this.animationTimeBetweenCardSpread = 25;
+
 
         },
         
@@ -131,23 +149,21 @@ function (dojo, declare) {
             _ when the game starts
             _ when a player refreshes the game page (F5)
             
-            "gamedatas" argument contains all datas retrieved by your "getAllDatas" PHP method.
+            "gamedatas" argument contains all datas retrieved by the "getAllDatas" PHP method.
         */
         
         setup: function( gamedatas )
         {
-            //console.log( "Starting game setup" );
-
             // DEBUG - see all game data in console
             // console.log( gamedatas);
 
             // INITALIZE VALUES
-            //  since we're now supporting undo - these need to be initialized here
+            //  To support undo, these need to be initialized here
             this.maxHandSizeDiscardHandlers = [];
             this.stateName = "";
             this.selectedPolyomino = null;
             this.hasConstructionDiscounted = false;
-            this.dragClient = {x:0, y:0 };
+            this.dragClient = {x:0, y:0 };   
             this.dragPositionLastFrame = {x:0, y:0};
             this.changeOfColorsCardHandlers = []; 
             this.changeColorsFromTo = null;
@@ -165,12 +181,13 @@ function (dojo, declare) {
             this.updateDeckDisplay(gamedatas.cards_in_deck);
 
             // HARBOR CARDS
+            //  the cards players can choose from
             for( var card_id in gamedatas.harbor )
             {
                 this.makeHarborCard( gamedatas.harbor[card_id] );
             }
 
-            // UI PLAYERBOARDS
+            // UI PLAYER_BOARDS
             //   the bga boxes containing the score - not the buildings
             for( var player_id in gamedatas.players )
             {
@@ -188,6 +205,7 @@ function (dojo, declare) {
             
 
             // PLAYERBOARD DATA OBJECT
+            //  these are the buildings players place their polyominoes down on
             this.playerboard = gamedatas.playerboards[this.player_id];
 
             // PLAYER BOARDS 
@@ -270,13 +288,14 @@ function (dojo, declare) {
                 var query = dojo.query(`#copen_wrapper #copen_ability_slot_${abilityName}_${this.player_id} .copen_ability_tile:not(.copen_used_ability)`);
                 if( query.length > 0 ) dojo.addClass( query[0], "copen_activated");
 
-                // SPECIAL BEHAVIOR FOR CONSTRUCTION DISCOUNT
+                // ABILITY - CONSTRUCTION DISCOUNT
                 if( abilityName == "construction_discount")
                 {
                     this.hasConstructionDiscounted = true;
                     this.determineUsablePolyominoes();
                 }
 
+				// ABILITY - CHANGE OF COLORS
                 if( abilityName == "change_of_colors")
                 {
                     this.triggerChangeOfColorsAbility( this.gamedatas.change_of_colors.from_color, this.gamedatas.change_of_colors.to_color);
@@ -288,26 +307,36 @@ function (dojo, declare) {
             // TOOLTIPS
             this.updateSpecialAbilityTooltips();
             
+            
+            // CONNECT INTERACTIVE ELEMENTS
+            
+            // Only the top polyomino in each stack should be interactible
             this.determineTopPolyominoInEveryStack();
 
-            // CONNECT INTERACTIVE ELEMENTS
-
+			// NEEDED FOR PROPER DRAGGING CURSOR
             dojo.query("#copen_wrapper").connect( 'ondragover', this, 'onDragOver');
 
             var game = this;
             dojo.query("#copen_wrapper #harbor_cards .copen_card").forEach( function(x){ game.connectMouseOverEventsToCard(x); });    
 
-            dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, this.selectPolyominoEventHandlerName); 
+			// CONNECT EVENTS TO POLYOMINOES
+			// To support clicking and dragging, many events are needed
+            dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'onclick', this, "onSelectPolyomino"); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ondragstart', this, "onDragStartPolyomino"); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ontouchstart', this, "onTouchStartPolyomino"); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ondrag', this, "onDragPolyomino"); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ontouchmove', this, "onTouchMovePolyomino"); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ondragend', this, "onDragEndPolyomino"); 
             dojo.query("#copen_wrapper #polyominoes .copen_polyomino.copen_top_of_stack").connect( 'ontouchend', this, "onTouchEndPolyomino"); 
+            
+            // CONNECT EVENTS TO PLAYER BOARD
+            //	If the player isn't dragging, they're clicking on the polyomino, then clicking on the board to place it
+            //  so the playerboard also needs to respond to events
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onclick', this, 'onPositionPolyomino');
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cell").connect( 'onmouseover', this, 'onPreviewPlacePolyomino');
             dojo.query("#copen_wrapper #owned_player_area .copen_board_cells").connect( 'onmouseout', this, 'onClearPreviewPolyomino');            
             
+            // POLYOMINO TRANSFORMATION BUTTONS
             dojo.query("#copen_wrapper #polyomino_rotate_button").connect( 'onclick', this, 'onRotatePolyomino');
             dojo.query("#copen_wrapper #polyomino_flip_button").connect( 'onclick', this, 'onFlipPolyomino');
 
@@ -340,7 +369,7 @@ function (dojo, declare) {
         //// Game & client states
         
         // onEnteringState: this method is called each time we are entering into a new game state.
-        //                  You can use this method to perform some user interface changes at this moment.
+        //                  Use this method to perform some user interface changes at this moment.
         //
         onEnteringState: function( stateName, args )
         {
@@ -391,6 +420,7 @@ function (dojo, declare) {
             }
         },
 
+
         onEnteringPlayerTurn( args )
         {
 
@@ -416,6 +446,7 @@ function (dojo, declare) {
 
         },
 
+		// REMOVE INTERACTIVE ELEMENTS IF ITS NO LONGER THE PLAYERS TURN
         onLeavingPlayerTurn()
         {
             dojo.query("#copen_wrapper .copen_card.copen_usable").removeClass("copen_usable");
@@ -424,6 +455,7 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper .copen_polyomino.copen_unusable").removeClass("copen_unusable");
         },
 
+		// IF THE PLAYER HAS TOO MANY CARDS, GO TO A SPECIAL GAME STATE
         onEnteringStateDiscardDownToMaxHandSize( args )
         {
 
@@ -476,6 +508,8 @@ function (dojo, declare) {
             this.splayCardsInHand();
         },
 
+		// ONCE A PLAYER HAS TAKEN A CARD
+		//  they usually have to take an adjacent one, so the set of valid choices changes
         onEnteringTakeAdjacentCard( args )
         {
             if( args.active_player == this.player_id )
@@ -505,6 +539,7 @@ function (dojo, declare) {
 
         },
 
+		// THIS SPECIAL ABILITY LETS THE PLAYER TAKE ANY CARD
         onEnteringTakeAdditionalCard( args )
         {
             if( args.active_player == this.player_id )
@@ -523,6 +558,9 @@ function (dojo, declare) {
 
         },   
 
+		// LAST CALL STATES ARE SPECIAL REMINDER STATES
+		//  We try to be generous to the player, since in the physical game players can be pretty sloppy with the order of doing actions and turning over tiles
+		//  To help simulate that workflow, we call out possible tiles the player might have meant to use, rather than assuming to skip past them
         onEnteringTakeCardsLastCall( args )
         {
             if( args.active_player == this.player_id )
@@ -537,6 +575,8 @@ function (dojo, declare) {
 
         },      
 
+		// A special ability lets the player place a polyomino after taking cards
+		//  but its a special state, as some of the actions are no longer available
         onEnteringPlacePolyominoAfterTakingCards( args )
         {
             if( args.active_player == this.player_id )
@@ -557,6 +597,10 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper .copen_polyomino.copen_unusable").removeClass("copen_unusable");
         },    
 
+
+		// PLAYER HAS EARNED A COAT OF ARMS
+		//  Coats of arms fuel the special abilities in the game,
+		//  and its possible to earn several at once, or chain from one into another.
         onEnteringCoatOfArms( args )
         {
 
@@ -588,7 +632,7 @@ function (dojo, declare) {
         },
 
         // ALSO RESETS VARIABLES - PREP FOR NEXT TURN
-        //  we always enter refill Harbor, so we use it to do some client side cleanup
+        //  we always enter refill Harbor at the end of a turn, so we use it to do some client side cleanup
         onEnteringRefillHarbor( args )
         {
             this.hasConstructionDiscounted = false; // reset between turns
@@ -654,7 +698,7 @@ function (dojo, declare) {
 
 
 
-        // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
+        // onUpdateActionButtons: in this method that manages "action buttons" that are displayed in the
         //                        action status bar (ie: the HTML links in the status bar).
         //        
         onUpdateActionButtons: function( stateName, args )
@@ -709,10 +753,17 @@ function (dojo, declare) {
         
         */
 
+		// LERP
         lerp( low, high, percent)
         {
             return low * (1 - percent) + high * percent;
         },
+
+		// DISTANCE FORMULA
+		distance( x1, y1, x2, y2 )
+		{
+			return Math.sqrt( Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2 ) );
+		},
 
         // When you get HTML children, you also get text nodes - which in this use case is usually some useless blank space
         //   this helper function returns just the element nodes
@@ -726,6 +777,9 @@ function (dojo, declare) {
             return childElementNodes;
         },
 
+		// DISPLAY HOW MANY CARDS REMAIN IN THE DECK
+		//  In the physical game you're allowed to count the cards, so this makes it easier
+		//	Also adds tooltips to help explain how the end of game works for players who are caught off guard
         updateDeckDisplay: function( numberCardsInDeck )
         {
             // TOOLTIPS
@@ -738,6 +792,7 @@ function (dojo, declare) {
             if( !this.isSmallMermaidCardVisible() && numberCardsInDeck <= this.mermaidCardWarningThreshold && this.mermaidCardWarningAnimation == null ) this.playDeckWarningAnimation();
         },
 
+		// CALL OUT THAT THE DECK IS ALMOST OUT OF CARDS
         playDeckWarningAnimation: function()
         {
 
@@ -785,6 +840,9 @@ function (dojo, declare) {
             }).play(); 
         },
 
+
+		// THE SMALL MERMAID CARD SIGNIFIES TO PLAYERS
+		//  whether the deck will be reshuffled once more or not
         isSmallMermaidCardVisible: function()
         {
 
@@ -793,6 +851,7 @@ function (dojo, declare) {
             return query.length != 0 ;
         },
 
+		// SHOW THE DECK BEING SHUFFLED
         playShuffleDeckAnimation: function( numberOfCards )
         {
             var numberOfCardsMinusOne = numberOfCards - 1;
@@ -856,6 +915,7 @@ function (dojo, declare) {
 
         },
 
+		// 3D HOVER EFFECTS FOR CARDS IN THE HARBOR
         connectMouseOverEventsToCard: function( cardNode )
         {
             var handlers = []
@@ -864,6 +924,7 @@ function (dojo, declare) {
             return handlers;
         },
 
+		// CLEAN UP 3D HOVER EFFECTS
         resetCard3DRotation: function( cardNode )
         {
             dojo.style(cardNode, "transform", "");
@@ -894,6 +955,7 @@ function (dojo, declare) {
             } 
         },
 
+		// PULL A CARD FROM THE DECK
         makeHarborCard: function( cardData )
         {
                 var cardHtml = this.format_block('jstpl_card',{   // make the html in memory
@@ -910,6 +972,7 @@ function (dojo, declare) {
 
         },
 
+		// DETERMINE COLOR OF CARD
         getColorNameOfCard: function( node )
         {
 
@@ -960,11 +1023,14 @@ function (dojo, declare) {
             return colorsInHand;
         },
 
+		// HOW MANY OF A COLOR DOES THE PLAYER HAVE?
         countColoredCardsInHand: function( color )
         {
             return this.getNodeListOfColoredCardsInHand( color ).length;
         },
 
+		// WHICH CARDS OF A PARTICULAR COLOR DOES THE PLAYER HAVE?
+		//  includes cards that have had their color temporarily changed
         getNodeListOfColoredCardsInHand: function( color )
         {
 
@@ -981,7 +1047,10 @@ function (dojo, declare) {
             });
         },
 
-
+		// DOES THE PLAYER HAVE BOTH BASE COLOR CARDS AND COLOR CHANGED CARDS?
+		//  typically, the player doesn't care which cards get discarded
+		//  unless they have used the color change ability, and also have cards with that base color
+		//  in only that scenario, we'll need to let them select which cards to discard
         hasMixOfBaseCardsAndChangedColorCards: function( color )
         {
             var baseCards = dojo.query(`#copen_wrapper #cards_in_hand .copen_card.copen_${color}_card .copen_new_color.copen_hidden`);
@@ -990,6 +1059,7 @@ function (dojo, declare) {
             return baseCards.length > 0 && changedColorCards.length > 0;
         },        
 
+		// HAS THE PLAYER EXCEEDED THE HAND LIMIT?
         hasTooManyCardsInHand: function()
         {
             return dojo.query("#copen_wrapper #cards_in_hand .copen_card").length > this.maxHandSize;
@@ -1019,6 +1089,7 @@ function (dojo, declare) {
 
         /**************** CARDS IN HAND ARRANGEMENT *****************************/
 
+		// Nicely display the cards beside the player's board'
         splayCardsInHand: function()
         {
             var cardsInHandNode = dojo.byId("cards_in_hand"); 
@@ -1071,6 +1142,9 @@ function (dojo, declare) {
             this.removeTooltip('cards_in_hand'); 
         },
 
+		// PUT CARDS IN HORIZONTAL ROW, BUT ALSO GROUP UP CARDS OF SIMILAR COLOR
+		//  the player isn't really selecting a "card" here, they're selecting a color of a card they have
+		//  so grouping up the cards lets the player still click on the game elements without presenting a "false choice"
         spreadCardsHorizontallyByColor: function()
         {
             var colors = this.getColorNamesInHand();
@@ -1114,6 +1188,7 @@ function (dojo, declare) {
             }
         },
 
+		// SHOW CARD BEING DISCARDED
         animateDiscard: function( card )
         {
             dojo.setStyle( card, "opacity" , 0);
@@ -1130,6 +1205,7 @@ function (dojo, declare) {
 
         /************************ POLYOMINOES ******************************/
 
+		// WHICH POLYOMINO IS AT THE TOP OF EACH STACK?
         determineTopPolyominoInEveryStack: function()
         {
 
@@ -1139,6 +1215,8 @@ function (dojo, declare) {
             });
         },
 
+		// WHICH STACK DOES THIS POLYOMINO BELONG TO
+		//  useful for putting it back after a canceled placement
         getStackIdFromPolyominoId: function( polyominoId )
         {
             var color = this.getPolyominoColorFromId( polyominoId );
@@ -1167,6 +1245,7 @@ function (dojo, declare) {
             return Math.ceil((copy * 1.0) / this.whitePolyominosPerStack);
         },
 
+		// FIND THE TOP POLYOMINO IN A PARTICULAR STACK
         determineTopPolyominoInStack: function( stackId )
         {
             var query = dojo.query( `#copen_wrapper #${stackId} > *:last-child` );
@@ -1177,6 +1256,9 @@ function (dojo, declare) {
             return topOfStackNode;
         },
 
+		// MARK WHICH POLYOMINOES CAN BE USED BY THE PLAYER
+		//  we try to account for simple rules like color cards
+		//  but there are some rules we don't account for - like determining if there's any valid placement spot
         determineUsablePolyominoes: function()
         {
 
@@ -1203,6 +1285,8 @@ function (dojo, declare) {
             });
         },
 
+		// ADD BUTTONS TO CONFIRM OR CANCEL POLYOMINO PLACEMENT
+		//  polyominoes can be manipulated around before being locked in, so we need a confirm button
         createPositionPolyominoButtons: function()
         {
             this.addActionButton( 'cancel_polyomino_placement', _("Cancel"), "onCancelPolyominoPlacement", null, false, "red");
@@ -1211,6 +1295,7 @@ function (dojo, declare) {
             dojo.style("confirm_polyomino_placement","display","none");
         },
 
+		// SHOW THE CONFIRM OR CANCEL BUTTONS WHEN THE TIME IS RIGHT
         showPositionPolyominoButtons: function()
         {
             dojo.style("cancel_polyomino_placement","display","inline");
@@ -1225,6 +1310,7 @@ function (dojo, declare) {
             if( query.length > 0 ) dojo.style(query[0], "display", "none");
         },
 
+		// HIDE THE CONFIRM AND CANCEL BUTTONS IF NOT NEEDED
         hidePositionPolyominoButtons: function()
         {
             dojo.style("cancel_polyomino_placement","display","none");
@@ -1234,6 +1320,8 @@ function (dojo, declare) {
             if( query.length > 0 ) dojo.style(query[0], "display", "inline-block");
         },
 
+		// PLAYERS CAN GET A DISCOUNT FOR PLACING SAME COLORS ADJACENT
+		//  check to see if the player has the right pieces to get this discount
         hasPolyominoOfColorOnBoard: function( color )
         {
 
@@ -1248,21 +1336,26 @@ function (dojo, declare) {
             return false;
         },
 
+		// POLYOMINO ID CONTAINS COLOR
         getPolyominoColorFromId: function( polyominoId )
         {
             return polyominoId.split('-')[0];
         },
 
+		// POLYOMINO ID CONTAINS SQUARE COUNT
         getPolyominoSquaresFromId: function( polyominoId )
         {
             return polyominoId.split('-')[1].split('_')[0];
         },
 
+		// POLYOMINO ID CONTAINS "COPY" - i.e., if there are 3 copies of this type of piece, which is it?
         getPolyominoCopyFromId: function( polyominoId )
         {
             return polyominoId.split('_')[1];
         },
 
+
+		// THE FACADE CELLS IDS HAVE THE COORDINATES WRITTEN IN
         getCoordinatesFromId: function( id )
         {
             var coordinates = id.split('_');
@@ -1272,11 +1365,13 @@ function (dojo, declare) {
             };
         },
 
+		// IS THIS CELL OF THE BOARD EMPTY?
         isCellEmpty: function( gridCell )
         {
             return this.playerboard[gridCell.x][gridCell.y].fill == null;
         },
 
+		// ARE ALL THESE CELLS EMPTY?
         areCellsEmpty: function( gridCells )
         {
 
@@ -1290,6 +1385,8 @@ function (dojo, declare) {
             return true;
         },
 
+		// IF A POLYOMINO WAS PLACED HERE, WOULD IT BE SUPPORTED?
+		//  vs would it be "floating"?
         isGroundedPosition: function( gridCells )
         {
             for( var i = 0; i < gridCells.length; i++)
@@ -1303,6 +1400,7 @@ function (dojo, declare) {
             return false;
         },
 
+		// IF A POLYOMINO OF A COLOR WAS PLACED HERE, WOULD IT BE ADJACENT TO ANOTHER POLYOMINO OF THE SAME COLOR?
         isAdjacentToSameColor: function( gridCells, color )
         {
             for( var i = 0; i < gridCells.length; i++ )
@@ -1312,7 +1410,7 @@ function (dojo, declare) {
             return false;
         },
 
-
+		// HOW MUCH WOULD IT COST TO PLACE A POLYOMINO HERE, ACCOUNTING FOR BONUSES?
         getCostOfShapeAtPosition( gridCells, color )
         {
             var cost = gridCells.length;
@@ -1321,6 +1419,7 @@ function (dojo, declare) {
             return cost;
         },
 
+		// DOES THIS CELL HAVE A POLYOMINO OF THE CHOSTEN COLOR ADJACENT TO IT?
         isCellAdjacentToSameColor: function( gridCells, color )
         {
             for( var i = 0; i < this.adjacentOffsets.length ; i++)
@@ -1338,6 +1437,7 @@ function (dojo, declare) {
             return false;
         },
 
+		// WOULD PLACING A POLYOMINO HERE BE ALLOWED, CHECKING ALL THE PLACEMENT RULES
         isValidPlacementPosition: function( gridCells )
         {
 
@@ -1356,6 +1456,7 @@ function (dojo, declare) {
             return cardsOfColor >= cost;
         },
 
+		// SHOW DIFFERENT STYLES ON THE SELECTED POLYOMINO WHETHER IT CAN BE PLACED HERE OR NOT
         styleSelectedPolyominoBasedOnValidity( validity, gridCells )
         {
 
@@ -1395,6 +1496,9 @@ function (dojo, declare) {
             } 
         },
 
+		// SHOW WHAT IS UNDERNEATH THE POLYOMINO
+		//  in real life, it's trivial to look at and understand if the space beneath a polyomino is free
+		//  but in a digital version, we need to show an extra styling element that the space is already taken up
         showOverlap: function( gridCells )
         {
 
@@ -1422,6 +1526,7 @@ function (dojo, declare) {
             dojo.query("#copen_wrapper .copen_overlap").forEach( dojo.destroy );
         },
 
+		// DEPRECATED
         getDifferenceBetweenCostAndCards: function( gridCells )
         {
             var color = this.getPolyominoColorFromId( this.selectedPolyomino.id);
@@ -1456,6 +1561,8 @@ function (dojo, declare) {
             return {x:x, y:y};
         },
 
+		// IF WE PUT THE POLYOMINO AT THIS POSITION,
+		//  which grid cells does it take up?
         getGridCellsForPolyominoAtCoordinates: function( polyominoShape, coordinates )
         {
 
@@ -1512,6 +1619,7 @@ function (dojo, declare) {
 
         },
 
+		// REMOVE PREVIEW SHOWN WHEN PLAYER HOVERS
         clearPreview: function()
         {
             dojo.query("#copen_wrapper .copen_preview").removeClass("copen_invalid").removeClass("copen_preview");
@@ -1532,6 +1640,7 @@ function (dojo, declare) {
 
         },
 
+		// RECONNECT NEW POLYOMINO DOM ELEMENT WITH EVENTS
         connectDraggingEventsToPolyomino: function( polyominoNode )
         {
             dojo.connect( polyominoNode, "ondragstart", this, "onDragStartPolyomino");
@@ -1555,6 +1664,11 @@ function (dojo, declare) {
             return {x: x/zoom, y:y/zoom};
         },
 
+
+		// FOCUS THE PLAYER ON THE POLYOMINO PLACEMENT BY DARKENING THE BACKGROUND
+		//  The BGA way to do things is to have physical parity
+		//  But with so many elements on screen, it's nice to be able to focus the player's attention
+		//  The solution here is to darken everything not used with a scrim, which is a nice compromise between these two philosophies
         fadeInPolyominoPlacementUI: function()
         {
 
@@ -1628,6 +1742,7 @@ function (dojo, declare) {
             return dojo.query(`#copen_wrapper #player_${this.player_id}_playerboard .copen_board_cell_${x}_${y}`)[0];
         },
 
+		// WHEN THE PLAYER HAS TO DISCARD A CARD, LET THEM CLICK A CARD FROM THEIR HAND
         showSelectDiscardUI: function( color, cost )
         {
 
@@ -1669,6 +1784,7 @@ function (dojo, declare) {
 
         },
 
+		// WHEN THE PLAYER HAS SELECTED A POLYOMINO TO TRY AND PLACE
         selectPolyomino: function( node )
         {
             this.selectedPolyomino = {};
@@ -1723,6 +1839,7 @@ function (dojo, declare) {
 
         },
 
+		// WHEN A PLAYER IS DONE USING THE POLYOMINO PLACEMENT UI
         fadeOutPolyominoPlacementUI: function()
         {
             dojo.query("#copen_wrapper .copen_behind_shadow_box").removeClass("copen_behind_shadow_box");
@@ -1798,6 +1915,7 @@ function (dojo, declare) {
 
         },
 
+		// AKIN TO A PLAYER HOLDING A POLYOMINO OVER A PHYSICAL BOARD AND THINKING "HMM... WOULD THIS FIT HERE?"
         positionPolyomino: function( coordinates )
         {
 
@@ -1853,11 +1971,6 @@ function (dojo, declare) {
             boardCellsNodePosition = dojo.position( boardCellsNode, true );
             polyominoNodePosition = dojo.position( polyominoNode, true);
             
-            console.log("boardCellsNodePosition");
-            console.log(boardCellsNodePosition);
-            console.log("polyominoNodePosition");
-            console.log(polyominoNodePosition);
-            
             
             return ( polyominoNodePosition.x + polyominoNodePosition.w > boardCellsNodePosition.x)
              	&& ( polyominoNodePosition.x < boardCellsNodePosition.x + boardCellsNodePosition.w)
@@ -1865,6 +1978,9 @@ function (dojo, declare) {
             	&& ( polyominoNodePosition.y < boardCellsNodePosition.y + boardCellsNodePosition.h);
 		},
 
+		// WHEN THE PLAYER DROPS THE POLYOMINO ON THE BOARD
+		//  there's all sorts of ways it might not line up nicely with the grid
+		//  so we make some educated guesses about where to put it, and allow the user to adjust if they're off
         dropPolyominoOnBoard: function()
         {
 
@@ -1989,6 +2105,7 @@ function (dojo, declare) {
             return position.y + position.h;
         },
 
+		// ACTUALLY PUT THE POLYOMINO ON THE BOARD
         placePolyomino: function( polyominoData )
         {
 
@@ -2025,6 +2142,7 @@ function (dojo, declare) {
             return copy;
         },
 
+		// ROTATE THE SHAPE DATA BY 90 DEGREES
         rotatePolyominoShape: function( polyominoShape )
         {
             for( var i = 0; i < polyominoShape.length; i++)
@@ -2035,6 +2153,7 @@ function (dojo, declare) {
             return this.setNewShapeOrigin( polyominoShape ); 
         },
 
+		// FLIP THE POLYOMINO SHAPE OVER
         flipPolyominoShape: function( polyominoShape )
         {
             for( var i = 0; i < polyominoShape.length; i++)
@@ -2090,6 +2209,7 @@ function (dojo, declare) {
             return {htmlX:htmlX, htmlY:htmlY, minCellNode:minCellNode};
         },
 
+		// WHEN YOU PUT THE POLYOMINO AT THIS CELL, WHERE SHOULD IT BE PHYSICALLY MOVED IN HTML COORDINATES?
         determineHtmlPlacementForPolyominoAtCell: function( polyominoNode, boardCellNode )
         {
 
@@ -2104,6 +2224,7 @@ function (dojo, declare) {
 
         /******************* SPECIAL ABILITY TILES ********************/
 
+		// PLAY AN ANIMATION WHEN A COAT OF ARMS IS EARNED TO HELP DRAW THE PLAYER'S ATTENTION
         animateCoatOfArms: function( coatOfArmsId, playerId )
         {
             var nodeName = `copen_coat_of_arms_${coatOfArmsId}_${playerId}`;
@@ -2142,6 +2263,7 @@ function (dojo, declare) {
             animation.play();
         },
 
+		// SHOW WHICH ABILITY TILES CAN BE TAKEN
         determineWhichAbilityTilesAreTakeable: function()
         {
             var game = this;
@@ -2153,21 +2275,25 @@ function (dojo, declare) {
             });
         },
 
+		// DOES THE PLAYER OWN THE ABILITY?
         ownsAbility: function( abilityName )
         {
             return dojo.query(`#copen_wrapper #owned_player_area .copen_${abilityName}`).length > 0;
         },
 
+		// HAS THE PLAYER USED THIS ABILITY?
         hasUsedAbility: function()
         {
             return dojo.query("#copen_wrapper #owned_player_area .copen_used_ability").length > 0;
         },
 
+		// SHOW THAT THIS ABILITY IS USABLE
         setAbilityAsUsable: function (abilityName)
         {
             dojo.query(`#copen_wrapper #owned_player_area .copen_${abilityName}:not(.copen_used_ability)`).addClass("copen_usable");
         },
 
+		// SHOW THAT THIS ABILITY IS UNUSABLE
         setAbilityAsUnusable: function (abilityName)
         {
             dojo.query(`#copen_wrapper #owned_player_area .copen_${abilityName}:not(.copen_used_ability)`).addClass("copen_unusable");
@@ -2181,6 +2307,10 @@ function (dojo, declare) {
                 .addClass("copen_used_ability");
         },
 
+		// CAUSE ANY CARDS ABILITY TO HAPPEN
+		//  I wanted players to be able to click ability tiles without worrying about a specific sequence too much,
+		//  as that's what they'd do in the physical game.
+		//  That means sometimes an ability is clicked, but we wait until the proper state to actually cause it to happen
         triggerAnyCardsAbility: function()
         {
             // SHOW ALL CARDS SELECTABLE
@@ -2191,6 +2321,7 @@ function (dojo, declare) {
             this.updatePageTitle();
         },
 
+		// CAUSE CHANGE OF COLORS ABILITY TO HAPPEN
         triggerChangeOfColorsAbility: function( fromColor, toColor)
         {
 
@@ -2204,6 +2335,7 @@ function (dojo, declare) {
             this.determineUsablePolyominoes();
         },
 
+		// RESET UI AFTER CHANGE OF COLORS ABILITY
         clearChangeOfColorsAbility: function()
         {
             for( var i = 0; i < this.cardColorOrder; i++ )
@@ -2217,6 +2349,7 @@ function (dojo, declare) {
             this.cellToPlacePolyomino = null;
         },
 
+		// SHOW A DARK SCRIM BEHIND THE PLAYER'S HAND OF CARDS
         fadeInHand: function()
         {
 
@@ -2242,6 +2375,8 @@ function (dojo, declare) {
 
         },
 
+		// BRING UP UI FOR CHANGE OF COLORS ABILITY
+		//	this is by far the most complex ability in the game, requiring two of its own special interfaces - one for a special edge case
         showChangeOfColorsUI: function( selectedCard, baseColorName )
         {
 
@@ -2285,6 +2420,7 @@ function (dojo, declare) {
             
         },
 
+		// FINISHED WITH CHANGES OF COLORS ABILITY UI
         fadeOutChangeOfColorsUI: function()
         {
             dojo.query("#copen_wrapper .copen_behind_shadow_box").removeClass("copen_behind_shadow_box");
@@ -2316,7 +2452,7 @@ function (dojo, declare) {
         
         /*
         
-            Here, you are defining methods to handle player's action (ex: results of mouse click on 
+            Here, we define methods to handle player's action (ex: results of mouse click on 
             game objects).
             
             Most of the time, these methods:
@@ -2325,6 +2461,7 @@ function (dojo, declare) {
         
         */
 
+		// SHOW NICE 3D EFFECT WHEN MOVING MOUSE OVER HARBOR CARDS
         onMouseMoveHarborCard: function( event )
         {
             // ONLY WORKS FOR ACTIVE PLAYER
@@ -2346,11 +2483,13 @@ function (dojo, declare) {
             dojo.style(event.currentTarget.children[1],"transform",`rotateX(${rotateX}deg) rotateY(${rotateY}deg)`);
         },
 
+		// RESET 3D EFFECT ON HARBOR CARDS
         onMouseOutHarborCard: function (event)
         {
             this.resetCard3DRotation( event.currentTarget );
         },
 
+		// REQUEST SERVER TO TAKE A CARD FROM THE HARBOR
         onTakeHarborCard: function( event )
         {
 
@@ -2380,6 +2519,7 @@ function (dojo, declare) {
  
         },
 
+		// REQUEST SERVER TO DISCARD A CARD
         onDiscardCardOverMaxHandSize: function( event )
         {
             dojo.stopEvent( event );
@@ -2396,6 +2536,7 @@ function (dojo, declare) {
             }
         },
 
+		// CLICK A POLYOMINO TO TRY AND PLACE IT SOMEWHERE
         onSelectPolyomino: function( event )
         {
 
@@ -2415,6 +2556,7 @@ function (dojo, declare) {
 
         },
 
+		// NEEDED TO MAKE THE CURSOR LOOK CORRECT ON DRAGS
         onDragOver: function( event )
         {
             
@@ -2427,9 +2569,10 @@ function (dojo, declare) {
             this.dragClient = { x: adjustedClientXY.x, y: adjustedClientXY.y };
         },
 
+		// START DRAGGING A POLYOMINO
         onDragStartPolyomino: function( event )
         {
-            
+            //console.log("onDragStartPolyomino");
 
             var target = event.currentTarget ?? event.customTarget;
 
@@ -2469,8 +2612,13 @@ function (dojo, declare) {
             this.dragPositionLastFrame = {x: adjustedClientXY.x, y:adjustedClientXY.y};
         },
 
+		// START DRAGGING A POLYOMINO ON MOBILE
         onTouchStartPolyomino: function( event )
         {
+
+			//console.log("onTouchStartPolyomino");
+
+			this.isMobileDragging = false;
 
             //console.log( "onTouchStartPolyomino" );
             // FAKE AN EVENT
@@ -2489,8 +2637,12 @@ function (dojo, declare) {
 
         },
 
+
+		// WHILE DRAGGING A POLYOMINO
         onDragPolyomino: function( event )
         { 
+	
+			//console.log( "onDragPolyomino");
 
             if( this.selectedPolyomino == null ) return;
 
@@ -2503,16 +2655,24 @@ function (dojo, declare) {
             var movementX = this.dragClient.x - this.dragPositionLastFrame.x;
             var movementY = this.dragClient.y - this.dragPositionLastFrame.y;
 
-            var polyominoNode = dojo.query(`#${ this.selectedPolyomino.id}`)[0];
+
+
+            var polyominoNode = dojo.query(`#${ this.selectedPolyomino.id}`)[0]; 
 
             this.adjustPositionHorizontally( polyominoNode, movementX );
             this.adjustPositionVertically( polyominoNode, movementY );
 
             this.dragPositionLastFrame = {x:this.dragClient.x, y: this.dragClient.y};
+           
         },
 
+		// WHILE DRAGGING A POLYOMINO ON MOBILE
         onTouchMovePolyomino: function( event )
         {
+
+			//console.log( "onTouchMovePolyomino");
+
+			this.isMobileDragging = true;
 
             var syntheticEvent = new MouseEvent("ondrag");
 
@@ -2522,6 +2682,7 @@ function (dojo, declare) {
             this.onDragPolyomino( syntheticEvent );
         },
 
+		// FINSIHED DRAGGING A POLYOMINO
         onDragEndPolyomino: function( event )
         {
 
@@ -2533,6 +2694,7 @@ function (dojo, declare) {
 			// IF POLYOMINO ISN'T OVERLAPPING BOARD AT ALL, CANCEL PLACEMENT
 			if( !this.isPolyominoAboveBoard()) 
 			{
+				//console.log( "polyomino is not above board")
 				this.onCancelPolyominoPlacement( event );
 				return;
 			}
@@ -2551,23 +2713,33 @@ function (dojo, declare) {
             this.dropPolyominoOnBoard();
         },
 
+		// FINSIHED DRAGGING A POLYOMINO ON MOBILE
         onTouchEndPolyomino: function( event )
         {
-            //console.log("onDragEndPolyomino");
 
-            // JAVASCRIPT NOTE
-            //  I thought stopping events was just to prevent that event from being sent to parents of the child catching the event
-            //  But in this case, an iPad will send both a touchend event AND a onclick if the user hasn't moved their finger past a certain threshold
-            //  you can stop the onclick by stopping the event
+			//console.log("OnTouchEndPolyomino")
+
+			// JAVASCRIPT NOTE
+			//  onTouchEnd is being called also on just tapping an object,
+			//  so we need to keep track of whether any dragging actually happened 
+			//  and only send onDragEnd if it did
+			if( this.isMobileDragging )
+			{
+            	var syntheticEvent = new MouseEvent("ondragend");
+            	this.onDragEndPolyomino( syntheticEvent );
+            	
+          		// JAVASCRIPT NOTE
+            	//  I thought stopping events was just to prevent that event from being sent to parents of the child catching the event
+           	 	//  But in this case, an iPad will send both a touchend event AND a onclick if the user hasn't moved their finger past a certain threshold
+            	//  you can stop the onclick by stopping the event   
+            	dojo.stopEvent( event );
+            }
+
             
-            dojo.stopEvent( event );
-
-            var syntheticEvent = new MouseEvent("ondragend");
-
-            this.onDragEndPolyomino( syntheticEvent );
+            this.isMobileDragging = false;
         },
 
-
+		// ROTATE A POLYOMINO
         onRotatePolyomino: function( event )
         {
 
@@ -2608,6 +2780,8 @@ function (dojo, declare) {
 
         },
         
+        
+        // FLIP A POLYOMINO
         onFlipPolyomino: function( event )
         {
 
@@ -2646,6 +2820,8 @@ function (dojo, declare) {
 
         },
 
+
+		// PREVIEW WHETHER A POLYOMINO CAN BE PLACED OR NOT
         onPreviewPlacePolyomino: function( event )
         {
 
@@ -2688,6 +2864,8 @@ function (dojo, declare) {
 
         },
 
+		// IF WE HAVE SELECTED A POLYOMINO, AND AREN'T DRAGGING IT
+		//  then show a preview of where it would be placed
         onPolyominoMouseMovePassThrough: function( event )
         {
             var cellNode = this.getCellNodeAtPageCoordinate( {x:event.pageX, y:event.pageY});
@@ -2717,6 +2895,8 @@ function (dojo, declare) {
 
         },
 
+		// IF WE HAVE SELECTED A POLYOMINO, AND AREN'T DRAGGING IT
+		//  when we click, position the polyomino there
         onPolyominoClickPassThrough: function( event )
         {
 
@@ -2735,7 +2915,7 @@ function (dojo, declare) {
 
         },            
 
-
+		// CANCEL OUT OF USING THIS POLYOMINO
         onCancelPolyominoPlacement: function( event )
         {
             if( this.selectedPolyomino == null ) return; 
@@ -2769,6 +2949,7 @@ function (dojo, declare) {
             this.clearPreview();
         },
 
+		// PUT THE POLYOMINO ON THE BOARD CLIENT SIDE, LET PLAYER EDIT IT BEFORE SUBMITTING TO SERVER
         onPositionPolyomino: function( event )
         {
             if( this.selectedPolyomino == null ) return; // make sure a polyomino is selected
@@ -2786,6 +2967,7 @@ function (dojo, declare) {
             this.positionPolyomino( coordinates);
         },
 
+		// PLAYER CONFIRMED THIS IS WHERE THEY WANT THE POLYOMINO, SUBMIT TO SERVER
         onConfirmPolyominoPlacement: function( event )
         {
             dojo.stopEvent( event );
@@ -2798,6 +2980,8 @@ function (dojo, declare) {
             this.requestPlacePolyomino();
         },
 
+		// EDGE CASE - In a very specific scenario, the player will care about which cards get discarded to pay for the polyomino
+		//  this allows them to select those cards
         onSelectCardToDiscard: function(event)
         {
 
@@ -2812,6 +2996,7 @@ function (dojo, declare) {
             
         },
 
+		// PLAYER EARNED AN ABILITY TILE - CHOOSE WHICH ONE TO TAKE
         onTakeAbilityTile: function( event )
         {
             dojo.stopEvent( event );
@@ -2839,6 +3024,7 @@ function (dojo, declare) {
             }
         },
 
+		// PLAYER CLICKED ON ABILITY "ANY CARDS"
         onActivateAbilityAnyCards: function( event )
         {
             // SPECIAL CASE - Do something different if the ability is used
@@ -2855,6 +3041,7 @@ function (dojo, declare) {
 
         },
 
+		// PLAYER CLICKED ON ABILITY "ADDITIONAL CARD"
         onActivateAbilityAdditionalCard: function( event )
         {
             // SPECIAL CASE - Do something different if the ability is used
@@ -2871,6 +3058,7 @@ function (dojo, declare) {
 
         },
 
+		// PLAYER CLICKED ON ABILITY "BOTH ACTIONS"
         onActivateAbilityBothActions: function( event )
         {
             // SPECIAL CASE - Do something different if the ability is used
@@ -2887,6 +3075,7 @@ function (dojo, declare) {
 
         },
 
+		// PLAYER CLICKED ON ABILITY "CONSTRUCTION DISCOUNT"
         onActivateAbilityConstructionDiscount: function( event )
         {
             // SPECIAL CASE - Do something different if the ability is used
@@ -2903,6 +3092,7 @@ function (dojo, declare) {
 
         },
 
+		// PLAYER CLICKED ON ABILTY "CHANGE OF COLORS"
         onActivateAbilityChangeOfColors: function( event )
         {
             // SPECIAL CASE - Do something different if the ability is used
@@ -2943,6 +3133,7 @@ function (dojo, declare) {
 
         },
 
+		// PLAYER USED CHANGE OF COLORS UI TO SELECT WHICH COLOR TO CHANGE
         onSelectColorFromHandToChange: function ( event )
         {
 
@@ -2976,6 +3167,7 @@ function (dojo, declare) {
 
         },
 
+		// PART 2 OF CHANGING COLORS UI - WHICH COLOR TO CHANGE TO
         onSelectChangeOfColorsOption: function ( event )
         {
 
@@ -3001,6 +3193,7 @@ function (dojo, declare) {
 
         },
 
+		// PLAYER REQUESTED TO REFRESH ALL UNLOCKED ABILITIES
         onResetUsedAbilities: function( event )
         {
 
@@ -3013,7 +3206,7 @@ function (dojo, declare) {
             }, this, function( result ){} ); 
         },
 
-
+		// UNDO SUPPORT
         onUndo: function( event )
         {
 
@@ -3026,6 +3219,9 @@ function (dojo, declare) {
 
         },
 
+		// EDGE CASE - PLAYER CONFIRMED END OF TURN
+		//  I try to be generous with players with special abilities - giving them a reminder they can use it if they want
+		//  if they don't want to, they'll use this to confirm they just want to end their turn
         onEndTurn: function( event )
         {
 
@@ -3040,6 +3236,8 @@ function (dojo, declare) {
         
         /********************* BROWSER SPECIFIC CODE **********************/
 
+		// Unfortunately, safari handles the scaling effect on the tiles differently than all the other browsers
+		//  so there's a separate set of css styles for it
         adjustAbilityTilesForSafari: function()
         {
             dojo.addClass("copen_wrapper", "copen_safari");
@@ -3052,10 +3250,7 @@ function (dojo, declare) {
         /*
             setupNotifications:
             
-            In this method, you associate each of your game notifications with your local method to handle it.
-            
-            Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" calls in
-                  your copenhagen.game.php file.
+            This handles responses from the server
         
         */
         setupNotifications: function()
@@ -3073,6 +3268,7 @@ function (dojo, declare) {
             dojo.subscribe( 'takeAbilityTile', this, 'notif_takeAbilityTile' );
 
             dojo.subscribe( 'activateAbility', this, 'notif_activateAbility' );
+            
             dojo.subscribe( 'activateAbilityChangeOfColors', this, 'notif_activateAbilityChangeOfColors' );
 
             dojo.subscribe( 'usedAbility', this, 'notif_usedAbility' );
@@ -3082,8 +3278,7 @@ function (dojo, declare) {
             dojo.subscribe( 'updateScore', this, 'notif_updateScore' );
         },  
         
-        // TODO: from this point and below, you can write your game notifications handling methods
-
+		// SERVER SAYS: PLAYER HAS TAKEN A CARD
         notif_takeCard: function(notif)
         {
 
@@ -3113,6 +3308,8 @@ function (dojo, declare) {
 
         },
 
+
+		// SERVER SAYS: PLAYER HAS DISCARDED A CARD
         notif_discardDownToMaxHandSize: function(notif)
         {
             // IF IT'S YOUR CARD
@@ -3125,6 +3322,7 @@ function (dojo, declare) {
             this.displayNumberOfCardsInHand( notif.args.player_id, notif.args.hand_size );
         },
 
+		// SERVER SAYS: THE HARBOR HAS BEEN REFILLED WITH NEW CARDS
         notif_refillHarbor: function(notif)
         {
 
@@ -3157,6 +3355,7 @@ function (dojo, declare) {
             
         },
 
+		// SERVER SAYS: PLAYER HAS PLACED A POLYOMINO
         notif_placePolyomino: function(notif)
         { 
 
@@ -3213,6 +3412,7 @@ function (dojo, declare) {
 
         },
 
+		// SERVER SAYS: PLAYER HAS TAKEN AN ABILITY TILE
         notif_takeAbilityTile: function(notif)
         {
             var abilityTileId = `${notif.args.ability_name}-${notif.args.copy}`;
@@ -3233,6 +3433,8 @@ function (dojo, declare) {
 
         },
 
+
+		// SERVER SAYS: PLAYER HAS USED AN ABILITY
         notif_activateAbility: function(notif)
         {
 
@@ -3256,6 +3458,7 @@ function (dojo, declare) {
             dojo.style("undo","display","inline");
         },
 
+		// SERVER SAYS: PLAYER HAS ACTIVATED CHANGE OF COLORS ABILITY
         notif_activateAbilityChangeOfColors: function(notif)
         {
 
@@ -3267,25 +3470,28 @@ function (dojo, declare) {
             dojo.style("undo","display","inline");
         },
 
+		// SERVER SAYS: PLAYER USED UP AN ABILITY
         notif_usedAbility: function(notif)
         {
             // DEACTIVATE ANY USED UP ABILITIES
             this.deactivateUsedAbility( notif.args.used_ability, notif.args.player_id);
         },
 
+		// SERVER SAYS: PLAYER'S ABILITIES ARE RESET
         notif_resetUsedAbilities: function(notif)
         {
             dojo.query(`#copen_wrapper #ability_tile_area_${notif.args.player_id} .copen_used_ability`).removeClass("copen_used_ability");    
         },
 
 
+		// SERVER SAYS: HERE ARE THE NEW SCORES
         notif_updateScore: function(notif)
         {
             this.scoreCtrl[ notif.args.player_id ].toValue( notif.args.score );
         },
 
 
-
+		///////////////////////////////////////////////////////////////////////////////
         // SCRIPT FOR PUTTING PICTURES IN LOG
         // from: https://en.doc.boardgamearena.com/BGA_Studio_Cookbook#Inject_images_and_styled_html_in_the_log
         /* @Override */
