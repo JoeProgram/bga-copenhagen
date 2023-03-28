@@ -71,9 +71,9 @@ This was my first Board Game Arena implementation, and the first time I've worke
 - **Seperate Files** - I'm not as familiar with using Javascript and PHP as I am using C#.  Breaking the .js and .game.php files into more self-contained files would help readability. 
 
 - **Coordinate Systems** - I ended up with a few coordinate systems:
--- The coordinate system of the HTML elements on the page
--- The coordinate system of the player's playerboard (5 cells wide, 9 cells high)
--- The local representation of the polyomino shape with it's origin
--- The representation of the polyomino shape at the "Min Grid Cell"
+ - The coordinate system of the HTML elements on the page
+ - The coordinate system of the player's playerboard (5 cells wide, 9 cells high)
+ - The local representation of the polyomino shape with it's origin
+ - The representation of the polyomino shape at the "Min Grid Cell"
 
 This system could be made more accessible and clear.
