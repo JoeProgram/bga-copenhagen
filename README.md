@@ -1,7 +1,7 @@
 # Overview
 This is the project for the Board Game Arena implementation of _[Copenhagen](https://boardgamegeek.com/boardgame/269595/copenhagen)_, a game designed by **Asger Harding Granerud** and **Daniel Skjold Pedersen**, and published by **Queen Games**.
 
-Copenhagen is what you'd get if you combined _Ticket to Ride_ and _Tetris_. Players take cards to pay for polyominoes (aka Tetris pieces).  The polyominoes come from a shared limited market. Players try to place as many polyominoes on their personal board as they can, completing columns and rows before the end of the game.  There are also 5 abilities players can unlock that add a little spiciness to the game, while keeping it solidly in the lightweight and easy to teach category.
+Copenhagen is what you'd get if you combined _[Ticket to Ride](https://boardgamegeek.com/boardgame/9209/ticket-ride)_ and _Tetris_. Players take cards to pay for polyominoes (aka Tetris pieces).  The polyominoes come from a shared limited market. Players try to place as many polyominoes on their personal board as they can, completing columns and rows before the end of the game.  There are also 5 abilities players can unlock that add a little spiciness to the game while keeping it solidly in the lightweight and easy to teach category.
 
 # Tech
 This project builds off the the default [Board Game Arena framework](https://en.doc.boardgamearena.com/Studio_file_reference?_gl=1*19qszbw*_ga*NjM2ODk4NzguMTY3NzA5OTE1Ng..*_ga_DWXD9R5L7D*MTY4MDAyMTUwOS44LjEuMTY4MDAyMTUxNC41NS4wLjA.).
@@ -10,9 +10,9 @@ It uses the Dojo Javascript Toolkit to make working with Javascript and HTML eas
 
 # Features of Note
 
-In addition to the basic table-stakes implementation, the areas I put some extra time into are:
+In addition to the basic table stakes implementation, I put some extra time into:
 
-- **Polyomino Placement**: Polyominoes are so easy to manipulate in real life, but a lot of digital implementations get clunky quickly.  This system features a drag-first design that also allows for a click-only fallback, and allows for fast and easy rotation and flipping with only two buttons.
+- **Polyomino Placement**: Polyominoes are easy to manipulate in real life, but many digital implementations are clunky.  This system features a drag-first design that also allows for a click-only fallback, and has fast and easy rotation and flipping with only two buttons.
 
 - **Physicality**: Cards have slight 3d rotation and lighting effects on hover, and interfaces help keep players interacting with the game elements rather than UI.  
 
