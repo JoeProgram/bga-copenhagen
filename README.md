@@ -57,7 +57,7 @@ In addition to the basic table stakes implementation, I put some extra time into
 - **Cell** or **Grid Cell** - a grid square on a player's board, used for positioning validation.
 - **Playerboard** - the house the player plays their polyominoes on to score.  Not to be confused with the BGA UI element player board.
 - **Polyominoes** - aka "Tetris Pieces" or "Facade Tiles."
-- **Polyomino Origin** - the lowest, left-most square of the shape.  Since polyominoes can be irregular, there's not a super clear system of what their "origin" should be.
+- **Polyomino Origin** - the lowest, left-most square of the shape.
 - **Polyomin Min Grid Cell** - a different sort of origin - the bottom left corner of the polyomino's "bounding box."  Because of the nature of polyominoes, there may or may not be an actual square in this grid cell, depending on the type of piece and its rotation and flip.
 - **Shape** - a list of local coordinates that represent the shape of a polyomino, that can be rotated, flipped, and used to check for valid placement.
 
