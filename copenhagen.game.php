@@ -10,9 +10,7 @@
   * 
   * copenhagen.game.php
   *
-  * This is the main file for your game logic.
-  *
-  * In this PHP file, you are going to defines the rules of the game.
+  * This is the main file for the game logic.
   *
   */
 
@@ -42,22 +40,21 @@ class Copenhagen extends Table
 
             // GLOBAL VARIABLES 
             "cards_taken_this_turn" => 10,  // keep track of how many cards have been taken this turn. 
-            "mermaid_card_id" => 11,
-            "total_drawable_cards" => 12,
+            "mermaid_card_id" => 11,        // track the id of the mermaid card
+            "total_drawable_cards" => 12,   // how many cards can possibly be drawn this game.  Used for progression purposes  
             "drawn_cards" => 13,            // keep track of total cards drawn this game, for progression purposes
-            "coat_of_arms_earned" => 14,
-            "ability_activated_any_cards" => 15,
-            "ability_activated_additional_card" => 16,
-            "ability_activated_construction_discount" => 17,
-            "ability_activated_change_of_colors" => 18,
-            "ability_activated_both_actions" => 19,
-            "change_of_colors_from" => 20,
-            "change_of_colors_to" => 21,
+            "coat_of_arms_earned" => 14,    // how many coat of arms the current player has earned.  Multiple can be earned at once, and coat of arms can combo into other coat of arms.
+            "ability_activated_any_cards" => 15,                // does the player have this ability active?
+            "ability_activated_additional_card" => 16,          // does the player have this ability active?
+            "ability_activated_construction_discount" => 17,    // does the player have this ability active?
+            "ability_activated_change_of_colors" => 18,         // does the player have this ability active?
+            "ability_activated_both_actions" => 19,             // does the player have this ability active?
+            "change_of_colors_from" => 20,  // Change of colors ability: what color of card is being changed?
+            "change_of_colors_to" => 21,    // Change of colors ability: what color are the cards being changed into?
             
-            // VARIANTS
+            // VARIANTS - not used
             //    "my_first_game_variant" => 100,
             //    "my_second_game_variant" => 101,
-            //      ...
         ) );   
 
         $this->cards = self::getNew( "module.common.deck" );
@@ -75,19 +72,18 @@ class Copenhagen extends Table
         setupNewGame:
         
         This method is called only once, when a new game is launched.
-        In this method, you must setup the game according to the game rules, so that
+        This method sets up the game according to the game rules, so that
         the game is ready to be played.
     */
     protected function setupNewGame( $players, $options = array() )
     {    
+        
         // Set the colors of the players with HTML color code
-        // The default below is red/green/blue/orange/brown
         // The number of colors defined here must correspond to the maximum number of players allowed for the gams
         $gameinfos = self::getGameinfos();
         $default_colors = $gameinfos['player_colors'];
  
         // Create players
-        // Note: if you added some extra field on "player" table in the database (dbmodel.sql), you can initialize it there.
         $sql = "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES ";
         $values = array();
         foreach( $players as $player_id => $player )
@@ -150,7 +146,7 @@ class Copenhagen extends Table
         $mermaid_card_id = $database_result['card_id'];
         self::setGameStateValue( 'mermaid_card_id', $mermaid_card_id );
 
-        // PREPARE CARDS
+        // PREPARE AND SHUFFLE DECK
         $this->cards->moveCard($mermaid_card_id, "mermaid_pile");
         $this->cards->shuffle( 'deck' );
 
@@ -236,7 +232,7 @@ class Copenhagen extends Table
 
 
 
-        // CREATE ANY TILE SPECIAL ABILITIES
+        // CREATE "ANY TILE" SPECIAL ABILITIES
         //   Each player starts with one
         $index = 1;
         foreach( $players as $player_id => $player )
@@ -270,8 +266,6 @@ class Copenhagen extends Table
     
         $current_player_id = self::getCurrentPlayerId();    // !! We must only return informations visible by this player !!
     
-        // Get information about players
-        // Note: you can retrieve some extra field you added for "player" table in "dbmodel.sql" if you need it.
         $sql = "SELECT player_id id, player_score score FROM player ";
         $result['players'] = self::getCollectionFromDb( $sql );
         
@@ -281,7 +275,7 @@ class Copenhagen extends Table
             $result['hand_sizes'][$player_id] = $this->cards->countCardInLocation( 'hand', $player_id );
         }
 
-        $result['hand'] = $this->cards->getCardsInLocation( 'hand', $current_player_id );
+        $result['hand'] = $this->cards->getCardsInLocation( 'hand', $current_player_id ); // each player is only sent the exact cards of their specific hand
         $result['harbor'] = $this->cards->getCardsInLocation( 'harbor' );
 
         $mermaid_card_id = self::getGameStateValue( 'mermaid_card_id' );
@@ -297,7 +291,7 @@ class Copenhagen extends Table
         $result['ability_tiles'] = self::getCollectionFromDb( $sql );
 
 
-        //  ACTIVE PLAYER ONLY STUFF
+        //  ACTIVE PLAYER ONLY 
         $result['activated_abilities'] = array();
         if( self::getActivePlayerId() == $current_player_id)
         {
@@ -349,6 +343,7 @@ class Copenhagen extends Table
         return $state['name'];
     }
 
+    // DIFFERENT PLAYERS GET DIFFERENT CARDS DEPENDING ON THEIR STARTING POSITION AND TOTAL PLAYER COUNT
     function getStartingCardsForPlayerNumber( $player_number, $player_count )
     {
 
@@ -399,6 +394,7 @@ class Copenhagen extends Table
         return array_values( $empty_harbors ); 
     }
 
+    // WHICH CARDS ARE ADJACENT TO THE HARBOR WHERE A PLAYER JUST TOOK A CARD?
     function getCardIdsAdjacentToEmptyHarbor()
     {
         $card_ids = [];
@@ -452,6 +448,7 @@ class Copenhagen extends Table
 
     }
 
+    // THE DISCARD IS SHUFFLED INTO THE DECK IF THE MERMAID CARD IS OUT, AND THE MERMAID CARD IS PLACED SOMEWHERE IN THE BOTTOM OF THE DECK
     function shuffleDiscardIntoDeck()
     {
         $this->cards->moveAllCardsInLocation( "discard", "deck");
@@ -466,6 +463,7 @@ class Copenhagen extends Table
         
     }
 
+    // ADD THE MERMAID CARD TO THE SHUFFLED DECK.  DON'T RESHUFFLE AFTERWARDS
     function shuffleInMermaidCard()
     {
         // mix in the mermaid card with other cards
@@ -481,6 +479,7 @@ class Copenhagen extends Table
         }
     }
 
+    // GET AN ARRAY OF ALL THE PLAYERBOARD DATA
     function getPlayerboards()
     {
         $players = self::loadPlayersBasicInfos();
@@ -494,6 +493,7 @@ class Copenhagen extends Table
         return $playerboards;
     }
 
+    // GET DATA OF A SPECIFIC PLAYERBOARD
     function getPlayerboard( $player_id )
     {
         $sql = "SELECT * from board_cell WHERE owner = " . $player_id . " ORDER BY x, y";
@@ -510,6 +510,7 @@ class Copenhagen extends Table
         return $playerboard;
     }
 
+    // GET THE SHAPE DATA OF A POLYOMINO, WITH POSSIBLE FLIPS AND ROTATION 
     function getTransformedShape( $color, $squares, $flip, $rotation )
     {
         // NOTE: In PHP, array assignment creates a copy of the array, so it's not going to corrupt the original
@@ -525,6 +526,7 @@ class Copenhagen extends Table
         return $shape;
     }
 
+    // ROTATE THE POLYOMINO SHAPE DATA
     function rotatePolyominoShape( $polyominoShape )
     {
         for( $i = 0; $i < count($polyominoShape); $i++)
@@ -540,6 +542,7 @@ class Copenhagen extends Table
         return $this->setNewShapeOrigin( $polyominoShape ); 
     }
 
+    // FLIP THE POLYOMINO SHAPE DATA
     function flipPolyominoShape( $polyominoShape )
     {
         for( $i = 0; $i < count($polyominoShape); $i++)
@@ -555,6 +558,7 @@ class Copenhagen extends Table
         return $this->setNewShapeOrigin( $polyominoShape ); 
     }
 
+    // SET THE ORIGIN OF THE SHAPE DATA AFTER FLIPPING OR ROTATING
     function setNewShapeOrigin( $polyominoShape )
     {
         $newOrigin = $polyominoShape[0];
@@ -584,6 +588,7 @@ class Copenhagen extends Table
         return $polyominoShape;
     }
 
+    // FIND THE LOWER LEFT CORNER OF THE BOUNDING BOX OF A GROUP OF GRID CELLS
     function getMinGridCell( $grid_cells )
     {
 
@@ -618,6 +623,7 @@ class Copenhagen extends Table
         return $results;
     }
 
+    // CHECK IF POLYOMINO IS SUPPORTED, OR IF ITS HOVERING
     function isGroundedPosition( $grid_cells, $playerboard )
     {
         for( $i = 0; $i < count($grid_cells); $i++)
@@ -632,6 +638,7 @@ class Copenhagen extends Table
         return false;
     }
 
+    // CHECK IF SHAPE IS ADJACENT TO A PARTICULAR COLOR ON A PARTICULAR PLAYERBOARD
     function isAdjacentToSameColor( $grid_cells, $playerboard, $color )
     {
         for( $i = 0; $i < count($grid_cells); $i++)
@@ -641,6 +648,7 @@ class Copenhagen extends Table
         return false;
     }
 
+    // CHECK IF A SINGLE CELL IS ADJACENT TO A PARTICULAR COLOR ON A PARTICULAR PLAYERBOARD
     function isCellAdjacentToSameColor( $grid_cell, $playerboard, $color )
     {
         foreach( $this->adjacent_offsets as $offset)
@@ -657,6 +665,7 @@ class Copenhagen extends Table
         return false;
     }
 
+    // RETURN HOW MANY POINTS THE PLAYER EARNED FROM A PARTICULAR ROW
     function getRowPoints( $y, $playerboard)
     {
         $windows_only = true;
@@ -671,12 +680,14 @@ class Copenhagen extends Table
         return $points;
     }
 
+    // RETURN IF A ROW IS COMPLETE
     function isRowComplete( $y, $playerboard )
     {
         for( $x = 0; $x < $this->board_width; $x++ ) if( $playerboard[$x][$y]["fill"] == NULL ) return false;
         return true;
     }
 
+    // RETURN HOW MANY POINTS THE PLAYER GOT FOR A PARTICULAR COLUMN
     function getColumnPoints( $x, $playerboard)
     {
 
@@ -692,6 +703,7 @@ class Copenhagen extends Table
         return $points;
     }
 
+    // DETERMINE TIE BREAKER - FILLED SQUARES ON BOARD
     function calculateTieBreaker()
     {
         $players = self::loadPlayersBasicInfos();
@@ -706,6 +718,7 @@ class Copenhagen extends Table
         }
     }
 
+    // GET A CARD FROM THE HARBOR, DOUBLE CHECK THAT IT'S VALID
     function getValidatedHarborCard( $card_id )
     {
         // MAKE SURE CARD EXISTS
@@ -718,6 +731,7 @@ class Copenhagen extends Table
         return $card;
     }
 
+    // GIVE A CARD TO A PLAYER'S HAND
     function givePlayerCard( $player_id, $card_id)
     {
         $this->cards->moveCard( $card_id, "hand", $player_id );
@@ -731,6 +745,8 @@ class Copenhagen extends Table
         self::incStat( 1, "cards_drawn", $player_id );
     }
 
+    // GET ALL THE CARDS OF A PARTICULAR COLOR IN A PLAYER'S HAND
+    // INCLUDING CARDS THAT HAVE BEEN CHANGED TO THAT COLOR
     function getCardsOfColorInHand( $color )
     {
 
@@ -754,6 +770,7 @@ class Copenhagen extends Table
         return array_filter( $cards, function($x) use ($color) { return $x['type'] == $color; });
     }
 
+    // TELL THE CLIENT:  A PLAYER TOOK A CARD
     function notifyPlayersOfTakenCard( $card_id, $color, $player_id, $player_name)
     {
         self::notifyAllPlayers( 
@@ -771,6 +788,7 @@ class Copenhagen extends Table
         );
     }
 
+    // DOUBLE CHECK THAT A PLAYER CAN USE AN ABILITY
     function validateActivatedAbility( $ability_name, $player_id)
     {
 
@@ -781,7 +799,7 @@ class Copenhagen extends Table
         if( $activated == 1 ) throw new feException( self::_("You've already activated that special ability"));
     }
 
-
+    // TELL THE CLIENT: PLAYER ACTIVATED AN ABILITY
     function notifyPlayerOfActivatedAbility( $ability_name, $player_id, $player_name)
     {
 
@@ -801,7 +819,7 @@ class Copenhagen extends Table
         );
     }
 
-
+    // TELL THE CLIENT: PLAYER USED AN ABILITY
     function notifyPlayersOfUsedAbilities( $used_abilities, $player_id, $player_name)
     {
         foreach( $used_abilities as $used_ability)
@@ -851,6 +869,7 @@ class Copenhagen extends Table
         (note: each method below must match an input method in copenhagen.action.php)
     */
 
+    // THE PLAYER TAKES THE FIRST CARD IN A TURN, WITHOUT ANY MODIFIERS
     function takeCard( $card_id )
     {
         self::checkAction( 'takeCard' );
@@ -873,6 +892,7 @@ class Copenhagen extends Table
         $this->gamestate->nextState( "checkHandSize");
     }
 
+    // THE PLAYER TAKES THE SECOND CARD IN A TURN, USUALLY WITH THE ADJACENCY RESTRICTION, UNLESS THERE'S A SPECIAL ABILITY 
     function takeAdjacentCard( $card_id  )
     {
         self::checkAction( 'takeCard' );
@@ -919,6 +939,7 @@ class Copenhagen extends Table
         $this->gamestate->nextState( "checkHandSize");
     }
 
+    // THE PLAYER IS TAKING A CARD WITH THE "ADDITIONAL CARD" ABILITY, MEANING THEY CAN TAKE FROM ANYWHERE
     function takeAdditionalCard( $card_id  )
     {
         self::checkAction( 'takeCard' );
@@ -952,6 +973,7 @@ class Copenhagen extends Table
         $this->gamestate->nextState( "checkHandSize");
     }
 
+    // THE PLAYER IS DISCARDING DOWN 
     function discardDownToMaxHandSize( $card_id )
     {
 
@@ -994,6 +1016,7 @@ class Copenhagen extends Table
 
     }
 
+    // THE PLAYER IS PLACING A POLYOMINO ON THEIR BOARD
     function placePolyomino( $color, $squares, $copy, $x, $y, $flip, $rotation, $discards )
     {
 
@@ -1231,6 +1254,7 @@ class Copenhagen extends Table
 
     }
 
+    // THE PLAYER IS TAKING AN ABILITY TILE
     function takeAbilityTile( $ability_name, $copy)
     {
         
@@ -1276,6 +1300,7 @@ class Copenhagen extends Table
 
     }
 
+    // THE PLAYER IS REFRESHING THEIR USED ABILITIES
     function resetUsedAbilities()
     {
 
@@ -1312,6 +1337,7 @@ class Copenhagen extends Table
     }
 
 
+    // THE PLAYER TURNED ON THE ABILITY "ANY CARDS"
     function activateAbilityAnyCards()
     {
 
@@ -1330,6 +1356,7 @@ class Copenhagen extends Table
         $this->notifyPlayerOfActivatedAbility("any_cards", $player_id, $player_name);
     }
 
+    // THE PLAYER TURNED ON THE ABILITY "ADDITIONAL CARD"
     function activateAbilityAdditionalCard()
     {
 
@@ -1352,6 +1379,7 @@ class Copenhagen extends Table
 
     }
 
+    // THE PLAYER TURNED ON THE ABILITY "BOTH ACTIONS"
     function activateAbilityBothActions()
     {
 
@@ -1374,6 +1402,7 @@ class Copenhagen extends Table
 
     }
 
+    // THE PLAYER TURNED ON THE ABILITY "CONSTRUCTION DISCOUNT"
     function activateAbilityConstructionDiscount()
     {
 
@@ -1393,6 +1422,7 @@ class Copenhagen extends Table
         
     }
 
+    // THE PLAYER TURNED ON THE ABILITY "CHANGE OF COLORS"
     function activateAbilityChangeOfColors($from_color, $to_color)
     {
 
@@ -1433,6 +1463,7 @@ class Copenhagen extends Table
         
     }
 
+    // THE PLAYER REQUESTED TO UNDO THEIR TURN
     function undo()
     {
         self::checkAction("undo");
@@ -1440,6 +1471,7 @@ class Copenhagen extends Table
         $this->gamestate->reloadState();
     }
 
+    // THE PLAYER CONFIRMED THEIR TURN WAS AT AN END
     function endTurn()
     {
         self::checkAction( 'endTurn' );
@@ -1451,11 +1483,12 @@ class Copenhagen extends Table
 ////////////
 
     /*
-        Here, you can create methods defined as "game state arguments" (see "args" property in states.inc.php).
+        These methods define "game state arguments" (see "args" property in states.inc.php).
         These methods function is to return some additional information that is specific to the current
         game state.
     */
 
+    // TELL THE CLIENT WHAT CARDS ARE ADJACENT, AND VALID TO TAKE
     function argTakeAdjacentCard()
     {
         return array(
@@ -1469,10 +1502,11 @@ class Copenhagen extends Table
 ////////////
 
     /*
-        Here, you can create methods defined as "game state actions" (see "action" property in states.inc.php).
+        Methods defined as "game state actions" (see "action" property in states.inc.php).
         The action method of state X is called everytime the current game state is set to X.
     */
 
+    // EACH TIME ITS A NEW PLAYER'S TURN
     function stNextPlayer()
     {
 
@@ -1498,6 +1532,7 @@ class Copenhagen extends Table
         $this->gamestate->nextState("playerTurn");
     }
 
+    // CHECK THAT THE PLAYER DIDN'T EXCEED THE MAX HAND SIZE
     function stCheckHandSize()
     {
         $player_id = self::getActivePlayerId();
@@ -1532,7 +1567,7 @@ class Copenhagen extends Table
     }
 
 
-
+    // REFILL THE HARBOR WITH NEW CARDS
     function stRefillHarbor()
     {
 
@@ -1583,6 +1618,7 @@ class Copenhagen extends Table
         } 
     }
 
+    // CALCULATE THE SCORE OF THE ACTIVE PLAYER
     function stCalculateScore()
     {
         $player_id = self::getActivePlayerId();
@@ -1666,6 +1702,7 @@ class Copenhagen extends Table
         }
     }
 
+    // PLAYER IS GOING TO CLAIM A COAT OF ARMS BONUS
     function stCoatOfArms()
     {
 
@@ -1680,7 +1717,7 @@ class Copenhagen extends Table
 
             self::notifyAllPlayers( 
                 "skippingCoatOfArms", 
-                clienttranslate("Skipping ${player_name}'s coat of arms action, as they can't do any of the 3 actions."  ),
+                clienttranslate('Skipping ${player_name}\'s coat of arms action, as they can\'t do any of the 3 actions.'  ), 
                 array(
                     "player_id" => $player_id,
                     "player_name" => $player_name,

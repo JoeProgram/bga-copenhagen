@@ -13,15 +13,11 @@
  *
  */
 
-/*
-     Note: on the production platform, this file will be compressed and comments will be removed.
-           Consequently, don't hesitate to put as many comments as necessary.
-*/
-
 
 /* Note: you must not use any @import directive */
 
 
+/* TOP LEVEL WRAPPER */
 #copen_wrapper
 {
     text-align: center;
@@ -37,6 +33,9 @@
     cursor:  default !important;
 }
 
+/* The layout is divided into two halves
+ * the "top chunk" is the more important half, being the cards, polyominoes, and the player's board
+ */
 #top_chunk
 {
     vertical-align: text-top;
@@ -46,11 +45,17 @@
     height: 550px;
 }
 
+/* If someone is playing, make sure their space still looks good */
 #top_chunk.copen_spectator
 {
     width: 500px; 
 }
 
+
+/* The layout is divided into two halves
+ * the "bottom chunk" is the less important half, being the other player's boards. 
+ * this part can be displayed inline or wrap, depending on screen space
+ */
 #bottom_chunk
 {
     vertical-align: text-top;
@@ -83,6 +88,7 @@
     background-repeat: no-repeat;
 }
 
+/* Set the position of each of the harbors*/
 #harbor_0{ left:0px; }
 #harbor_1{ left:66px; }
 #harbor_2{ left:132px; }
@@ -90,6 +96,7 @@
 #harbor_4{ left:264px; }
 #harbor_5{ left:330px; }
 #harbor_6{ left:396px; }
+
 
 #deck_cards
 {
@@ -116,6 +123,7 @@
     text-align: center;
 }
 
+/* The count of how many cards remain, shown over the deck*/
 #cards_remaining
 {
     position: absolute;
@@ -130,6 +138,7 @@
     opacity: 0.75; 
 }
 
+/* Shows a small mermaid as a reminder of how the rule works if the mermaid is shuffled into the deck*/
 #small_mermaid_card_slot
 {
     background-image: url('img/tiny_cards.png');
@@ -336,15 +345,18 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
     cursor: grabbing ;
 }
 
-.copen_log_polyomino,
+/* The log_polyominoes are the ones that show up in the gameplay history log.  They can mostly reuse existing styles*/
+.copen_log_polyomino
 {
     display: inline-block;
 }
 
 
+/********************************** POLYOMINO STACKS *******************************/
+
 .copen_stack { position: absolute; }
 .copen_stack .copen_polyomino { position: absolute; }
-.copen_stack .copen_polyomino:nth-child(1) { left: 0px; top: 4px; }
+.copen_stack .copen_polyomino:nth-child(1) { left: 0px; top: 4px; } /* automatically adjust the position of the elements in each stack */
 .copen_stack .copen_polyomino:nth-child(2) { left: 2px; top: 2px; }
 .copen_stack .copen_polyomino:nth-child(3) { left: 4px; top: 0px; }
 
@@ -533,6 +545,9 @@ I'VE TRIED KEEPING THE GRABBING HAND DURING THE WHOLE DRAG OPERATION
 .copen_white-1 .copen_polyomino_image {background-position: -416px -106px; }
 
 /******************** POLYOMINOS REMAINING *************************/
+/* Players were having a hard time counting up remaining polyominoes
+ * and it turned out to be easy and readable just to write the remaining number
+ * on the square that doesn't have a window */
 
 .copen_polyominoes_remaining
 {

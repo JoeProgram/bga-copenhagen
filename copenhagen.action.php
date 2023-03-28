@@ -13,11 +13,9 @@
  * Copenhagen main action entry point
  *
  *
- * In this file, you are describing all the methods that can be called from your
+ * This file describs all the methods that can be called from the
  * user interface logic (javascript).
  *       
- * If you define a method "myAction" here, then you can call it from your javascript code with:
- * this.ajaxcall( "/copenhagen/copenhagen/myAction.html", ...)
  *
  */
   
@@ -40,8 +38,7 @@
       }
   	} 
   	
-  	// TODO: define your action entry points there
-
+    // PLAYER REQUESTS TO TAKE A CARD - 1st of the turn
     public function takeCard()
     {
         self::setAjaxMode();  
@@ -52,6 +49,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO TAKE A CARD - 2nd of the turn
     public function takeAdjacentCard()
     {
         self::setAjaxMode();  
@@ -62,6 +60,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO TAKE A CARD - USING ADDITIONAL CARD ABILITY
     public function takeAdditionalCard()
     {
         self::setAjaxMode();  
@@ -72,6 +71,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO DISCARD A CARD
     public function discardDownToMaxHandSize()
     {
         self::setAjaxMode();  
@@ -82,6 +82,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO PLACE A POLYOMINO
     public function placePolyomino()
     {
         self::setAjaxMode();  
@@ -104,6 +105,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO TAKE AN ABILITY TILE
     public function takeAbilityTile()
     {
         self::setAjaxMode();  
@@ -116,6 +118,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO ACTIVATE THE "ANY CARDS" ABILITY
     public function activateAbilityAnyCards()
     {
         self::setAjaxMode();  
@@ -123,6 +126,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO ACTIVATE THE "ADDITIONAL CARD" ABILITY
     public function activateAbilityAdditionalCard()
     {
         self::setAjaxMode();  
@@ -130,6 +134,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO ACTIVATE THE "BOTH ACTIONS" ABILITY
     public function activateAbilityBothActions()
     {
         self::setAjaxMode();  
@@ -137,6 +142,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO ACTIVATE THE "CONSTRUCTION DISCOUNT" ABILITY
     public function activateAbilityConstructionDiscount()
     {
         self::setAjaxMode();  
@@ -144,6 +150,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO ACTIVATE THE "CHANGE OF COLORS" ABILITY
     public function activateAbilityChangeOfColors()
     {
         self::setAjaxMode();  
@@ -156,6 +163,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO RESET THEIR USED ABILITIES
     public function resetUsedAbilities()
     {
         self::setAjaxMode();  
@@ -163,6 +171,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER REQUESTS TO UNDO THEIR TURN
     public function undo()
     {
         self::setAjaxMode();  
@@ -170,6 +179,7 @@
         self::ajaxResponse(); 
     }
 
+    // PLAYER CONFIRMS THEIR TURN IS OVER
     public function endTurn()
     {
         self::setAjaxMode();  
