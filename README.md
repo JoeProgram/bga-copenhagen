@@ -29,14 +29,14 @@ In addition to the basic table stakes implementation, I put some extra time into
 
 - **copenhagen.css**: Contains all the styling CSS for the game
 
-- **copenhagen.js**: Contains all the client-side logic and AJAX requests and callbacks to the server.
+- **:crown:copenhagen.js**: Contains all the client-side logic and AJAX requests and callbacks to the server.
 
 ## Back End
 - **states.inc.php** - defines a state machine of how the game works, which can determine which actions and state transitions are allowed.
 
 - **copenhagen.action.php** - defines the URLs the client is allowed to call on the server, and does some basic sanitization on provided parameters.
 
-- **copenhagen.game.php** - the controller of the MVC, does all the heavy lifting of the server work: processing the client requests, checking input parameters, modifying the database, transitioning the game from one state to another, and returning data to the proper clients. While the javascript client handles some of the rules of the game to make for an accessible experience, the server handles all the rules of the game, to make sure no illegal moves are allowed from a hacked client.
+- **:crown:copenhagen.game.php** - the controller of the MVC, does all the heavy lifting of the server work: processing the client requests, checking input parameters, modifying the database, transitioning the game from one state to another, and returning data to the proper clients. While the javascript client handles some of the rules of the game to make for an accessible experience, the server handles all the rules of the game, to make sure no illegal moves are allowed from a hacked client.
 
 - **dbmodel.sql** - The database that holds all of the information about the game state, so that it can be manipulated and restored at any time.  Every single game instance played on Board Game Arena has its own database.
 
@@ -59,7 +59,6 @@ In addition to the basic table stakes implementation, I put some extra time into
 - **Polyominoes** - aka "Tetris Pieces" or "Facade Tiles."
 - **Polyomino Origin** - the lowest, left-most square of the shape.  Since polyominoes can be irregular, there's not a super clear system of what their "origin" should be.
 - **Polyomin Min Grid Cell** - a different sort of origin - the bottom left corner of the polyomino's "bounding box."  Because of the nature of polyominoes, there may or may not be an actual square in this grid cell, depending on the type of piece and its rotation and flip.
-- **Position Selected Polyomino vs Place Selected Polyomino** - positioning is all done on the client side, and is akin to the player holding up the piece above their board and saying "hm..." as they rotate it around.  Placing it is submitted to the server, similar to a player actually putting a piece into its final spot.
 - **Shape** - a list of local coordinates that represent the shape of a polyomino, that can be rotated, flipped, and used to check for valid placement.
 
 
